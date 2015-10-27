@@ -30,6 +30,7 @@ app.use('/v1', require('./proxy'));
 
 app.use('/create', express.static('./build/index.html'));
 app.use('/profile', express.static('./build/index.html'));
+app.use('/setup', express.static('./build/index.html'));
 
 console.log('About to crank up node');
 console.log('PORT=' + port);

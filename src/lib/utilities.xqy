@@ -2,6 +2,9 @@ xquery version "1.0-ml";
 
 module namespace utilities = "http://marklogic.com/utilities";
 
+import module namespace json = "http://marklogic.com/xdmp/json"
+    at "/MarkLogic/json/json.xqy";
+
 declare default function namespace "http://www.w3.org/2005/xpath-functions";
 
 (:
@@ -44,4 +47,90 @@ declare function utilities:send-notification(
 
 declare function utilities:highlight($doc, $query) {
   cts:highlight($doc, $query, <span class="highlight">{$cts:text}</span>)
+};
+
+declare function utilities:transform-json-config() {
+  let $c := json:config("custom") ,
+    $cx := map:put( $c, "whitespace", "ignore" ),
+    $cx := map:put( $c, "array-element-names" ,('included-element','excluded-element','word-lexicon')),
+    $cx := map:put( $c, "attribute-names", ()),
+    $cx := map:put( $c , "camel-case", fn:true() )
+  return $c
+};
+
+declare variable $json-config := utilities:transform-json-config();
+
+declare function utilities:transform-from-json(
+  $node as node()
+) as node()*
+{
+  let $list-name := utilities:camel-case-to-hyphenated(fn:local-name-from-QName(fn:node-name($node/array-node())))
+  let $items := utilities:add-dbnamespace(json:transform-from-json($node, $json-config))
+  return
+    element {$list-name} {
+      $items/node()
+    }
+};
+
+declare function utilities:add-dbnamespace(
+  $node as node()
+) as node()
+{
+  typeswitch($node)
+  case element() return
+    let $local-name := fn:local-name($node)
+    let $namespace :=
+      if ($local-name = ("rangeindex-list", "field-list")) then
+        ""
+      else
+        "http://marklogic.com/xdmp/database"
+    return
+      element {fn:QName($namespace, $local-name)} {
+        utilities:add-dbnamespace($node/(@*|node()))
+      }
+  default return
+    $node
+};
+
+declare function utilities:transform-to-json(
+  $node as element()
+) as node()
+{
+  let $local-name := fn:local-name($node)
+  let $camel-case := utilities:hyphenated-to-camel-case($local-name)
+  return
+    object-node {
+      $camel-case: array-node {
+        $node/* ! json:transform-to-json-object(., $json-config)
+      }
+    }
+};
+
+declare
+function utilities:hyphenated-to-camel-case(
+  $string as xs:string
+) as xs:string {
+  let $words := cts:tokenize($string)[. instance of cts:word]
+  return
+    fn:string-join(
+      (fn:head($words),
+      for $word in fn:tail($words)
+      return
+        fn:upper-case(fn:substring($word,1,1)) || fn:substring($word,2)
+      ),
+      ''
+    )
+};
+
+declare
+function utilities:camel-case-to-hyphenated(
+  $string as xs:string
+) as xs:string {
+  fn:lower-case(
+    fn:replace(
+      $string,
+      "([a-z])([A-Z])",
+      "$1-$2"
+    )
+  )
 };

@@ -1,0 +1,13 @@
+<div class="col-md-12">
+  <div ng-repeat="chart in populatedConfigs" class="col-md-12">
+    <div>
+      <div class="row" ng-if="removeChart">
+        <a class="pull-right" ng-click="removeChart($index)"><i class="glyphicon glyphicon-trash">&nbsp;</i></a>
+        <a class="pull-right" ng-click="editChart(chart, $index)"><i class="glyphicon glyphicon-cog">&nbsp;</i></a>
+      </div>
+      <div class="clearfix">
+        <ml-highchart highchart-config="chart" ml-search="mlSearch"></ml-highchart>
+      </div>
+    </div>
+  </div>
+</div>

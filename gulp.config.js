@@ -32,6 +32,7 @@ module.exports = function() {
     marklogic: {
       version: 8,
       host: 'localhost',
+      manageHttpPort: '8002',
       httpPort: '8040',
       xccPort: '8041',
       user: 'admin',

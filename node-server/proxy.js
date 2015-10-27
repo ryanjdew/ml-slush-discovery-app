@@ -9,6 +9,7 @@ var config = require('../gulp.config')();
 var options = {
   mlHost: process.env.ML_HOST || config.marklogic.host,
   mlHttpPort: process.env.ML_PORT || config.marklogic.httpPort,
+  mlManageHttpPort: process.env.ML_MNG_PORT || config.marklogic.manageHttpPort,
   defaultUser: process.env.ML_APP_USER || config.marklogic.user,
   defaultPass: process.env.ML_APP_PASS || config.marklogic.password
 };
@@ -19,13 +20,7 @@ var options = {
 // For any other GET request, proxy it on to MarkLogic.
 router.get('*', function(req, res) {
   noCache(res);
-  if (req.session.user === undefined) {
-    res.status(401).send('Unauthorized');
-  } else {
-    proxy(req, res);
-  }
-  // To not require authentication, simply use the proxy below:
-  //proxy(req, res);
+  proxy(req, res);
 });
 
 router.put('*', function(req, res) {
@@ -46,7 +41,19 @@ router.put('*', function(req, res) {
   }
 });
 
-// Require authentication for POST requests
+// Don't require authentication for POST search requests
+router.post('/search*', function(req, res) {
+  noCache(res);
+  proxy(req, res);
+});
+
+// Don't require authentication for POST value requests
+router.post('/value*', function(req, res) {
+  noCache(res);
+  proxy(req, res);
+});
+
+// Require authentication for other POST requests
 router.post('*', function(req, res) {
   noCache(res);
   if (req.session.user === undefined) {

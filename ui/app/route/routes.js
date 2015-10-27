@@ -3,7 +3,7 @@
 
   angular.module('app')
     .run(['loginService', function(loginService) {
-      loginService.protectedRoutes(['root.search', 'root.create', 'root.profile']);
+      loginService.protectedRoutes(['root.create', 'root.profile', 'root.setup']);
     }])
     .config(Config);
 
@@ -100,6 +100,12 @@
         templateUrl: 'app/login/login-full.html',
         controller: 'LoginFullCtrl',
         controllerAs: 'ctrl'
+      })
+      .state('root.setup', {
+        url: '/setup',
+        templateUrl: 'app/setup/index.html',
+        controller: 'SetupCtrl',
+        controllerAs: 'ctrl'
       });
-  }
+    }
 }());

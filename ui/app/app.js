@@ -13,6 +13,7 @@
     'app.login',
     'app.root',
     'app.search',
+    'app.setup',
     'app.user',
     'ui.bootstrap',
     'ui.router',

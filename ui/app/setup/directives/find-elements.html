@@ -1,0 +1,27 @@
+<div class="form-group">
+  <h3>{{title}} <a class="pull-right" ng-click="add()"><i class="glyphicon glyphicon-plus-sign"></i> Add</a></h3>
+  <table>
+    <thead>
+      <tr>
+        <th>namespace</th>
+        <th>name</th>
+        <th>attribute namespace</th>
+        <th>attribute name</th>
+        <th>attribute value</th>
+        <th class="col-sm-2">weight</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="fieldElement in fieldElements">
+        <td><input type="text" ng-model="fieldElement['namespace-uri']"/></td>
+        <td><input type="text" ng-model="fieldElement.localname"/></td>
+        <td><input type="text" ng-model="fieldElement['attribute-namespace-uri']"/></td>
+        <td><input type="text" ng-model="fieldElement['attribute-localname']"/></td>
+        <td><input type="text" ng-model="fieldElement['attribute-value']"/></td>
+        <td class="col-sm-2"><input class="col-sm-12" type="number" ng-model="fieldElement.weight"/></td>
+        <td><a class="pull-right" ng-click="remove($index)"><i class="glyphicon glyphicon-trash"></i></a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

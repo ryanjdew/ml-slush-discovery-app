@@ -10,6 +10,9 @@
 
     <!-- build:css styles/lib.css -->
     <!-- bower:css -->
+    <link rel="stylesheet" href="/bower_components/highlightjs/styles/default.css" />
+    <link rel="stylesheet" href="/bower_components/ng-json-explorer/dist/angular-json-explorer.css" />
+    <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -17,6 +20,7 @@
 
     <!-- build:css styles/app.css -->
     <!-- inject:css -->
+    <link rel="stylesheet" href="/.tmp/main.css">
     <!-- endinject -->
     <!-- endbuild -->
 
@@ -27,12 +31,78 @@
 
     <!-- build:js js/lib.js -->
     <!-- bower:js -->
+    <script src="/bower_components/jquery/dist/jquery.js"></script>
+    <script src="/bower_components/angular/angular.js"></script>
+    <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="/bower_components/highlightjs/highlight.pack.js"></script>
+    <script src="/bower_components/angular-highlightjs/build/angular-highlightjs.js"></script>
+    <script src="/bower_components/angular-mocks/angular-mocks.js"></script>
+    <script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="/bower_components/tinymce-dist/tinymce.min.js"></script>
+    <script src="/bower_components/angular-ui-tinymce/src/tinymce.js"></script>
+    <script src="/bower_components/x2js/xml2json.min.js"></script>
+    <script src="/bower_components/angular-x2js/dist/x2js.min.js"></script>
+    <script src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="/bower_components/lodash/lodash.js"></script>
+    <script src="/bower_components/highcharts/highcharts.js"></script>
+    <script src="/bower_components/highcharts/highcharts-more.js"></script>
+    <script src="/bower_components/highcharts/modules/exporting.js"></script>
+    <script src="/bower_components/highcharts-ng/dist/highcharts-ng.js"></script>
+    <script src="/bower_components/ml-common-ng/dist/ml-common-ng.js"></script>
+    <script src="/bower_components/ml-search-ng/dist/ml-search-ng.js"></script>
+    <script src="/bower_components/ml-search-ng/dist/ml-search-ng-tpls.js"></script>
+    <script src="/bower_components/ml-highcharts-ng/dist/ml-highcharts-ng.min.js"></script>
+    <script src="/bower_components/ml-highcharts-ng/dist/ml-highcharts-ng-tpls.min.js"></script>
+    <script src="/bower_components/ml-utils/ml-utils.js"></script>
+    <script src="/bower_components/ng-json-explorer/dist/angular-json-explorer.js"></script>
+    <script src="/bower_components/ng-sortable/dist/ng-sortable.js"></script>
+    <script src="/bower_components/vkbeautify-wrapper/dist/vkbeautify.0.99.00.beta.js"></script>
     <!-- endbower -->
     <script src="/bower_components/tinymce-dist/themes/modern/theme.js"></script>
     <!-- endbuild -->
 
     <!-- build:js js/app.js -->
     <!-- inject:js -->
+    <script src="/ui/app/create/create.module.js"></script>
+    <script src="/ui/app/detail/detail.module.js"></script>
+    <script src="/ui/app/detail/similar.module.js"></script>
+    <script src="/ui/app/error/error.module.js"></script>
+    <script src="/ui/app/login/login.module.js"></script>
+    <script src="/ui/app/message-board/message-board.module.js"></script>
+    <script src="/ui/app/root/root.module.js"></script>
+    <script src="/ui/app/search/search.module.js"></script>
+    <script src="/ui/app/search/snippet.module.js"></script>
+    <script src="/ui/app/setup/setup.module.js"></script>
+    <script src="/ui/app/user/user.module.js"></script>
+    <script src="/ui/app/app.js"></script>
+    <script src="/ui/app/create/create.controller.js"></script>
+    <script src="/ui/app/detail/detail.controller.js"></script>
+    <script src="/ui/app/detail/similar-directive.js"></script>
+    <script src="/ui/app/error/errorInterceptor.service.js"></script>
+    <script src="/ui/app/login/login.controller.js"></script>
+    <script src="/ui/app/login/login.directive.js"></script>
+    <script src="/ui/app/login/login.service.js"></script>
+    <script src="/ui/app/login/loginInterceptor.service.js"></script>
+    <script src="/ui/app/message-board/message-board.directive.js"></script>
+    <script src="/ui/app/message-board/message-board.service.js"></script>
+    <script src="/ui/app/root/root.controller.js"></script>
+    <script src="/ui/app/route/routes.js"></script>
+    <script src="/ui/app/search/facet-charts.directive.js"></script>
+    <script src="/ui/app/search/search.controller.js"></script>
+    <script src="/ui/app/search/snippet.directive.js"></script>
+    <script src="/ui/app/setup/dialogs/editGeospatialIndex.js"></script>
+    <script src="/ui/app/setup/dialogs/editRangeIndex.js"></script>
+    <script src="/ui/app/setup/dialogs/field.js"></script>
+    <script src="/ui/app/setup/dialogs/newGeospatialIndex.js"></script>
+    <script src="/ui/app/setup/dialogs/newRangeIndex.js"></script>
+    <script src="/ui/app/setup/directives/find-elements.js"></script>
+    <script src="/ui/app/setup/directives/finder.js"></script>
+    <script src="/ui/app/setup/setup.controller.js"></script>
+    <script src="/ui/app/setup/setup.service.js"></script>
+    <script src="/ui/app/user/profile.controller.js"></script>
+    <script src="/ui/app/user/user.directive.js"></script>
+    <script src="/ui/app/user/user.service.js"></script>
     <!-- endinject -->
 
     <!-- inject:templates:js -->
