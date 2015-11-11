@@ -201,8 +201,8 @@
 
     serverConfig.setRangeIndexes = function(rangeIndexes) {
       var dbProperties = {};
-      for (var prop in rangeIndexTypes) {
-        dbProperties[prop] = [];
+      for (var key in rangeIndexTypes) {
+        dbProperties[rangeIndexTypes[key]] = [];
       }
       for (var key in rangeIndexes['range-index-list']) {
         var type = Object.keys(rangeIndexes['range-index-list'][key])[0];

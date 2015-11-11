@@ -5,6 +5,7 @@
 var router = require('express').Router();
 var http = require('http');
 var config = require('../gulp.config')();
+var manageML = require('./manage-ml');
 
 var options = {
   mlHost: process.env.ML_HOST || config.marklogic.host,
@@ -87,7 +88,16 @@ function getAuth(options, session) {
 
 // Generic proxy function used by multiple HTTP verbs
 function proxy(req, res) {
-  var queryString = req.originalUrl.split('?')[1];
+  var origUrl = req.originalUrl;
+  var separator = /\?/.test(origUrl) ? '&' : '?';
+  var databaseParam;
+  if (/^\/(alert|documents|graphs|keyvalue|qbe|resources|search|suggest|values)/.test(req.path)) {
+    databaseParam = separator + 'database=' + manageML.database();
+  }
+  if (databaseParam) {
+    origUrl = origUrl + databaseParam;
+  }
+  var queryString = origUrl.split('?')[1];
   var path = '/v1' + req.path + (queryString ? '?' + queryString : '');
   console.log(
     req.method + ' ' + req.path + ' proxied to ' +

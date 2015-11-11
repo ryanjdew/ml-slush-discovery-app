@@ -7,6 +7,7 @@ var four0four = require('./utils/404')();
 var http = require('http');
 var config = require('../gulp.config')();
 var q = require('q');
+var manageML = require('./manage-ml');
 
 var options = {
   appPort: process.env.APP_PORT || config.defaultPort,
@@ -14,18 +15,8 @@ var options = {
   mlHttpPort: process.env.ML_PORT || config.marklogic.httpPort,
   mlManageHttpPort: process.env.ML_MNG_PORT || config.marklogic.manageHttpPort,
   defaultUser: process.env.ML_APP_USER || config.marklogic.user,
-  defaultPass: process.env.ML_APP_PASS || config.marklogic.password,
-  database: 'Documents'
+  defaultPass: process.env.ML_APP_PASS || config.marklogic.password
 };
-
-var serverConfigObj = {};
-
-serverConfig().then(function(sConfig) {
-  if (sConfig) {
-    options.database = sConfig.database;
-    serverConfigObj = sConfig;
-  }
-});
 
 router.get('/user/status', function(req, res) {
   var headers = req.headers;
@@ -147,7 +138,7 @@ router.get('/user/logout', function(req, res) {
 });
 
 router.get('/server/search-options', function(req, res) {
-  passOnToML(
+  manageML.passOnToML(
     req,
     res,
     {
@@ -159,7 +150,7 @@ router.get('/server/search-options', function(req, res) {
 });
 
 router.put('/server/search-options', function(req, res) {
-  passOnToML(
+  manageML.passOnToML(
     req,
     res,
     {
@@ -172,53 +163,52 @@ router.put('/server/search-options', function(req, res) {
 });
 
 router.put('/server/ui-config', function(req, res) {
-  uiConfig(res, req.body);
+  manageML.uiConfig(res, req.body);
 });
 
 router.get('/server/ui-config', function(req, res) {
-  uiConfig(res);
+  manageML.uiConfig(res);
 });
 
 router.put('/server/charts', function(req, res) {
-  chartConfig(res, req.body);
+  manageML.chartConfig(res, req.body);
 });
 
 router.get('/server/charts', function(req, res) {
-  chartConfig(res);
+  manageML.chartConfig(res);
 });
 
 router.put('/server/database', function(req, res) {
   if (req.body && req.body['database-name']) {
-    serverConfigObj.database = req.body['database-name'];
-    options.database = req.body['database-name'];
-    serverConfig({
-      'server-config': serverConfigObj
+    manageML.serverConfig({
+      'database': req.body['database-name']
     });
   }
-  passOnToMLManage(
+  console.log('/manage/v2/databases/' + manageML.database() + '/properties');
+  manageML.passOnToMLManage(
     req,
     res, {
       method: 'PUT',
       data: req.body,
       params: {format: 'json'},
-      path: '/manage/v2/databases/' + options.database + '/properties'
+      path: '/manage/v2/databases/' + manageML.database() + '/properties'
     }
   );
 });
 
 router.get('/server/database', function(req, res) {
-  passOnToMLManage(
+  manageML.passOnToMLManage(
     req,
     res, {
       method: 'GET',
       params: {format: 'json'},
-      path: '/manage/v2/databases/' + options.database + '/properties'
+      path: '/manage/v2/databases/' + manageML.database() + '/properties'
     }
   );
 });
 
 router.get('/server/databases', function(req, res) {
-  passOnToMLManage(
+  manageML.passOnToMLManage(
     req,
     res, {
       method: 'GET',
@@ -229,7 +219,7 @@ router.get('/server/databases', function(req, res) {
 });
 
 router.get('/server/database/load-data', function(req, res) {
-  passOnToML(
+  manageML.passOnToML(
     req,
     res, {
       method: 'POST',
@@ -242,7 +232,7 @@ router.get('/server/database/load-data', function(req, res) {
 });
 
 router.get('/server/database/content-metadata', function(req, res) {
-  passOnToML(
+  manageML.passOnToML(
     req,
     res, {
       method: 'GET',
@@ -262,132 +252,6 @@ function noCache(response) {
   response.append('Pragma', 'no-cache'); //HTTP 1.0
   response.append('Expires', 'Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
 }
-
-function serverConfig(data) {
-  var d = q.defer();
-  genericConfig('server-config', new MockRes(d), data);
-  return d.promise.then(function(data) {
-    if (data && data['server-config']) {
-      return data['server-config'];
-    }
-    return data;
-  });
-}
-
-function chartConfig(res, data) {
-  genericConfig('charts', res, data);
-}
-
-function uiConfig(res, data) {
-  genericConfig('ui-config', res, data);
-}
-
-function genericConfig(name, res, data) {
-  var opt = {
-      method: 'GET',
-      params: {
-        uri: '/discovery-app/config/' + name + '.json',
-        database: 'Documents'
-      },
-      path: '/v1/documents'
-    };
-  if (data) {
-    opt.method = 'PUT';
-    opt.data = data;
-  }
-  passOnToML(
-    {
-      headers: {}
-    },
-    res,
-    opt
-  );
-}
-
-function passOnToMLManage(req, res, transferOptions) {
-  passOnToML(req, res, transferOptions, options.mlManageHttpPort);
-}
-
-function passOnToML(req, res, transferOptions, port) {
-  var params = [];
-  var chunks = [];
-  var responseTransform = transferOptions.responseTransform;
-  var databaseInParams = false;
-  for (var key in transferOptions.params) {
-    if (key === 'database') {
-      databaseInParams = true;
-    }
-    params.push(key + '=' + transferOptions.params[key]);
-  }
-
-  if (!(databaseInParams || /\/(config|manage)\//.test(transferOptions.path))) {
-    params.push('database=' + options.database);
-  }
-
-  var mlReq = http.request({
-    hostname: options.mlHost,
-    port: port || options.mlHttpPort,
-    method: transferOptions.method,
-    path: [transferOptions.path, params.join('&')].join('?'),
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    auth: getAuth(options, req.session)
-  }, function(response) {
-
-    for (var header in response.headers) {
-      res.header(header, response.headers[header]);
-    }
-
-    res.status(response.statusCode);
-    response.on('data', function(chunk) {
-      chunks.push(chunk);
-    });
-    response.on('end', function() {
-      var str = chunks.join('');
-      if (responseTransform) {
-        var transformedStr = responseTransform(str);
-        if (transformedStr) {
-          res.write(transformedStr);
-        }
-      } else {
-        res.write(str);
-      }
-      res.end();
-    });
-  });
-
-  mlReq.on('error', function(e) {
-    console.log('Problem with request: ' + e.message);
-  });
-  if (transferOptions.data) {
-    mlReq.write(JSON.stringify(transferOptions.data));
-  }
-  mlReq.end();
-}
-
-function MockRes(p) {
-  this.code = 0;
-  this.deferred = p;
-}
-MockRes.prototype.write = function(d) {
-  this.response = d;
-};
-MockRes.prototype.end = function() {
-  // console.log('MockRes end, code:', this.code, this.response);
-  if (this.code === 200) {
-    this.deferred.resolve(this.response.data);
-  } else {
-    this.deferred.reject({
-      code: this.code,
-      response: this.response
-    });
-  }
-};
-MockRes.prototype.header = function() {};
-MockRes.prototype.status = function(code) {
-  this.code = code;
-};
 
 function getAuth(options, session) {
   var auth = null;

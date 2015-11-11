@@ -6,26 +6,10 @@
   /**
    * @ngdoc controller
    * @kind constructor
-   * @name EditGeoIndexCtrl
+   * @name EditIndexCtrl
    * @description
-   * Controller for {@link loginDialog}. The controller is injected by the
-   * $modal service. Provides a user interface for authenticating a user.
-   * Upon instantiation the `loginDialogCtlr` creates an empty instance of
-   * {@link ssSession} for handling authentication. See
-   * <a href="http://angular-ui.github.io/bootstrap/"
-   * target="_blank">ui.bootstrap.modal</a> for more information.
-   *
-   * @param {angular.Scope} $scope (injected)
-   * @param {ui.bootstrap.modal.$modalInstance} $modalInstance (injected)
-   * @param {object} ssSession Session object
-   * @param {object} mlAuth Authentication object
-   *
-   * @property {string} $scope.error If present, indicates what error
-   * occurred while attempting to authenticate a user.
-   * @property {string} $scope.session.username The username input.
-   * @property {string} $scope.session.password The password input.
    */
-  module.controller('EditGeoIndexCtrl', ['$modalInstance', '$scope', 'ServerConfig', 'index', 'indexType', function ($modalInstance, $scope, ServerConfig, index, indexType) {
+  module.controller('EditConstraintCtrl', ['$modalInstance', '$scope', 'ServerConfig', 'index', 'indexType', function ($modalInstance, $scope, ServerConfig, index, indexType) {
       $scope.indexType = indexType;
       $scope.index = index;
       $scope.save = function () {
@@ -40,10 +24,10 @@
    * @description A UI Bootstrap component that provides a modal dialog for
    * adding a range index to the application.
    */
-  module.factory('editGeospatialIndexDialog', [
+  module.factory('EditConstraintDialog', [
     '$modal',
     function ($modal) {
-      return function (index) {
+      return function (constraint) {
         var indexValue,
             indexType;
         angular.forEach(index, function(val, keyName){
@@ -54,7 +38,7 @@
         });
         return $modal.open({
             templateUrl: 'app/setup/dialogs/editGeospatialIndex.html',
-            controller: 'EditGeoIndexCtrl',
+            controller: 'EditConstraintCtrl',
             size: 'lg',
             resolve: {
               index: function() {

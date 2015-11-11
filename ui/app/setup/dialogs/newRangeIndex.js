@@ -45,6 +45,7 @@
             },
             objProperty = indexTypeToObjProperty[$scope.indexType];
           index[objProperty] = {
+            'collation': null,
             'range-value-positions': false,
             'invalid-values': 'ignore'
           };

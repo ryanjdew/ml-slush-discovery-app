@@ -55,7 +55,14 @@ declare function data:get-sample-docs(
     $amount as xs:integer
 ) as node()*
 {
-  (collection()/node())[1 to $amount]
+  let $sample-positions as xs:integer+ := (1 to $amount)
+  let $unique-root-qnames as xs:QName* := data:find-unique-root-qnames("xml")
+  for $root-qname as xs:QName in $unique-root-qnames
+  return
+    cts:search(fn:collection()/element(),
+      cts:element-query($root-qname,cts:and-query(()),"self"),
+      "format-xml"
+    )[fn:position() = $sample-positions]
 };
 
 
@@ -64,5 +71,43 @@ declare function data:get-sample-properties(
     $localname as xs:string
 ) as element()*
 {
-    (collection()/node())[1 to $amount]/property::*[starts-with(local-name(), $localname,"http://marklogic.com/collation//S1")]
+  let $sample-positions as xs:integer+ := (1 to $amount)
+  let $unique-root-qnames as xs:QName* := data:find-unique-root-qnames("xml")
+  for $root-qname as xs:QName in $unique-root-qnames
+  return
+    cts:search(fn:collection()/element(),
+      cts:element-query($root-qname,cts:and-query(()),"self"),
+      "format-xml"
+    )[fn:position() = $sample-positions]/property::*[starts-with(local-name(), $localname,"http://marklogic.com/collation//S1")]
+};
+
+declare variable $sample-positions as xs:integer+ := (1 to 5);
+
+declare function data:find-unique-root-qnames($format as xs:string?, $found-qnames as xs:QName*) {
+  let $next-qname := fn:distinct-values(cts:search(fn:collection(),
+      if (fn:exists($found-qnames))
+      then
+        if ($format = "json") then
+          cts:not-query(cts:json-property-scope-query(($found-qnames ! fn:string(.)), cts:and-query(())))
+        else
+          cts:not-query(cts:element-query($found-qnames,cts:and-query(()),"self"))
+      else cts:and-query(()),
+      (
+        if (fn:exists($format)) then
+          "format-" || $format
+        else (),
+        "score-random",
+        "unfaceted",
+        "filtered"
+      )
+    )[fn:position() = $sample-positions]/(.|object-node())/node()/fn:node-name(.))
+  return if (fn:exists($next-qname))
+          then data:find-unique-root-qnames($format, ($found-qnames,$next-qname))
+          else $found-qnames
+};
+
+declare function data:find-unique-root-qnames($format as xs:string?) {
+  for $qn in data:find-unique-root-qnames($format, ())
+  order by string($qn)
+  return $qn
 };

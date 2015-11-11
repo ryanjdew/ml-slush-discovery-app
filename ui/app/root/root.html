@@ -21,8 +21,10 @@
 <!-- Add your site or application content here -->
 <div class=" content">
   <div class="container">
-    <message-board msg="ctrl.messageBoardService.message()"></message-board>
-    <div ng-hide="ctrl.messageBoardService.message()">
+    <div class="alert alert-danger" role="alert" ng-if="ctrl.messageBoardService.message()">
+      <message-board msg="ctrl.messageBoardService.message()"></message-board>
+    </div>
+    <div>
       <ui-view></ui-view>
     </div>
   </div>
