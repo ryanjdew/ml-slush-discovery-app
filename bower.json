@@ -15,7 +15,7 @@
     "highlightjs": "~8.7.0",
     "jquery": "~2.1.4",
     "lodash": "~3.10.1",
-    "ml-highcharts-ng": "git@github.com:ryanjdew/ml-highcharts-ng.git",
+    "ml-highcharts-ng": "ryanjdew/ml-highcharts-ng",
     "ml-search-ng": "~0.2.0",
     "ml-utils": "withjam/ml-utils",
     "ng-json-explorer": "8c2a0f9104",
@@ -37,6 +37,6 @@
   },
   "private": true,
   "resolutions": {
-    "angular": "1.4.7"
+    "angular": "1.4.8"
   }
 }

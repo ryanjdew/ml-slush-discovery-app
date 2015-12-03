@@ -30,7 +30,7 @@
       return function (constraint) {
         var indexValue,
             indexType;
-        angular.forEach(index, function(val, keyName){
+        angular.forEach(constraint, function(val, keyName){
           if (keyName === 'geospatial-element-index' || keyName === 'geospatial-element-pair-index' || keyName === 'geospatial-element-attribute-pair-index') {
             indexType = keyName;
             indexValue = val;

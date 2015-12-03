@@ -5,7 +5,7 @@
     .controller('SetupCtrl', SetupCtrl);
 
   SetupCtrl.$inject = [
-    '$modal', '$scope', 'ServerConfig',
+    '$modal', '$scope', '$timeout', 'ServerConfig',
     '$window', 'MLSearchFactory',
     'newGeospatialIndexDialog', 'editGeospatialIndexDialog',
     'newRangeIndexDialog', 'editRangeIndexDialog',
@@ -14,12 +14,12 @@
   ];
 
   function SetupCtrl(
-    $modal, $scope, ServerConfig,
+    $modal, $scope, $timeout, ServerConfig,
     win, searchFactory,
     newGeospatialIndexDialog, editGeospatialIndexDialog,
     newRangeIndexDialog, editRangeIndexDialog,
     fieldDialog,
-    EditChartConfigDialog
+    editChartConfigDialog
   ) {
     var model = {};
     var mlSearch = searchFactory.newContext();
@@ -144,13 +144,25 @@
         });
       },
       loadData: function() {
-        ServerConfig.loadData($scope.loadDirectory).then(function(data) {
-          $scope.loadDataInfo = data;
-          model.dataCollections.push(data.collection);
-          updateSearchResults().then(function() {
-            $scope.state = 'appearance';
+        var uploaderInput = document.getElementById('directoryUploader');
+        var allFiles = uploaderInput.files;
+        $scope.isUploading = true;
+        $scope.currentFilesToUpload = allFiles.length;
+        $scope.currentFilesUploaded = 0;
+        ServerConfig.bulkUpload(allFiles).then(function(data) {
+            updateSearchResults().then(function() {
+              $scope.state = 'appearance';
+            });
+            $scope.isUploading = false;
+            try {
+              uploaderInput.value = '';
+            } catch (e) {}
+            $scope.currentFilesToUpload = 0;
+            $scope.currentFilesUploaded = 0;
+          }, handleError,
+          function(updatedCount) {
+            $scope.currentFilesUploaded = updatedCount;
           });
-        }, handleError);
       },
       removeCollection: function(index) {
         ServerConfig.removeDataCollection(model.dataCollections[index]).then(function() {
@@ -178,13 +190,13 @@
         });
       },
       editChart: function(eChart, index) {
-        EditChartConfigDialog(model.search.facets, eChart).then(function(chart) {
+        editChartConfigDialog(model.search.facets, eChart).then(function(chart) {
           model.chartData.charts[index] = chart;
           ServerConfig.setCharts(model.chartData).then(updateSearchResults, handleError);
         });
       },
       addChart: function() {
-        EditChartConfigDialog(model.search.facets).then(function(chart) {
+        editChartConfigDialog(model.search.facets).then(function(chart) {
           model.chartData.charts.push(chart);
           ServerConfig.setCharts(model.chartData).then(updateSearchResults, handleError);
         });

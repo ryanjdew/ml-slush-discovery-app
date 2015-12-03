@@ -3,6 +3,8 @@
 'use strict';
 
 var router = require('express').Router();
+
+var bodyParser = require('body-parser');
 var four0four = require('./utils/404')();
 var http = require('http');
 var config = require('../gulp.config')();
@@ -18,6 +20,8 @@ var options = {
   defaultPass: process.env.ML_APP_PASS || config.marklogic.password
 };
 
+router.use(bodyParser.urlencoded({extended: true}));
+router.use(bodyParser.json());
 router.get('/user/status', function(req, res) {
   var headers = req.headers;
   noCache(res);
@@ -102,7 +106,6 @@ router.post('/user/login', function(req, res) {
         username: username
       });
     } else {
-      console.log('code: ' + response.statusCode);
       if (response.statusCode === 200) {
         // authentication successful, remember the username
         req.session.user = {
@@ -120,6 +123,11 @@ router.post('/user/login', function(req, res) {
           } else {
             console.log('did not find chunk.user');
           }
+        });
+      } else {
+        console.log('code: ' + response.statusCode);
+        response.on('data', function(chunk) {
+          console.log(JSON.parse(chunk));
         });
       }
     }

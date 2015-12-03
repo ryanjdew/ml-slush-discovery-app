@@ -46,7 +46,7 @@
         field = field || {
             'field-name': '',
             'include-root': false,
-            'word-lexicon': ["http://marklogic.com/collation/"],
+            'word-lexicon': ['http://marklogic.com/collation/'],
             'included-element': [],
             'excluded-element': []
           };

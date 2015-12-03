@@ -36,7 +36,12 @@
       <h4>Load Data</h4>
       <div class="form-group">
         <label class="control-label">Directory</label>
-        <input class="form-control" name="directory" type="text" ng-model="loadDirectory">
+        <div ng-show="isUploading">
+          <progressbar max="currentFilesToUpload" value="currentFilesUploaded" ></progressbar>
+        </div>
+        <div ng-hide="isUploading">
+          <input class="form-control" id="directoryUploader" name="directory" type="file" multiple webkitdirectory>
+        </div>
       </div>
       <div class="clearfix">
         <button ng-click="loadData()" class="clearfix btn btn-primary pull-right">Load</button>

@@ -43,13 +43,13 @@
         subPart['longitude-localname'] = $scope.index['parent-localname'];
         subPart['longitude-namespace-uri'] = $scope.index['parent-namespace-uri'] || '';
       } else if ($scope.indexType === 'geospatial-element-index') {
-        subPart['localname'] = $scope.index['localname'];
+        subPart.localname = $scope.index.localname;
         subPart['namespace-uri'] = $scope.index['namespace-uri'] || '';
         subPart['point-format'] = $scope.index['point-format'];
       }
       subPart['coordinate-system'] = $scope.index['coordinate-system'];
       $modalInstance.close(index);
-    }
+    };
   }]);
 
   /**

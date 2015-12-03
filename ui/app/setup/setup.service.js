@@ -3,9 +3,9 @@
   angular.module('app.setup')
     .factory('ServerConfig', ServerConfig);
 
-  ServerConfig.$inject = ['$http', '$q'];
+  ServerConfig.$inject = ['$http', '$q', '$timeout'];
 
-  function ServerConfig($http, $q) {
+  function ServerConfig($http, $q, $timeout) {
     var serverConfig = {};
     var databasePropertiesPromise;
     serverConfig.get = function() {
@@ -84,9 +84,9 @@
       if (!(databasePropertiesPromise && cache)) {
         databasePropertiesPromise = $http.get('/api/server/database')
           .then(function(response) {
-            return response.data;
-          },
-          $q.reject);
+              return response.data;
+            },
+            $q.reject);
       }
       return databasePropertiesPromise;
     };
@@ -94,17 +94,17 @@
     serverConfig.getCharts = function() {
       return $http.get('/api/server/charts')
         .then(function(response) {
-          return response.data;
-        },
-        $q.reject);
+            return response.data;
+          },
+          $q.reject);
     };
 
     serverConfig.setCharts = function(charts) {
       return $http.put('/api/server/charts', charts)
         .then(function(response) {
-          return response.data;
-        },
-        $q.reject);
+            return response.data;
+          },
+          $q.reject);
     };
 
     serverConfig.getDatabaseName = function(cache) {
@@ -121,7 +121,7 @@
         function(dbProperties) {
           var fieldList = [];
           angular.forEach(dbProperties.field, function(field) {
-            if (field['field-name'] && field['field-name'] != '') {
+            if (field['field-name'] && field['field-name'] !== '') {
               fieldList.push(field);
             }
           });
@@ -134,7 +134,9 @@
     };
 
     serverConfig.setFields = function(fields) {
-      return $http.put('/api/server/database', { field: field['field-list'] })
+      return $http.put('/api/server/database', {
+          field: fields['field-list']
+        })
         .then(function(response) {
           return response.data;
         }, $q.reject);
@@ -162,24 +164,25 @@
 
     serverConfig.setGeospatialIndexes = function(geospatialIndexes) {
       var dbProperties = {};
-      for (var key in geospatialIndexTypes) {
+      var key;
+      for (key in geospatialIndexTypes) {
         dbProperties[geospatialIndexTypes[key]] = [];
       }
-      for (var key in geospatialIndexes['geospatial-index-list']) {
+      for (key in geospatialIndexes['geospatial-index-list']) {
         var type = Object.keys(geospatialIndexes['geospatial-index-list'][key])[0];
         dbProperties[type].push(geospatialIndexes['geospatial-index-list'][key][type]);
       }
       return $http.put('/api/server/database', dbProperties)
         .then(function(response) {
-          return response.data;
-        },
-        $q.reject);
+            return response.data;
+          },
+          $q.reject);
     };
 
     var rangeIndexTypes = [
-        'range-element-index', 'range-element-attribute-index',
-        'range-path-index', 'range-field-index'
-      ];
+      'range-element-index', 'range-element-attribute-index',
+      'range-path-index', 'range-field-index'
+    ];
     serverConfig.getRangeIndexes = function(cache) {
       return serverConfig.getDatabaseProperties(cache).then(
         function(dbProperties) {
@@ -201,34 +204,35 @@
 
     serverConfig.setRangeIndexes = function(rangeIndexes) {
       var dbProperties = {};
-      for (var key in rangeIndexTypes) {
+      var key;
+      for (key in rangeIndexTypes) {
         dbProperties[rangeIndexTypes[key]] = [];
       }
-      for (var key in rangeIndexes['range-index-list']) {
+      for (key in rangeIndexes['range-index-list']) {
         var type = Object.keys(rangeIndexes['range-index-list'][key])[0];
         dbProperties[type].push(rangeIndexes['range-index-list'][key][type]);
       }
       return $http.put('/api/server/database', dbProperties)
         .then(function(response) {
-          return response.data;
-        },
-        $q.reject);
+            return response.data;
+          },
+          $q.reject);
     };
 
     serverConfig.getSearchOptions = function() {
       return $http.get('/api/server/search-options')
         .then(function(response) {
-          return response.data;
-        },
-        $q.reject);
+            return response.data;
+          },
+          $q.reject);
     };
 
     serverConfig.setSearchOptions = function(searchOptions) {
       return $http.put('/api/server/search-options', searchOptions)
         .then(function(response) {
-          return response.data;
-        },
-        $q.reject);
+            return response.data;
+          },
+          $q.reject);
     };
 
     serverConfig.find = function(localname, type) {
@@ -239,9 +243,9 @@
           }
         })
         .then(function(response) {
-          return response.data;
-        },
-        $q.reject);
+            return response.data;
+          },
+          $q.reject);
     };
 
     serverConfig.loadData = function(directory) {
@@ -251,51 +255,51 @@
           }
         })
         .then(function(response) {
-          return response.data;
-        },
-        $q.reject);
+            return response.data;
+          },
+          $q.reject);
     };
 
     serverConfig.getUiConfig = function() {
       return $http.get('/api/server/ui-config')
         .then(function(response) {
-          return response.data;
-        },
-        $q.reject);
+            return response.data;
+          },
+          $q.reject);
     };
 
     serverConfig.setUiConfig = function(uiConfig) {
       return $http.put('/api/server/ui-config', uiConfig)
         .then(function(response) {
-          return response.data;
-        },
-        $q.reject);
+            return response.data;
+          },
+          $q.reject);
     };
 
     serverConfig.getDatabases = function() {
       return $http.get('/api/server/databases')
         .then(function(response) {
-          return _.map(response.data['database-default-list']['list-items']['list-item'],
-            function(db) {
-              return db.nameref;
-            });
-        },
-        $q.reject);
-    }
+            return _.map(response.data['database-default-list']['list-items']['list-item'],
+              function(db) {
+                return db.nameref;
+              });
+          },
+          $q.reject);
+    };
 
     serverConfig.setDatabase = function(dbConfig) {
       return $http.put('/api/server/database', dbConfig)
         .then(function(response) {
           return response.data;
         });
-    }
+    };
 
     serverConfig.removeDataCollection = function(collection) {
       return $http.delete('/api/server/database/collection/' + collection)
         .then(function(response) {
-          return response;
-        },
-        $q.reject);
+            return response;
+          },
+          $q.reject);
     };
 
     serverConfig.dataTypes = function() {
@@ -319,6 +323,79 @@
         'string',
         'anyURI'
       ];
+    };
+
+    function uploadBatch(files) {
+      var promises = [];
+      var epochTicks = 621355968000000000;
+      var ticksPerMillisecond = 10000;
+      var yourTicks = epochTicks + ((new Date()).getTime() * ticksPerMillisecond);
+      var boundary = 'BOUNDARY' + yourTicks;
+      var header = '--' + boundary + '\r\n';
+      var footer = '\r\n--' + boundary + '--\r\n';
+      var contenttype = 'multipart/mixed; boundary=' + boundary;
+
+      var contents = [];
+      angular.forEach(files, function(file) {
+        var reader = new FileReader(),
+            fileName = file.webkitRelativePath || file.name,
+            d = $q.defer();
+        if (/^[^\/]/.test(fileName)) {
+          fileName = '/' + fileName;
+        }
+        promises.push(d.promise);
+        reader.onloadend = function () {
+          var contentBlock = header + 'Content-Type: ' + file.type + '\r\n';
+          contentBlock += 'Content-Disposition: attachment; filename="' + fileName +
+          '"\r\n';
+          contentBlock += 'Content-Length: ' + file.size + '\r\n\r\n';
+          contentBlock += reader.result + '\r\n';
+          contents.push(contentBlock);
+          d.resolve();
+        };
+        reader.readAsBinaryString(file);
+      });
+      return $q.all(promises).then(function() {
+        contents.push(footer);
+        var fullContent = contents.join('');
+        return $http.post('/v1/documents', fullContent, {'headers':{'Content-Type':contenttype}});
+      });
+    }
+
+    serverConfig.bulkUpload = function(allFiles) {
+      var currentSet = [];
+      var currentFilesToUpload = allFiles.length;
+      var currentFilesUploaded = 0;
+      var lastIndex = currentFilesToUpload - 1;
+      var d = $q.defer();
+      angular.forEach(allFiles, function(file, fileIndex) {
+        currentSet.push(file);
+        if (currentSet.length === 5 || fileIndex === lastIndex) {
+          var currentSetCp = currentSet.slice(0, currentSet.length);
+          var runUpload = function() {
+            uploadBatch(currentSetCp).then(function(data) {
+              //$scope.loadDataInfo = data;
+              //model.dataCollections.push(data.collection);
+              currentFilesUploaded += currentSetCp.length;
+              if (currentFilesToUpload === currentFilesUploaded) {
+                d.resolve();
+              } else {
+                d.notify(currentFilesUploaded);
+              }
+            },
+            function() {
+              d.reject();
+            });
+          };
+          if ($http.pendingRequests.length > 8) {
+            $timeout(runUpload, $http.pendingRequests.length);
+          } else {
+            runUpload();
+          }
+          currentSet.length = 0;
+        }
+      });
+      return d.promise;
     };
 
     return serverConfig;
