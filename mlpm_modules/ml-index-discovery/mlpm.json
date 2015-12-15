@@ -1,0 +1,10 @@
+{
+  "name": "ml-index-discovery",
+  "version": "2.0.0",
+  "description": "functions for discovering range indexes and grouping them by document-root QNames",
+  "repository": "https://github.com/joemfb/ml-index-discovery.git",
+  "dependencies": {
+    "cts-extensions": "1.1.*"
+  },
+  "gitHead": "1b54d91f05110436b18524497dba0875cf98c632"
+}

@@ -1,0 +1,832 @@
+@media (max-width: 1300px) {
+  .navbar-header {
+    float: none;
+  }
+  .navbar-left,.navbar-right {
+    float: none !important;
+  }
+  .navbar-toggle {
+    display: block;
+  }
+  .navbar-collapse {
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .navbar-fixed-top {
+    top: 0;
+    border-width: 0 0 1px;
+  }
+  .navbar-collapse.collapse {
+    display: none !important;
+  }
+  .navbar-nav {
+    float: none !important;
+    margin-top: 7.5px;
+  }
+  .navbar-nav>li {
+    float: none;
+  }
+  .navbar-nav>li>a {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .collapse.in {
+    display: block !important;
+  }
+}
+
+.navbar-inverse {
+  background: rgb(0, 60, 113);
+  border-top: 2px solid #11506d;
+  border-left: 2px solid #11506d;
+  border-right: 2px solid #11506d;
+}
+
+.welcome {
+  margin-top: 16px;
+  margin-right: 15px;
+  margin-bottom: 8px;
+  color: white;
+}
+
+.welcome a {
+  color: #78be20; /*#ccc*/
+}
+
+.modal-dialog {
+  margin: 120px auto;
+}
+
+#loader {
+  z-index: 19999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("/images/loading.gif") no-repeat center center #ffffff;
+  opacity: 0.7;
+  cursor: wait;
+  display: none;
+}
+
+/* overwrite the dashboard styles */
+.widget-container {
+  float: none;
+  display: block;
+  width: auto;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+p {
+  margin: 0 0 10px;
+}
+
+.pull-left {
+  float: left !important;
+}
+
+.text-muted {
+  color: #999;
+}
+
+#footer-inner {
+  border-top: 1px solid;
+  height: 51px;
+  margin-top: 15px;
+
+  background-color: #f1f2f2;
+  border-top: 1px solid #d1d3d4;
+  bottom: 0;
+  height: 71px;
+  width: 100%;
+  padding: 10px 0;
+  margin-top: 30px;
+}
+
+#footer-inner .footer-container {
+  padding: 0 15px;
+}
+
+#footer-inner .text-muted {
+  font-size: 85%;
+  padding: 20px 0 0;
+}
+
+.editor-link {
+  cursor: pointer;
+}
+
+.mandatory-field {
+  color: #e05314;
+}
+
+/* ngTable */
+.ng-table th {
+  text-align: left;
+}
+
+.ng-table th:last-child {
+  text-align: center;
+}
+
+.ng-table th:nth-last-child(3) {
+  /*text-align: right;*/
+}
+
+.text-center {
+  text-align: center;
+  width: 60px;
+}
+
+th.centered, td.centered {
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* the main container for the wizard */
+#main-container {
+  position: relative;
+  border: 4px solid #bbb;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+  background-color: red;
+}
+
+#main-container .left-column {
+  border: 1px solid gray; /*#ddd*/
+
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: #EEEEEE; /*#FFF #EEEEEE #20252b*/
+}
+
+#main-container .splitter {
+  width: 5px;
+  height: 100%;
+
+  border: 1px solid #b3b3b3;
+  background-color: #d9d9d9;
+  cursor: col-resize;
+
+  position: absolute;
+  left: 300px;
+  top: 0;
+}
+
+.splitter-vertical-button {
+  background-color: #0081c2;
+  background-repeat: repeat-x;
+  background-image: linear-gradient(to right, #149bdf, #0480be);
+
+  position: absolute;
+  width: 3px;
+  height: 45px;
+  position: relative;
+  top: 50%;
+  left: 0;
+  /* give the element a negative top and left margin equal to half of its height and width. */
+  margin-top: -23px;
+  margin-left: 0px;
+
+  cursor: pointer;
+}
+
+#main-container .right-column {
+  border: 1px solid gray;
+  background-color: white; /*#F7F7F9*/
+
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+@media all and (max-width: 640px) {  
+  #main-container {
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #main-container .left-column, #main-container .splitter, #main-container .right-column {
+    /* Return them to document order */
+    -webkit-order: 0;
+    order: 0;
+  }
+
+  #main-container .left-column, #main-container .right-column {
+    /*min-height: 50px;
+    max-height: 50px;*/
+  }
+}
+
+.sidebar-container-outer {
+  padding: 0;
+  width: 100%
+}
+
+#sidebar-container {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #bbb;
+  overflow: auto;
+
+  width: 100%
+
+  position: relative;
+}
+
+.workspace-container-outer {
+  position: relative;
+  z-index: 6;
+
+  word-wrap: break-word;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* This viewer hides the scroll bars by setting overflow to hidden. */
+#workspace-container {
+  margin: 0;
+  padding: 0;
+  border: 0px none;
+  overflow: auto;
+
+  width: 100%;
+
+  /* With flex, you can stop worrying. You can align anything 
+   * (vertically or horizontally) quite painlessly with the 
+   * align-items, align-self, and justify-content properties.
+   */
+  /*display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+  justify-content: flex-start;*/
+
+  position: relative;
+}
+
+.workspace-view {
+  margin: 0 10px;
+  padding: 5px;
+}
+
+#sidebar h2 {
+  padding: 5px;
+}
+
+#sidebar .menu-title {
+  display: inline-block;
+  padding-top: 4px;
+  padding-left: 8px;
+  padding-bottom: 6px;
+
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+#workspace-container .view-title {
+  display: inline-block;
+  padding-bottom: 6px;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.facet h3 {
+  font-size: 16px;
+  font-weight: 300;
+
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.facet a {
+  cursor: pointer;
+}
+
+.results .pagination {
+  margin-top: 10px;
+}
+
+.filter-form {
+  margin: 0 6px 10px 6px;
+}
+
+.filter-form input {
+  color: #000000;
+  background-color: #fff3c0;
+  border: 1px solid #a4a4a4;
+}
+
+/*
+ * The palette for selecting reports
+ */
+.report-palette {
+}
+
+.report-palette .report-container {
+  font-size: 13px;
+  color: #555;
+  text-align: left;
+  margin: 2px;
+  padding: 2px;
+}
+
+.report-palette .report-container .report-container-inner {
+  white-space: nowrap;
+  overflow-y: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.report-container .report-item {
+  display: block;
+  background-color: white;
+  border: 1px solid #d1d1d1;
+  overflow: hidden;
+  margin: 2px;
+  padding: 8px;
+  text-decoration: none;
+  color: #cdcdcd;
+  /*z-index: 10000;*/
+  text-align: left;
+
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+
+  cursor: pointer;
+
+  display: flex;
+  -webkit-flex-flow: row;
+  flex-flow: row;
+  flex-wrap: wrap;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+
+  position: relative;
+}
+
+.report-item span, .report-item span {
+  display: inline-block;
+}
+
+.report-item i {
+  padding-right: 8px;
+  font-size: 42px;
+  color: #828282;
+}
+
+.report-item span {
+  font-size: 12px;
+  color: #555;
+  /* Sequences of whitespace will collapse 
+   * into a single whitespace. Text will 
+   * wrap when necessary.
+   */
+  white-space: normal;
+}
+
+.report-item:hover {
+  background-color: #F24D00; /* #DDDDDD */
+}
+
+.report-item:hover i, .report-item:hover span {
+  color: #f9edbe;
+}
+
+.report-item .toolbar {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: none;
+  border: 1px solid #gray;
+  margin-bottom: 0px;
+  padding: 1px 4px;
+  /*background-color: blue;*/
+
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.report-item .toolbar a {
+  padding: 0;
+  margin: 0;
+}
+
+.report-item .toolbar i {
+  font-size: 12px;
+  color: yellow;
+}
+
+.report-item:hover .toolbar {
+  display: inline-block;
+}
+
+/* make div width and height auto adjust to content.
+ */
+.hcontainer {
+  /* 100% auto also works */
+  /*width: auto;*/
+  height: auto;
+}
+
+
+
+.qb-dashboard .col-xs-12 {
+  width: 100%;
+  float: left;
+  position: relative;
+  min-height: 1px;
+  /*padding-left: 15px;
+  padding-right: 15px;*/
+  border: none;
+}
+
+.gadget-ws {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.gadget-ws .col-xs-12 {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.qb-header {
+  margin-bottom: 10px;
+}
+
+.qb-header h3 {
+  display: inline-block;
+
+  margin-top: 20px;
+  margin-bottom: 10px;
+
+  font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: #2d2d2d;
+}
+
+.qb-header button {
+  position: relative;
+  top: -3px;
+}
+
+.qb-dashboard .btn {
+  text-shadow: 0 -1px 0 rgba(0,0,0,.3);
+}
+
+.qb-dashboard .btn-default {
+  border: 1px solid #2e2f2f;
+  color: #fff;
+  background-color: #474949;
+}
+
+.gadget .results-header input {
+  margin-left: 10px;
+  display: inline-block;
+  width: 80px;
+}
+.gadget .form-control {
+  height: 30px;
+}
+
+.gadget .results-header select {
+  display: inline-block;
+  width: auto;
+}
+.gadget .form-control {
+  height: 30px;
+}
+
+.gadget .options {
+    margin-bottom: 5px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 10px 10px;
+}
+
+.gadget .dimension {
+    display: inline-block;
+    padding: 5px 8px;
+    border: 1px solid #bbb;
+    background-color: #ccc;
+    border-radius: 10px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.gadget .dimension select {
+  display: inline-block;
+  width: auto;
+}
+
+.gadget .dimension i {
+  font-size: 18px;
+  color: black;
+}
+
+
+.qb-dashboard .panel {
+  margin-bottom: 20px;
+  background-color: #fff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  box-shadow: 0 1px 1px rgba(0,0,0,.05);
+}
+
+.qb-dashboard .panel-primary {
+  border-color: #446e9b;
+}
+
+.panel-heading {
+  padding: 10px 15px;
+  border-bottom: 1px solid transparent;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+
+.gadget .panel-heading {
+  overflow: hidden;
+}
+
+.panel-primary > .panel-heading {
+  color: #fff;
+  background-color: #446e9b;
+  border-color: #446e9b;
+}
+
+.panel-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 16px;
+  color: inherit;
+}
+
+.panel-primary .panel-title {
+  color: #fff;
+}
+
+.panel-body {
+  padding: 15px;
+}
+
+.gadget .panel-body {
+  height: 430px;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 20px;
+}
+table {
+  background-color: transparent;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.gadget .section {
+  font-weight: 700;
+  margin-left: 5px;
+}
+
+/* Structured Query Builder */
+.actions {
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+.sq-builder-chooser {
+  margin-top: 10px;
+}
+
+.design-mode .list-group-item-info {
+  color: #31708f;
+  background-color: #d9edf7;
+}
+
+.design-mode .list-group-item-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+}
+
+.design-mode .list-group-item-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+}
+
+.design-mode .list-group-item-danger {
+  color: #a94442;
+  background-color: #f2dede;
+}
+
+.qb-title {
+  background-color: #0088CC;
+  color: white;
+  padding: 5px 5px;
+
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+/* flex wrapper */
+.flex-wrapper {
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.flex, .fx {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  min-width: 1px;
+}
+
+.file-upload-button-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.file-upload-button-wrapper input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0;
+  filter: alpha(opacity=0);
+}
+
+.file-upload-note {
+  background: #f8f7f0;
+  border: 1px solid #e1e1e1;
+  line-height: 1.3;
+  padding: 8px 10px;
+  border-radius: 4px;
+}
+
+/* end of Structured Query Builder */
+
+/* hoptions */
+
+.hoptions {
+  margin: 0; 
+  padding: 0;
+}
+
+.hoptions li {
+  display: inline-block; 
+  zoom:1; 
+  *display:inline; 
+  background: #eee; 
+  border: solid 1px #999; 
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0; 
+  -webkit-border-radius: 4px 4px 0 0;
+  padding: 0 10px;
+}
+
+.hoptions li a {
+  font-size: 14px; 
+  line-height: 2em; 
+  display: block; 
+  padding: 0 10px; 
+  outline: none;
+}
+
+.hoptions li a:hover {
+  text-decoration: underline;
+}
+
+.hoptions li.current { 
+  background: #fff; 
+  /*padding-top: 6px;*/
+  position: relative; 
+  top: 1px; /* 1px to push the bottom line */
+  border-color: #666;
+}
+
+.hoptions li a.current {
+  font-weight: bold;
+}
+
+.hcontainer .hpanel {
+  background: #fff; 
+  border: solid #666 1px; 
+  padding: 10px; 
+  border-radius: 0 4px 4px 4px; 
+  -moz-border-radius: 0 4px 4px 4px; 
+  -webkit-border-radius: 0 4px 4px 4px;
+}
+
+.hpanel .hcontent {
+  display: none;
+}
+
+.hpanel .show {
+  display: block;
+}
+
+.hoptions li .radio {
+  display: inline-block;
+  min-height: 20px;
+  padding-left: 20px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  vertical-align: middle;
+}
+
+.hoptions li.current .radio label {
+  font-weight: bold;
+}
+
+/*
+ * Center Bootstrap 3 Modal Dialog vertically
+ */
+#query-editor-dialog.modal {
+  text-align: center;
+  padding: 0!important;
+}
+
+#query-editor-dialog.modal:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px; /* Adjusts for spacing */
+}
+
+#query-editor-dialog .modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+  width: 90%;
+}
+
+/* query-editor */
+#query-editor {
+  margin: 0;
+  padding: 0;
+  border: 0px none;
+  overflow: hidden;
+
+  width: 100%;
+
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Auto resize the editor to fit its parent size. */
+.CodeMirror {
+  height: 100%;
+  width: 100%;
+  font-family: monospace;
+  font-size: 16px;
+  line-height: 1em;
+}
+
+.CodeMirror-scroll {
+  height: 100%;
+  width: 100%;
+}
+
+/* end of hoptions */
+
+.panel > .panel-heading {
+  text-align: left;
+}

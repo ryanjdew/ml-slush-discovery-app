@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+  <head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title>discovery-app</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/images/favicon.ico" />
+
+    <!-- build:css styles/lib.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="/bower_components/highlightjs/styles/default.css" />
+    <link rel="stylesheet" href="/bower_components/ng-json-explorer/dist/angular-json-explorer.css" />
+    <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <link rel="stylesheet" href="//js.arcgis.com/3.11/esri/css/esri.css">
+
+    <!-- build:css styles/app.css -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="/.tmp/main.css">
+    <!-- endinject -->
+    <!-- endbuild -->
+
+    <link rel="stylesheet" href="/ui/app/lib/ng-table/dist/ng-table.css" />
+    <link rel="stylesheet" href="/ui/app/lib/codemirror-5.8/lib/codemirror.css">
+    <link rel="stylesheet" href="/ui/app/styles/malhar-angular-dashboard.css">
+    <link rel="stylesheet" href="/ui/app/styles/custom.css">
+
+  </head>
+  <body ng-app="app">
+
+    <ui-view></ui-view>
+
+    <!-- build:js js/lib.js -->
+    <!-- bower:js -->
+    <script src="/bower_components/jquery/dist/jquery.js"></script>
+    <script src="/bower_components/angular/angular.js"></script>
+    <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="/bower_components/highlightjs/highlight.pack.js"></script>
+    <script src="/bower_components/angular-highlightjs/build/angular-highlightjs.js"></script>
+    <script src="/bower_components/angular-mocks/angular-mocks.js"></script>
+    <script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="/bower_components/tinymce-dist/tinymce.js"></script>
+    <script src="/bower_components/angular-ui-tinymce/src/tinymce.js"></script>
+    <script src="/bower_components/x2js/xml2json.min.js"></script>
+    <script src="/bower_components/angular-x2js/dist/x2js.min.js"></script>
+    <script src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="/bower_components/lodash/lodash.js"></script>
+    <script src="/bower_components/highcharts/highcharts.js"></script>
+    <script src="/bower_components/highcharts/highcharts-more.js"></script>
+    <script src="/bower_components/highcharts/modules/exporting.js"></script>
+    <script src="/bower_components/highcharts-ng/dist/highcharts-ng.js"></script>
+    <script src="/bower_components/ml-common-ng/dist/ml-common-ng.js"></script>
+    <script src="/bower_components/ml-search-ng/dist/ml-search-ng.js"></script>
+    <script src="/bower_components/ml-search-ng/dist/ml-search-ng-tpls.js"></script>
+    <script src="/bower_components/ml-highcharts-ng/dist/ml-highcharts-ng.min.js"></script>
+    <script src="/bower_components/ml-highcharts-ng/dist/ml-highcharts-ng-tpls.min.js"></script>
+    <script src="/bower_components/ml-utils/ml-utils.js"></script>
+    <script src="/bower_components/ng-json-explorer/dist/angular-json-explorer.js"></script>
+    <script src="/bower_components/ng-sortable/dist/ng-sortable.js"></script>
+    <script src="/bower_components/vkbeautify-wrapper/dist/vkbeautify.0.99.00.beta.js"></script>
+    <!-- endbower -->
+    <script src="/bower_components/tinymce-dist/themes/modern/theme.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:js js/app.js -->
+    <!-- inject:js -->
+    <script src="/ui/app/create/create.module.js"></script>
+    <script src="/ui/app/detail/detail.module.js"></script>
+    <script src="/ui/app/detail/similar.module.js"></script>
+    <script src="/ui/app/error/error.module.js"></script>
+    <script src="/ui/app/login/login.module.js"></script>
+    <script src="/ui/app/message-board/message-board.module.js"></script>
+    <script src="/ui/app/root/root.module.js"></script>
+    <script src="/ui/app/search/search.module.js"></script>
+    <script src="/ui/app/search/snippet.module.js"></script>
+    <script src="/ui/app/setup/setup.module.js"></script>
+    <script src="/ui/app/user/user.module.js"></script>
+    <script src="/ui/app/app.js"></script>
+    <script src="/ui/app/create/create.controller.js"></script>
+    <script src="/ui/app/detail/detail.controller.js"></script>
+    <script src="/ui/app/detail/similar-directive.js"></script>
+    <script src="/ui/app/error/errorInterceptor.service.js"></script>
+    <script src="/ui/app/lib/angular-resource/angular-resource.js"></script>
+    <script src="/ui/app/lib/angular-resource/angular-resource.min.js"></script>
+    <script src="/ui/app/lib/angular-resource/index.js"></script>
+    <script src="/ui/app/lib/angular-route/angular-route.js"></script>
+    <script src="/ui/app/lib/angular-route/angular-route.min.js"></script>
+    <script src="/ui/app/lib/angular-sanitize/angular-sanitize.js"></script>
+    <script src="/ui/app/lib/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="/ui/app/lib/angular-sanitize/index.js"></script>
+    <script src="/ui/app/lib/angular-ui-sortable/sortable.js"></script>
+    <script src="/ui/app/lib/Chart.min.js"></script>
+    <script src="/ui/app/lib/codemirror-5.8/lib/codemirror.js"></script>
+    <script src="/ui/app/lib/codemirror-5.8/mode/javascript/javascript.js"></script>
+    <script src="/ui/app/lib/highcharts/highcharts-3d.js"></script>
+    <script src="/ui/app/lib/highcharts/highcharts-more.js"></script>
+    <script src="/ui/app/lib/highcharts/highcharts.js"></script>
+    <script src="/ui/app/lib/highcharts/modules/exporting.js"></script>
+    <script src="/ui/app/lib/jquery-ui/jquery-ui.js"></script>
+    <script src="/ui/app/lib/jquery.event.drag-2.2/jquery.event.drag-2.2.js"></script>
+    <script src="/ui/app/lib/jquery.event.drag-2.2/jquery.event.drag.live-2.2.js"></script>
+    <script src="/ui/app/lib/jquery.form.min.js"></script>
+    <script src="/ui/app/lib/malhar-angular-dashboard/dist/malhar-angular-dashboard.js"></script>
+    <script src="/ui/app/lib/ng-table/dist/ng-table.min.js"></script>
+    <script src="/ui/app/login/login.controller.js"></script>
+    <script src="/ui/app/login/login.directive.js"></script>
+    <script src="/ui/app/login/login.service.js"></script>
+    <script src="/ui/app/login/loginInterceptor.service.js"></script>
+    <script src="/ui/app/message-board/message-board.directive.js"></script>
+    <script src="/ui/app/message-board/message-board.service.js"></script>
+    <script src="/ui/app/root/root.controller.js"></script>
+    <script src="/ui/app/route/routes.js"></script>
+    <script src="/ui/app/scripts/angular-recursion.min.js"></script>
+    <script src="/ui/app/scripts/common/case-filters.js"></script>
+    <script src="/ui/app/scripts/common/common.js"></script>
+    <script src="/ui/app/scripts/compile/compile.directive.js"></script>
+    <script src="/ui/app/scripts/controllers/designer.js"></script>
+    <script src="/ui/app/scripts/controllers/editor.js"></script>
+    <script src="/ui/app/scripts/controllers/home.js"></script>
+    <script src="/ui/app/scripts/controllers/new-report.js"></script>
+    <script src="/ui/app/scripts/controllers/remover.js"></script>
+    <script src="/ui/app/scripts/controllers/sidebar.js"></script>
+    <script src="/ui/app/scripts/ml-dimension-builder.js"></script>
+    <script src="/ui/app/scripts/ml-index-builder.js"></script>
+    <script src="/ui/app/scripts/ml-sq-builder.js"></script>
+    <script src="/ui/app/scripts/services/service.js"></script>
+    <script src="/ui/app/scripts/util.js"></script>
+    <script src="/ui/app/search/facet-charts.directive.js"></script>
+    <script src="/ui/app/search/search.controller.js"></script>
+    <script src="/ui/app/search/snippet.directive.js"></script>
+    <script src="/ui/app/setup/dialogs/editConstraint.js"></script>
+    <script src="/ui/app/setup/dialogs/editGeospatialIndex.js"></script>
+    <script src="/ui/app/setup/dialogs/editRangeIndex.js"></script>
+    <script src="/ui/app/setup/dialogs/field.js"></script>
+    <script src="/ui/app/setup/dialogs/newGeospatialIndex.js"></script>
+    <script src="/ui/app/setup/dialogs/newRangeIndex.js"></script>
+    <script src="/ui/app/setup/directives/find-elements.js"></script>
+    <script src="/ui/app/setup/directives/finder.js"></script>
+    <script src="/ui/app/setup/setup.controller.js"></script>
+    <script src="/ui/app/setup/setup.service.js"></script>
+    <script src="/ui/app/user/profile.controller.js"></script>
+    <script src="/ui/app/user/user.directive.js"></script>
+    <script src="/ui/app/user/user.service.js"></script>
+    <script src="/ui/app/widgets/src/ml-report.js"></script>
+    <script src="/ui/app/widgets/src/widgets.js"></script>
+    <!-- endinject -->
+
+    <!-- inject:templates:js -->
+    <!-- endinject -->
+    <!-- endbuild -->
+
+    <script src="//js.arcgis.com/3.13/"></script>
+  </body>
+</html>

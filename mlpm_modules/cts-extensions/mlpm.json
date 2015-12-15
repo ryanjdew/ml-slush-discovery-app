@@ -1,0 +1,6 @@
+{
+  "name": "cts-extensions",
+  "version": "1.1.1",
+  "description": "experimental extensions to MarkLogic cts functionality",
+  "repository": "https://github.com/joemfb/cts-extensions.git"
+}

@@ -1,0 +1,33 @@
+<div class="form-group">
+  <label class="col-sm-4 control-label">parent namespace uri</label>
+    <div class="col-sm-8">
+      <input type="text" name="parentNamespaceUri" class="form-control" 
+             ng-model="current_index['parent-namespace-uri']" />
+    </div>
+</div>
+
+<div class="form-group" ng-class="{ 'has-error' : indexForm.parentLocalname.$invalid && !indexForm.parentLocalname.$pristine }">
+  <label class="col-sm-4 control-label">parent localname <i class="fa fa-asterisk mandatory-field"></i></label>
+  <div class="col-sm-8">
+    <input type="text" name="parentLocalname" class="form-control" 
+           ng-model="current_index['parent-localname']" required />
+    <p ng-show="indexForm.parentLocalname.$invalid && !indexForm.parentLocalname.$pristine" class="help-block">parent localname uri is required.</p>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="col-sm-4 control-label">namespace uri</label>
+    <div class="col-sm-8">
+      <input type="text" name="namespaceUri" class="form-control" 
+             ng-model="current_index['namespace-uri']" />
+    </div>
+</div>
+
+<div class="form-group" ng-class="{ 'has-error' : indexForm.localname.$invalid && !indexForm.localname.$pristine }">
+  <label class="col-sm-4 control-label">localname <i class="fa fa-asterisk mandatory-field"></i></label>
+  <div class="col-sm-8">
+    <input type="text" name="localname" class="form-control" 
+           ng-model="current_index['localname']" required />
+    <p ng-show="indexForm.localname.$invalid && !indexForm.localname.$pristine" class="help-block">localname uri is required.</p>
+  </div>
+</div>

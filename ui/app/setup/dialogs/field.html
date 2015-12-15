@@ -1,0 +1,22 @@
+<div>
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="$dismiss()">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only">Close</span>
+    </button>
+    <h4 class="modal-title">Add Field</h4>
+  </div>
+  <div class="modal-body">
+    <form name="form">
+      <div class="form-group">
+        <label class="control-label">Field Name</label>
+        <input class="form-control" name="fieldName" type="text" ng-model="field['field-name']">
+      </div>
+      <field-elements field-elements="field['included-element']" title="Include Elements"></field-elements>
+      <field-elements field-elements="field['excluded-element']" title="Exclude Elements"></field-elements>
+      <div class="clearfix">
+        <button type="button" class="btn btn-primary pull-right" ng-click="save()">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

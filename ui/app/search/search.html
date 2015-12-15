@@ -1,0 +1,35 @@
+<h1>Sample MarkLogic Application</h1>
+<div class="row" ng-if="!ctrl.currentUser">Please log in to see content</div>
+<div class="row" ng-if="ctrl.currentUser">
+  <div class="col-md-12">
+    <ml-input qtext="ctrl.qtext" search="ctrl.search(qtext)" suggest="ctrl.suggest(val)" template="fa" class="search"></ml-input>
+  </div>
+</div>
+<div class="search row" ng-if="ctrl.currentUser">
+  <div class="col-md-3 right-col">
+    <div class="facet" ng-repeat="(constraintName, constraint) in ctrl.dateTimeConstraints">
+      <h3>{{constraintName}}</h3>
+      <div class="input-daterange input-group">
+        <input ng-model="ctrl.pickerDateStart[constraintName]" type="text" class="input-sm form-control ng-valid-date" title="Constrain results to entries beginning on selected date" datepicker-popup="yyyy-MM-dd" ng-model-onblur-onenter ng-click="ctrl.openStartDatePicker(constraintName, $event)" is-open="ctrl.dateStartOpened[constraintName]" name="start" parse-strict="parseStrict" close-text="Close" />
+        <span class="input-group-addon">to</span>
+        <input ng-model="ctrl.pickerDateEnd[constraintName]" type="text" class="input-sm form-control ng-valid-date" ng-click="ctrl.openEndDatePicker(constraintName, $event)" title="Constrain results to entries ending on selected date" datepicker-popup="yyyy-MM-dd" ng-model-onblur-onenter is-open="ctrl.dateEndOpened[constraintName]" parse-strict="parseStrict" close-text="Close" />
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" ng-click="ctrl.applyDateFilter(constraintName)">Apply Date Filter</button>
+      <button type="button" class="btn btn-default btn-sm" ng-click="ctrl.clearDateFilter(constraintName)">Clear</button>
+    </div>
+    <ml-facets facets="ctrl.response.facets" toggle="ctrl.toggleFacet(facet, value)" active-facets="ctrl.mlSearch.activeFacets" negate="ctrl.toggleNegatedFacet(facet,value)"></ml-facets>
+  </div>
+  <div class="col-md-9">
+    <h4 ng-if="ctrl.response.total === 0">No results to show</h4>
+    <div ng-if="ctrl.response.total > 0" class="results">
+      <facet-charts charts="ctrl.charts" ml-search="ctrl.mlSearch"></facet-charts>
+      <div class="pagination-ctrls">
+        <pagination class="pagination pagination-sm" ng-model="ctrl.page" ng-change="ctrl.search()" max-size="10" boundary-links="true" total-items="ctrl.response.total" items-per-page="ctrl.response['page-length']">
+        </pagination>
+        <ml-snippet set-snippet="ctrl.setSnippet(type)"></ml-snippet>
+      </div>
+      <ml-metrics search="ctrl.response"></ml-metrics>
+      <ml-results template="app/search/search-results.html" results="ctrl.response.results"></ml-results>
+    </div>
+  </div>
+</div>

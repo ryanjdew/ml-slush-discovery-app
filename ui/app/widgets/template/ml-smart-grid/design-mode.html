@@ -1,0 +1,130 @@
+<div class="design-mode">
+  <p>The Query Builder allows you to configure query rules without writing any custom code.</p>
+
+  <form name="designForm" class="form-inline" novalidate>
+    <div class="form-group">
+      <label class="control-label">Database:</label>
+      <select class="form-control" 
+              ng-options="database for database in model.config.databases"
+              ng-model="model.config['current-database']"
+              ng-change="getDbConfig()"></select>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label">Limited By:</label>
+      <select class="form-control" 
+              ng-model="model.groupingStrategy"
+              ng-change="getDbConfig()">
+        <option>root</option>
+        <option>collection</option>
+      </select>
+      <span ng-show="model.loadingConfig">&nbsp;<i class="fa fa-spinner fa-spin"></i></span>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label">Name:</label>
+      <select class="form-control" 
+              ng-model="data.directory_model" 
+              ng-options="d.name for d in data.docs" 
+              ng-change="setDocument()" required>
+        <option value="">Choose...</option>
+      </select>
+    </div>
+
+    <button class="btn btn-default" ng-click="save()" ng-disabled="designForm.$invalid">
+      <span class="fa fa-check"></span> Save</button>
+    <button class="btn btn-default" ng-click="execute()" ng-disabled="designForm.$invalid">
+      <span class="fa fa-eye"></span> Run</button>
+    <span ng-show="model.loadingResults">&nbsp;<i class="fa fa-spinner fa-spin"></i></span>
+  </form>
+
+  <div class="row" style="margin-top:10px" ng-if="model.configError">
+    <div class="col-md-12">
+      <div class="alert alert-danger">{{model.configError}}</div>
+    </div>
+  </div>
+
+  <div class="row" ng-show="model.showBuilder">
+    <div class="col-md-5">
+      <h3 class="qb-title">Define Dimensions & Computations</h3>
+      <div dimension-builder="data"></div>
+    </div>
+    <div class="col-md-7">
+      <h3 class="qb-title">Define Query Rules</h3>
+      <div sq-builder="data"></div>
+    </div>
+  </div>
+
+  <div class="table-responsive" ng-if="executor.results.length>0">
+    <pagination ng-model="grid.page" ng-change="fetchPage()" max-size="10" boundary-links="true"
+                total-items="grid.total" items-per-page="widget.dataModelOptions.pageLength"></pagination>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th data-ng-repeat="dimension in executor.dimensions">{{dimension.name}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="row in executor.results">
+          <td data-ng-repeat="cell in row track by $index">{{cell}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-responsive" ng-if="model.results.results">
+    <div ng-if="model.queryError" class="alert alert-danger">{{ model.queryError }}</div>
+    <p ng-if="model.results" class="metrics">
+      <em>{{ model.results.results.length }} results in {{ model.results.metrics['total-time'] }}</em>
+    </p>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th ng-repeat="header in model.results.headers">{{ header }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="result in model.results.results track by $index">
+          <td ng-repeat="val in result track by $index">
+            <em ng-if="val === ''"></em>
+            <span ng-if="val !== ''">{{ val }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="hcontainer"></div>
+
+  <div class="row" ng-show="model.showBuilder">
+    <div class="col-md-5">
+      <h3>Dimensions & Computations</h3>
+      <pre ng-bind="showDimensions()"></pre>
+    </div>
+    <div class="col-md-7">
+      <h3>Query Rules <button class="btn btn-default" ng-click="edit()">Edit</button></h3>
+      <pre ng-bind="showQuery()"></pre>
+    </div>
+  </div>
+
+</div>
+
+<div id="query-editor-dialog" class="modal modal-wide" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Edit Query Rules</h4>
+      </div>
+      <div class="modal-body">
+        <div id="query-editor"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-ng-click="save()">
+          <span class="fa fa-check"></span> Save</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          <span class="fa fa-close"></span> Close</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,4 @@
+TODO:
+
+error on duplicate aliases
+re-implement definition/evaluation: recursion strategy should be implemented in the definition, simplying evaluation
