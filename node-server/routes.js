@@ -7,6 +7,7 @@ var router = require('express').Router();
 var bodyParser = require('body-parser');
 var four0four = require('./utils/404')();
 var http = require('http');
+var www_authenticate = require('www-authenticate');
 var config = require('../gulp.config')();
 var q = require('q');
 var manageML = require('./manage-ml');
@@ -142,6 +143,9 @@ router.post('/user/login', function(req, res) {
 router.get('/user/logout', function(req, res) {
   noCache(res);
   delete req.session.user;
+  if (req.session.authenticator) {
+    delete req.session.authenticator;
+  }
   res.send();
 });
 

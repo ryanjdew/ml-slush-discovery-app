@@ -4,6 +4,7 @@
 
 var config = require('../gulp.config')();
 var http = require('http');
+var www_authenticate = require('www-authenticate');
 var q = require('q');
 var _ = require('underscore');
 
@@ -15,6 +16,8 @@ var options = {
   defaultUser: process.env.ML_APP_USER || config.marklogic.user,
   defaultPass: process.env.ML_APP_PASS || config.marklogic.password
 };
+
+var defaultCredentials = www_authenticate.user_credentials(options.defaultUser, options.defaultPass);
 
 var serverConfigObj = {
   database: 'discovery-app-content'
@@ -53,19 +56,18 @@ function uiConfig(res, data) {
 
 function genericConfig(name, res, data) {
   var opt = {
-      method: 'GET',
-      params: {
-        uri: '/discovery-app/config/' + name + '.json',
-        database: 'discovery-app-content'
-      },
-      path: '/v1/documents'
-    };
+    method: 'GET',
+    params: {
+      uri: '/discovery-app/config/' + name + '.json',
+      database: 'discovery-app-content'
+    },
+    path: '/v1/documents'
+  };
   if (data) {
     opt.method = 'PUT';
     opt.data = data;
   }
-  passOnToML(
-    {
+  passOnToML({
       headers: {}
     },
     res,
@@ -77,7 +79,40 @@ function passOnToMLManage(req, res, transferOptions) {
   passOnToML(req, res, transferOptions, options.mlManageHttpPort);
 }
 
+var challengeOpts = {
+  method: 'HEAD',
+  path: '/v1/ping'
+};
+
+var authorizationFunctions = {};
+
+function createAuthenticator(session, port, user, password, challenge) {
+  var authenticator = www_authenticate.call(null, user, password)(challenge);
+  if (!session.authenticator) {
+    session.authenticator = {};
+  }
+  session.authenticator[user + ':' + port] = authenticator;
+  if (!authorizationFunctions[port]) {
+    authorizationFunctions[port] = authenticator.authorize;
+  }
+  return authenticator;
+}
+
+function getAuthenticator(session, user, port) {
+  if (!session.authenticator) {
+    return null;
+  }
+  return session.authenticator[user + ':' + port];
+}
+
 function passOnToML(req, res, transferOptions, port) {
+  port = port || options.mlHttpPort;
+  var session = req.session || {
+    user: {
+      name: options.defaultUser,
+      password: options.defaultPass
+    }
+  };
   var params = [];
   var chunks = [];
   var responseTransform = transferOptions.responseTransform;
@@ -93,46 +128,78 @@ function passOnToML(req, res, transferOptions, port) {
     params.push('database=' + serverConfigObj.database);
   }
 
-  var mlReq = http.request({
+  var reqOptions = {
     hostname: options.mlHost,
     port: port || options.mlHttpPort,
     method: transferOptions.method,
     path: [transferOptions.path, params.join('&')].join('?'),
     headers: {
       'Content-Type': 'application/json'
-    },
-    auth: getAuth(options, req.session)
-  }, function(response) {
-
-    for (var header in response.headers) {
-      res.header(header, response.headers[header]);
     }
+  };
 
-    res.status(response.statusCode);
-    response.on('data', function(chunk) {
-      chunks.push(chunk);
-    });
-    response.on('end', function() {
-      var str = chunks.join('');
-      if (responseTransform) {
-        var transformedStr = responseTransform(str);
-        if (transformedStr) {
-          res.write(transformedStr);
+  var makeRequest = function(authenticator) {
+    if (authenticator) {
+      reqOptions.headers.Authorization = authorizationFunctions[port].call(authenticator, reqOptions.method, reqOptions.path);
+    }
+    var mlReq = http.request(reqOptions, function(response) {
+      for (var header in response.headers) {
+        if (header !== 'www-authenticate') {
+          res.header(header, response.headers[header]);
         }
-      } else {
-        res.write(str);
       }
-      res.end();
-    });
-  });
 
-  mlReq.on('error', function(e) {
-    console.log('Problem with request: ' + e.message);
-  });
-  if (transferOptions.data) {
-    mlReq.write(JSON.stringify(transferOptions.data));
+      res.status(response.statusCode);
+      response.on('data', function(chunk) {
+        chunks.push(chunk);
+      });
+      response.on('end', function() {
+        var str = chunks.join('');
+        if (responseTransform) {
+          var transformedStr = responseTransform(str);
+          if (transformedStr) {
+            res.write(transformedStr);
+          }
+        } else {
+          res.write(str);
+        }
+        res.end();
+      });
+    });
+    mlReq.on('error', function(e) {
+      console.log('Problem with request: ' + e.message);
+    });
+    if (transferOptions.data) {
+      mlReq.write(JSON.stringify(transferOptions.data));
+    }
+    mlReq.end();
+  };
+  var authenticator = getAuthenticator(session, session.user.name, port);
+  if (!authenticator) {
+    var challengeReq = http.request({
+      hostname: options.mlHost,
+      port: port,
+      method: 'HEAD',
+      path: '/v1/ping',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }, function(response) {
+      var statusCode = response.statusCode;
+      var challenge = response.headers['www-authenticate'];
+      var hasChallenge = (challenge != null);
+      var authenticator = null;
+      if (statusCode === 401 && hasChallenge) {
+        var authenticator = createAuthenticator(
+          session, port, session.user.name, session.user.password, challenge
+        );
+      }
+      makeRequest(authenticator);
+    });
+    challengeReq.end();
+  } else {
+    makeRequest(authenticator);
   }
-  mlReq.end();
 }
 
 function MockRes(p) {
@@ -161,9 +228,8 @@ MockRes.prototype.status = function(code) {
 function getAuth(options, session) {
   var auth = null;
   if (session && session.user !== undefined && session.user.name !== undefined) {
-    auth =  session.user.name + ':' + session.user.password;
-  }
-  else {
+    auth = session.user.name + ':' + session.user.password;
+  } else {
     auth = options.defaultUser + ':' + options.defaultPass;
   }
 
