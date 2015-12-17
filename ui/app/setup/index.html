@@ -62,9 +62,9 @@
             </thead>
             <tbody>
               <tr ng-repeat="index in model.rangeIndexes['range-index-list'] track by $index">
-                <td><a ng-click="editIndex(index)">{{(index['range-element-index'] || index['range-element-attribute-index']).localname || (index['range-element-index'] || index['range-element-attribute-index']).name || index['range-field-index']['field-name']}}</a></td>
-                <td>{{(index['range-element-index'] || index['range-element-attribute-index'] || index['range-field-index'])['scalar-type']}}</td>
-                <td>{{(index['range-element-index'] || index['range-element-attribute-index'] || index['range-field-index']).collation}}</td>
+                <td><a ng-click="editIndex(index)">{{(index['range-element-index'] || index['range-element-attribute-index']).localname || (index['range-element-index'] || index['range-element-attribute-index']).name || index['range-field-index']['field-name'] || index['range-path-index']['path-expression']}}</a></td>
+                <td>{{(index['range-element-index'] || index['range-element-attribute-index'] || index['range-field-index'] || index['range-path-index'])['scalar-type']}}</td>
+                <td>{{(index['range-element-index'] || index['range-element-attribute-index'] || index['range-field-index'] || index['range-path-index']).collation}}</td>
                 <td class="col-sm-1"><a class="pull-right" ng-click="removeIndex($index)"><i class="glyphicon glyphicon-trash"></i></a></td>
               </tr>
             </tbody>

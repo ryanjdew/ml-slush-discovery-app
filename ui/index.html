@@ -11,8 +11,11 @@
     <!-- build:css styles/lib.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="/bower_components/highlightjs/styles/default.css" />
+    <link rel="stylesheet" href="/bower_components/codemirror/lib/codemirror.css" />
+    <link rel="stylesheet" href="/app/lib/malhar-angular-dashboard/dist/malhar-angular-dashboard.css" />
     <link rel="stylesheet" href="/bower_components/ng-json-explorer/dist/angular-json-explorer.css" />
     <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
+    <link rel="stylesheet" href="/bower_components/ng-table/dist/ng-table.min.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -24,6 +27,10 @@
     <!-- endinject -->
     <!-- endbuild -->
 
+    <link rel="stylesheet" href="/ui/app/lib/ng-table/dist/ng-table.css" />
+    <link rel="stylesheet" href="/ui/app/lib/codemirror-5.8/lib/codemirror.css">
+    <link rel="stylesheet" href="/ui/app/styles/malhar-angular-dashboard.css">
+    <link rel="stylesheet" href="/ui/app/styles/custom.css">
   </head>
   <body ng-app="app">
 
@@ -39,11 +46,14 @@
     <script src="/bower_components/angular-highlightjs/build/angular-highlightjs.js"></script>
     <script src="/bower_components/angular-mocks/angular-mocks.js"></script>
     <script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="/bower_components/jquery-ui/jquery-ui.js"></script>
+    <script src="/bower_components/angular-ui-sortable/sortable.js"></script>
     <script src="/bower_components/tinymce-dist/tinymce.min.js"></script>
     <script src="/bower_components/angular-ui-tinymce/src/tinymce.js"></script>
     <script src="/bower_components/x2js/xml2json.min.js"></script>
     <script src="/bower_components/angular-x2js/dist/x2js.min.js"></script>
     <script src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="/bower_components/codemirror/lib/codemirror.js"></script>
     <script src="/bower_components/lodash/lodash.js"></script>
     <script src="/bower_components/highcharts/highcharts.js"></script>
     <script src="/bower_components/highcharts/highcharts-more.js"></script>
@@ -58,6 +68,11 @@
     <script src="/bower_components/ng-json-explorer/dist/angular-json-explorer.js"></script>
     <script src="/bower_components/ng-sortable/dist/ng-sortable.js"></script>
     <script src="/bower_components/vkbeautify-wrapper/dist/vkbeautify.0.99.00.beta.js"></script>
+    <script src="/bower_components/angular-resource/angular-resource.js"></script>
+    <script src="/bower_components/angular-route/angular-route.js"></script>
+    <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="/bower_components/ng-table/dist/ng-table.min.js"></script>
+    <script src="/bower_components/angular-recursion/angular-recursion.js"></script>
     <!-- endbower -->
     <script src="/bower_components/tinymce-dist/themes/modern/theme.js"></script>
     <!-- endbuild -->
@@ -80,6 +95,12 @@
     <script src="/ui/app/detail/detail.controller.js"></script>
     <script src="/ui/app/detail/similar-directive.js"></script>
     <script src="/ui/app/error/errorInterceptor.service.js"></script>
+    <script src="/ui/app/lib/Chart.min.js"></script>
+    <script src="/ui/app/lib/jquery-ui/jquery-ui.js"></script>
+    <script src="/ui/app/lib/jquery.event.drag-2.2/jquery.event.drag-2.2.js"></script>
+    <script src="/ui/app/lib/jquery.event.drag-2.2/jquery.event.drag.live-2.2.js"></script>
+    <script src="/ui/app/lib/jquery.form.min.js"></script>
+    <script src="/ui/app/lib/malhar-angular-dashboard/dist/malhar-angular-dashboard.js"></script>
     <script src="/ui/app/login/login.controller.js"></script>
     <script src="/ui/app/login/login.directive.js"></script>
     <script src="/ui/app/login/login.service.js"></script>
@@ -88,6 +109,21 @@
     <script src="/ui/app/message-board/message-board.service.js"></script>
     <script src="/ui/app/root/root.controller.js"></script>
     <script src="/ui/app/route/routes.js"></script>
+    <script src="/ui/app/scripts/angular-recursion.min.js"></script>
+    <script src="/ui/app/scripts/common/case-filters.js"></script>
+    <script src="/ui/app/scripts/common/common.js"></script>
+    <script src="/ui/app/scripts/compile/compile.directive.js"></script>
+    <script src="/ui/app/scripts/controllers/designer.js"></script>
+    <script src="/ui/app/scripts/controllers/editor.js"></script>
+    <script src="/ui/app/scripts/controllers/home.js"></script>
+    <script src="/ui/app/scripts/controllers/new-report.js"></script>
+    <script src="/ui/app/scripts/controllers/remover.js"></script>
+    <script src="/ui/app/scripts/controllers/sidebar.js"></script>
+    <script src="/ui/app/scripts/ml-dimension-builder.js"></script>
+    <script src="/ui/app/scripts/ml-index-builder.js"></script>
+    <script src="/ui/app/scripts/ml-sq-builder.js"></script>
+    <script src="/ui/app/scripts/services/service.js"></script>
+    <script src="/ui/app/scripts/util.js"></script>
     <script src="/ui/app/search/facet-charts.directive.js"></script>
     <script src="/ui/app/search/search.controller.js"></script>
     <script src="/ui/app/search/snippet.directive.js"></script>
@@ -97,7 +133,6 @@
     <script src="/ui/app/setup/dialogs/field.js"></script>
     <script src="/ui/app/setup/dialogs/newGeospatialIndex.js"></script>
     <script src="/ui/app/setup/dialogs/newRangeIndex.js"></script>
-    <script src="/ui/app/setup/dialogs/suggestRangeIndexes.js"></script>
     <script src="/ui/app/setup/directives/find-elements.js"></script>
     <script src="/ui/app/setup/directives/finder.js"></script>
     <script src="/ui/app/setup/setup.controller.js"></script>
@@ -105,6 +140,8 @@
     <script src="/ui/app/user/profile.controller.js"></script>
     <script src="/ui/app/user/user.directive.js"></script>
     <script src="/ui/app/user/user.service.js"></script>
+    <script src="/ui/app/widgets/src/ml-report.js"></script>
+    <script src="/ui/app/widgets/src/widgets.js"></script>
     <!-- endinject -->
 
     <!-- inject:templates:js -->

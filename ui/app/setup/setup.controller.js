@@ -279,8 +279,8 @@
       resampleConstraints: function() {
         model.constraints = [];
         angular.forEach(model.rangeIndexes['range-index-list'], function(val) {
-          var value = val['range-element-index'] || val['range-element-attribute-index'] || val['range-field-index'];
-          var name = value.localname || value['field-name'];
+          var value = val['range-element-index'] || val['range-element-attribute-index'] || val['range-field-index'] || val['range-path-index'];
+          var name = value.localname || value['field-name'] || value['path-expression'];
           if (name && name !== '') {
             var constraint = {
               'name': name,

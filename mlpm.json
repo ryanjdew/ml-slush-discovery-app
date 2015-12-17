@@ -4,5 +4,8 @@
   "description": "Sample app generated with slush-marklogic-node",
   "private": true,
   "dependencies": {
+    "cts-extensions": "1.1.*",
+    "group-by": "1.1.*",
+    "ml-index-discovery": "2.0.*"
   }
 }

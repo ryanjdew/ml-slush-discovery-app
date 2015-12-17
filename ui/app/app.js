@@ -17,7 +17,18 @@
     'app.user',
     'ui.bootstrap',
     'ui.router',
-    'ui.tinymce'
+    'ui.tinymce',
+    'app.common',
+    'app.service',
+    'ngRoute',
+    'ngResource',
+    'ngSanitize',
+    'ui.dashboard',
+    'ngTable',
+    'marklogic.widgets',
+    'ml.report',
+    'ml-index-builder',
+    'compile'
   ]);
 
 }());

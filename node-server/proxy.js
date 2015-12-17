@@ -4,6 +4,9 @@
 
 var router = require('express').Router();
 var http = require('http');
+// Analytics Dashboard
+var querystring = require('querystring');
+// end of Analytics Dashboard
 var config = require('../gulp.config')();
 var manageML = require('./manage-ml');
 
@@ -102,6 +105,22 @@ function proxy(req, res) {
   console.log(
     req.method + ' ' + req.path + ' proxied to ' +
     options.mlHost + ':' + options.mlHttpPort + path);
+  // Analytics Dashboard
+  if (queryString) {
+    var params = querystring.parse(queryString);
+    var category = params['category'];
+    // Can use the 'category' parameter only with multipart/mixed accept.
+
+    if (category) {
+      var multipartHeader = 'multipart/mixed';
+      if (req.headers['accept']) {
+        req.headers['accept'] = multipartHeader;
+      } else if (req.headers['Accept']) {
+        req.headers['Accept'] = multipartHeader;
+      }
+    }
+  }
+  // end of Analytics Dashboard
   var mlReq = http.request({
     hostname: options.mlHost,
     port: options.mlHttpPort,

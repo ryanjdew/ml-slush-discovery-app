@@ -17,13 +17,13 @@ var options = {
 };
 
 var serverConfigObj = {
-  database: 'Documents'
+  database: 'discovery-app-content'
 };
 
 serverConfig().then(function(sConfig) {
   if (sConfig) {
     serverConfigObj = sConfig;
-    serverConfigObj.database = serverConfigObj.database || 'Documents';
+    serverConfigObj.database = serverConfigObj.database || 'discovery-app-content';
   }
 });
 
@@ -56,7 +56,7 @@ function genericConfig(name, res, data) {
       method: 'GET',
       params: {
         uri: '/discovery-app/config/' + name + '.json',
-        database: 'Documents'
+        database: 'discovery-app-content'
       },
       path: '/v1/documents'
     };

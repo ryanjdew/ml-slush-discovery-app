@@ -8,9 +8,11 @@
     "angular-highlightjs": "~0.4.3",
     "angular-mocks": "~1.4.4",
     "angular-ui-router": "~0.2.15",
+    "angular-ui-sortable": "~0.13.4",
     "angular-ui-tinymce": "~0.0.9",
     "angular-x2js": "https://github.com/janmichaelyu/angular-x2js.git",
     "bootstrap": "~3.3.5",
+    "codemirror": "~5.8",
     "font-awesome": "~4.4.0",
     "highlightjs": "~8.7.0",
     "jquery": "~2.1.4",
@@ -20,7 +22,12 @@
     "ml-utils": "withjam/ml-utils",
     "ng-json-explorer": "8c2a0f9104",
     "ng-sortable": "~1.3.1",
-    "vkbeautify-wrapper": "*"
+    "vkbeautify-wrapper": "*",
+    "angular-resource": "~1.4.8",
+    "angular-route": "~1.4.8",
+    "angular-sanitize": "~1.4.8",
+    "ng-table": "~0.8.3",
+    "angular-recursion": "~1.0.5"
   },
   "overrides": {
     "angular-highlightjs": {
@@ -37,6 +44,8 @@
   },
   "private": true,
   "resolutions": {
-    "angular": "1.4.8"
+    "angular": "1.4.8",
+    "angular-bootstrap": "~0.13.3",
+    "lodash": "~3.10.1"
   }
 }

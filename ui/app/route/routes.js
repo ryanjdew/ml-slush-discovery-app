@@ -106,6 +106,56 @@
         templateUrl: 'app/setup/index.html',
         controller: 'SetupCtrl',
         controllerAs: 'ctrl'
+      })
+      .state('root.new-report', {
+        url: '/new-report',
+        templateUrl: 'app/views/new-report.html',
+        controller: 'NewReportCtrl'
+      })
+      .state('root.analytics-dashboard', {
+        url: '/analytics-dashboard',
+        templateUrl: 'app/views/dashboard.html',
+        controller: 'SidebarCtrl'
+      })
+      .state('root.analytics-dashboard.home', {
+        url: '/home',
+        templateUrl: 'app/views/home.html',
+        controller: 'HomeCtrl'
+      })
+      .state('root.analytics-dashboard.designer', {
+        url: '/designer{uri:path}',
+        templateUrl: 'app/views/designer.html',
+        controller: 'ReportDesignerCtrl',
+        resolve: {
+          ReportData: function($stateParams, ReportService) {
+            //MarkLogic.Util.showLoader();
+            var uri = $stateParams.uri;
+            return ReportService.getReport(uri).then(function(response) {
+              //MarkLogic.Util.hideLoader();
+              return response;
+            });
+          }
+        }
+      })
+      .state('root.analytics-dashboard.remover', {
+        url: '/remover{uri:path}',
+        templateUrl: 'app/views/remover.html',
+        controller: 'ReportRemoverCtrl'
+      })
+      .state('root.analytics-dashboard.editor', {
+        url: '/editor{uri:path}',
+        templateUrl: 'app/views/editor.html',
+        controller: 'ReportEditorCtrl',
+        resolve: {
+          ReportData: function($stateParams, ReportService) {
+            //MarkLogic.Util.showLoader();
+            var uri = $stateParams.uri;
+            return ReportService.getReport(uri).then(function(response) {
+              //MarkLogic.Util.hideLoader();
+              return response;
+            });
+          }
+        }
       });
     }
 }());
