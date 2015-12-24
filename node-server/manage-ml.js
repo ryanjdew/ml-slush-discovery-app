@@ -2,22 +2,13 @@
 
 'use strict';
 
-var config = require('../gulp.config')();
 var http = require('http');
 var www_authenticate = require('www-authenticate');
 var q = require('q');
 var _ = require('underscore');
+var authHelper = require('./auth-helper');
 
-var options = {
-  appPort: process.env.APP_PORT || config.defaultPort,
-  mlHost: process.env.ML_HOST || config.marklogic.host,
-  mlHttpPort: process.env.ML_PORT || config.marklogic.httpPort,
-  mlManageHttpPort: process.env.ML_MNG_PORT || config.marklogic.manageHttpPort,
-  defaultUser: process.env.ML_APP_USER || config.marklogic.user,
-  defaultPass: process.env.ML_APP_PASS || config.marklogic.password
-};
-
-var defaultCredentials = www_authenticate.user_credentials(options.defaultUser, options.defaultPass);
+var options = require('./options');
 
 var serverConfigObj = {
   database: 'discovery-app-content'
@@ -32,17 +23,20 @@ serverConfig().then(function(sConfig) {
 
 function serverConfig(data) {
   var d = q.defer();
+  var putData = null;
   if (data) {
     _.extend(serverConfigObj, data);
+    putData = {
+      'server-config': serverConfigObj
+    };
   }
-  genericConfig('server-config', new MockRes(d), {
-    'server-config': serverConfigObj
-  });
-  return d.promise.then(function(data) {
-    if (data && data['server-config']) {
-      return data;
+  genericConfig('server-config', new MockRes(d), putData);
+  return d.promise.then(function(resData) {
+    if (resData) {
+      var resObj = JSON.parse(resData);
+      return resObj['server-config'] || resObj;
     }
-    return data;
+    return resData;
   });
 }
 
@@ -64,6 +58,8 @@ function genericConfig(name, res, data) {
     path: '/v1/documents'
   };
   if (data) {
+    opt.params['perm:discovery-app-role'] = 'read';
+    opt.params['perm:discovery-app-admin-role'] = 'update';
     opt.method = 'PUT';
     opt.data = data;
   }
@@ -107,12 +103,8 @@ function getAuthenticator(session, user, port) {
 
 function passOnToML(req, res, transferOptions, port) {
   port = port || options.mlHttpPort;
-  var session = req.session || {
-    user: {
-      name: options.defaultUser,
-      password: options.defaultPass
-    }
-  };
+  req.session = req.session || {};
+  var user = req.session.user;
   var params = [];
   var chunks = [];
   var responseTransform = transferOptions.responseTransform;
@@ -138,9 +130,9 @@ function passOnToML(req, res, transferOptions, port) {
     }
   };
 
-  var makeRequest = function(authenticator) {
-    if (authenticator) {
-      reqOptions.headers.Authorization = authorizationFunctions[port].call(authenticator, reqOptions.method, reqOptions.path);
+  var makeRequest = function(authorization) {
+    if (authorization) {
+      reqOptions.headers.Authorization = authorization;
     }
     var mlReq = http.request(reqOptions, function(response) {
       for (var header in response.headers) {
@@ -174,32 +166,18 @@ function passOnToML(req, res, transferOptions, port) {
     }
     mlReq.end();
   };
-  var authenticator = getAuthenticator(session, session.user.name, port);
-  if (!authenticator) {
-    var challengeReq = http.request({
-      hostname: options.mlHost,
-      port: port,
-      method: 'HEAD',
-      path: '/v1/ping',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }, function(response) {
-      var statusCode = response.statusCode;
-      var challenge = response.headers['www-authenticate'];
-      var hasChallenge = (challenge != null);
-      var authenticator = null;
-      if (statusCode === 401 && hasChallenge) {
-        var authenticator = createAuthenticator(
-          session, port, session.user.name, session.user.password, challenge
-        );
-      }
-      makeRequest(authenticator);
-    });
-    challengeReq.end();
-  } else {
-    makeRequest(authenticator);
-  }
+  authHelper.getAuthorization(req.session, reqOptions.method, reqOptions.path,
+    {
+      authHost: reqOptions.host,
+      authPort: reqOptions.port,
+      authUser: user ? user.name : options.defaultUser,
+      authPassword: user ? user.password : options.defaultPass
+    }
+  ).then(function(authorization) {
+    makeRequest(authorization);
+  }, function() {
+    makeRequest(null);
+  });
 }
 
 function MockRes(p) {
@@ -212,7 +190,7 @@ MockRes.prototype.write = function(d) {
 MockRes.prototype.end = function() {
   // console.log('MockRes end, code:', this.code, this.response);
   if (this.code === 200) {
-    this.deferred.resolve(this.response.data);
+    this.deferred.resolve(this.response);
   } else {
     this.deferred.reject({
       code: this.code,
@@ -225,24 +203,14 @@ MockRes.prototype.status = function(code) {
   this.code = code;
 };
 
-function getAuth(options, session) {
-  var auth = null;
-  if (session && session.user !== undefined && session.user.name !== undefined) {
-    auth = session.user.name + ':' + session.user.password;
-  } else {
-    auth = options.defaultUser + ':' + options.defaultPass;
-  }
-
-  return auth;
-}
-
-
 var manageML = {
   serverConfig: serverConfig,
   chartConfig: chartConfig,
   uiConfig: uiConfig,
   genericConfig: genericConfig,
   database: function() {
+    console.log('serverConfigObj.database');
+    console.log(serverConfigObj.database);
     return serverConfigObj.database;
   },
   passOnToML: passOnToML,

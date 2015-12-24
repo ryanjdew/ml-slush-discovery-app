@@ -7,16 +7,10 @@ var http = require('http');
 // Analytics Dashboard
 var querystring = require('querystring');
 // end of Analytics Dashboard
-var config = require('../gulp.config')();
 var manageML = require('./manage-ml');
+var authHelper = require('./auth-helper');
 
-var options = {
-  mlHost: process.env.ML_HOST || config.marklogic.host,
-  mlHttpPort: process.env.ML_PORT || config.marklogic.httpPort,
-  mlManageHttpPort: process.env.ML_MNG_PORT || config.marklogic.manageHttpPort,
-  defaultUser: process.env.ML_APP_USER || config.marklogic.user,
-  defaultPass: process.env.ML_APP_PASS || config.marklogic.password
-};
+var options = require('./options');
 
 // ==================================
 // MarkLogic REST API endpoints
@@ -91,6 +85,8 @@ function getAuth(options, session) {
 
 // Generic proxy function used by multiple HTTP verbs
 function proxy(req, res) {
+  req.session = req.session || {};
+  var user = req.session.user;
   var origUrl = req.originalUrl;
   var separator = /\?/.test(origUrl) ? '&' : '?';
   var databaseParam;
@@ -121,39 +117,64 @@ function proxy(req, res) {
     }
   }
   // end of Analytics Dashboard
-  var mlReq = http.request({
-    hostname: options.mlHost,
-    port: options.mlHttpPort,
-    method: req.method,
-    path: path,
-    headers: req.headers,
-    auth: getAuth(options, req.session)
-  }, function(response) {
-
-    res.statusCode = response.statusCode;
-
-    // [GJo] (#67) forward all headers from MarkLogic
-    for (var header in response.headers) {
-      res.header(header, response.headers[header]);
+  var reqOptions = {
+      hostname: options.mlHost,
+      port: options.mlHttpPort,
+      method: req.method,
+      path: path,
+      headers: req.headers,
+      auth: getAuth(options, req.session)
+    };
+  var makeRequest = function(authorization) {
+    if (authorization) {
+      reqOptions.headers.Authorization = authorization;
     }
+    var mlReq = http.request({
+      hostname: options.mlHost,
+      port: options.mlHttpPort,
+      method: req.method,
+      path: path,
+      headers: req.headers,
+      auth: getAuth(options, req.session)
+    }, function(response) {
 
-    response.on('data', function(chunk) {
-      res.write(chunk);
+      res.statusCode = response.statusCode;
+
+      // [GJo] (#67) forward all headers from MarkLogic
+      for (var header in response.headers) {
+        res.header(header, response.headers[header]);
+      }
+
+      response.on('data', function(chunk) {
+        res.write(chunk);
+      });
+      response.on('end', function() {
+        res.end();
+      });
     });
-    response.on('end', function() {
+
+    req.pipe(mlReq);
+    req.on("end", function() {
+      mlReq.end();
+    });
+
+    mlReq.on('error', function(e) {
+      console.log('Problem with request: ' + e.message);
+      res.statusCode = 500;
       res.end();
     });
-  });
-
-  req.pipe(mlReq);
-  req.on("end", function() {
-    mlReq.end();
-  });
-
-  mlReq.on('error', function(e) {
-    console.log('Problem with request: ' + e.message);
-    res.statusCode = 500;
-    res.end();
+  };
+  authHelper.getAuthorization(req.session, reqOptions.method, reqOptions.path,
+    {
+      authHost: reqOptions.host,
+      authPort: reqOptions.port,
+      authUser: user ? user.name : options.defaultUser,
+      authPassword: user ? user.password : options.defaultPass
+    }
+  ).then(function(authorization) {
+    makeRequest(authorization);
+  }, function() {
+    makeRequest(null);
   });
 }
 

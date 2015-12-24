@@ -1,11 +1,10 @@
-<h1>Sample MarkLogic Application</h1>
-<div class="row" ng-if="!ctrl.currentUser">Please log in to see content</div>
-<div class="row" ng-if="ctrl.currentUser">
+<h1>Discovery MarkLogic Application</h1>
+<div class="row">
   <div class="col-md-12">
     <ml-input qtext="ctrl.qtext" search="ctrl.search(qtext)" suggest="ctrl.suggest(val)" template="fa" class="search"></ml-input>
   </div>
 </div>
-<div class="search row" ng-if="ctrl.currentUser">
+<div class="search row">
   <div class="col-md-3 right-col">
     <div class="facet" ng-repeat="(constraintName, constraint) in ctrl.dateTimeConstraints">
       <h3>{{constraintName}}</h3>
