@@ -13,16 +13,17 @@ class ServerConfig
   # In ruby this is called monkey patching
   #
   # first you would rename the original method
-  # alias_method :original_deploy_modules, :deploy_modules
+  alias_method :original_deploy_modules, :deploy_modules
 
   # then you would define your new method
-  # def deploy_modules
-  #   # do your stuff here
-  #   # ...
+  def deploy_modules
+    original_deploy_modules
 
-  #   # you can optionally call the original
-  #   original_deploy_modules
-  # end
+    system %Q!mlpm deploy -u #{ @properties['ml.user'] } \
+                      -p #{ @ml_password } \
+                      -H #{ @properties['ml.server'] } \
+                      -P #{ @properties['ml.app-port'] }!
+  end
 
   #
   # you can define your own methods and call them from the command line
@@ -63,13 +64,13 @@ end
 #  def self.example
 #    <<-DOC.strip_heredoc
 #      Usage: ml {env} example [args] [options]
-#      
+#
 #      Runs a special example task against given environment.
-#      
+#
 #      Arguments:
 #        this    Do this
 #        that    Do that
-#        
+#
 #      Options:
 #        --whatever=value
 #    DOC

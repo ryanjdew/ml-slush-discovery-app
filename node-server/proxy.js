@@ -71,18 +71,6 @@ router.delete('*', function(req, res) {
   }
 });
 
-function getAuth(options, session) {
-  var auth = null;
-  if (session.user !== undefined && session.user.name !== undefined) {
-    auth =  session.user.name + ':' + session.user.password;
-  }
-  else {
-    auth = options.defaultUser + ':' + options.defaultPass;
-  }
-
-  return auth;
-}
-
 // Generic proxy function used by multiple HTTP verbs
 function proxy(req, res) {
   req.session = req.session || {};
@@ -122,21 +110,13 @@ function proxy(req, res) {
       port: options.mlHttpPort,
       method: req.method,
       path: path,
-      headers: req.headers,
-      auth: getAuth(options, req.session)
+      headers: req.headers
     };
   var makeRequest = function(authorization) {
     if (authorization) {
       reqOptions.headers.Authorization = authorization;
     }
-    var mlReq = http.request({
-      hostname: options.mlHost,
-      port: options.mlHttpPort,
-      method: req.method,
-      path: path,
-      headers: req.headers,
-      auth: getAuth(options, req.session)
-    }, function(response) {
+    var mlReq = http.request(reqOptions, function(response) {
 
       res.statusCode = response.statusCode;
 
