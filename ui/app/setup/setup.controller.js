@@ -95,6 +95,7 @@
         ServerConfig.setDatabase({
           'database-name': model.databaseName
         }).then(function() {
+          $scope.error = null;
           init();
         }, handleError);
       },
@@ -130,7 +131,9 @@
           size: 'sm'
         }).result.then(function(dbName) {
           model.databaseOptions.push(dbName);
-          model.databaseOptions.sort();
+          model.databaseOptions.sort(function (a, b) {
+            return a.toLowerCase().localeCompare(b.toLowerCase());
+          });
           model.databaseName = dbName;
         });
       },

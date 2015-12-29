@@ -70,35 +70,55 @@ router.put('/server/search-options', function(req, res) {
 });
 
 router.put('/server/ui-config', function(req, res) {
-  manageML.uiConfig(res, req.body);
+  manageML.uiConfig(req, res, req.body);
 });
 
 router.get('/server/ui-config', function(req, res) {
-  manageML.uiConfig(res);
+  manageML.uiConfig(req, res);
 });
 
 router.put('/server/charts', function(req, res) {
-  manageML.chartConfig(res, req.body);
+  manageML.chartConfig(req, res, req.body);
 });
 
 router.get('/server/charts', function(req, res) {
-  manageML.chartConfig(res);
+  manageML.chartConfig(req, res);
 });
 
 router.put('/server/database', function(req, res) {
   if (req.body && req.body['database-name']) {
-    manageML.serverConfig({
+    manageML.serverConfig(req,
+    {
       'database': req.body['database-name']
     });
   }
-  console.log('/manage/v2/databases/' + manageML.database() + '/properties');
-  manageML.passOnToMLManage(
-    req,
-    res, {
-      method: 'PUT',
-      data: req.body,
-      params: {format: 'json'},
-      path: '/manage/v2/databases/' + manageML.database() + '/properties'
+  console.log('checking db ' + manageML.database());
+  manageML.databaseExists(req, manageML.database()).then(
+    function (doesDbExist) {
+      if (doesDbExist) {
+        console.log('/manage/v2/databases/' + manageML.database() + '/properties');
+        manageML.passOnToMLManage(
+          req,
+          res,
+          {
+            method: 'PUT',
+            data: req.body,
+            params: {format: 'json'},
+            path: '/manage/v2/databases/' + manageML.database() + '/properties'
+          }
+        );
+      } else {
+        console.log('POST /manage/v2/databases creating ' + manageML.database());
+        manageML.createDatabase(req, req.body).then(
+          function() {
+            res.status(200).send(req.body);
+          },
+          function(err) {
+            console.log(err);
+            res.status(500).send('Internal Server Error');
+          }
+        );
+      }
     }
   );
 });

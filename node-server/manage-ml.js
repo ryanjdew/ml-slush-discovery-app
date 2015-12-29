@@ -14,6 +14,8 @@ var serverConfigObj = {
   database: 'discovery-app-content'
 };
 
+var _hostName;
+
 serverConfig().then(function(sConfig) {
   if (sConfig) {
     serverConfigObj = sConfig;
@@ -21,7 +23,7 @@ serverConfig().then(function(sConfig) {
   }
 });
 
-function serverConfig(data) {
+function serverConfig(req, data) {
   var d = q.defer();
   var putData = null;
   if (data) {
@@ -30,7 +32,7 @@ function serverConfig(data) {
       'server-config': serverConfigObj
     };
   }
-  genericConfig('server-config', new MockRes(d), putData);
+  genericConfig('server-config', req, new MockRes(d), putData);
   return d.promise.then(function(resData) {
     if (resData) {
       var resObj = JSON.parse(resData);
@@ -40,15 +42,15 @@ function serverConfig(data) {
   });
 }
 
-function chartConfig(res, data) {
-  genericConfig('charts', res, data);
+function chartConfig(req, res, data) {
+  genericConfig('charts', req, res, data);
 }
 
-function uiConfig(res, data) {
-  genericConfig('ui-config', res, data);
+function uiConfig(req, res, data) {
+  genericConfig('ui-config', req, res, data);
 }
 
-function genericConfig(name, res, data) {
+function genericConfig(name, req, res, data) {
   var opt = {
     method: 'GET',
     params: {
@@ -63,7 +65,8 @@ function genericConfig(name, res, data) {
     opt.method = 'PUT';
     opt.data = data;
   }
-  passOnToML({
+  passOnToML(
+    req || {
       headers: {}
     },
     res,
@@ -75,36 +78,10 @@ function passOnToMLManage(req, res, transferOptions) {
   passOnToML(req, res, transferOptions, options.mlManageHttpPort);
 }
 
-var challengeOpts = {
-  method: 'HEAD',
-  path: '/v1/ping'
-};
-
-var authorizationFunctions = {};
-
-function createAuthenticator(session, port, user, password, challenge) {
-  var authenticator = www_authenticate.call(null, user, password)(challenge);
-  if (!session.authenticator) {
-    session.authenticator = {};
-  }
-  session.authenticator[user + ':' + port] = authenticator;
-  if (!authorizationFunctions[port]) {
-    authorizationFunctions[port] = authenticator.authorize;
-  }
-  return authenticator;
-}
-
-function getAuthenticator(session, user, port) {
-  if (!session.authenticator) {
-    return null;
-  }
-  return session.authenticator[user + ':' + port];
-}
-
 function passOnToML(req, res, transferOptions, port) {
   port = port || options.mlHttpPort;
-  req.session = req.session || {};
-  var user = req.session.user;
+  var session = req.session || {};
+  var user = session.user;
   var params = [];
   var chunks = [];
   var responseTransform = transferOptions.responseTransform;
@@ -166,7 +143,7 @@ function passOnToML(req, res, transferOptions, port) {
     }
     mlReq.end();
   };
-  authHelper.getAuthorization(req.session, reqOptions.method, reqOptions.path,
+  authHelper.getAuthorization(session, reqOptions.method, reqOptions.path,
     {
       authHost: reqOptions.host,
       authPort: reqOptions.port,
@@ -189,7 +166,7 @@ MockRes.prototype.write = function(d) {
 };
 MockRes.prototype.end = function() {
   // console.log('MockRes end, code:', this.code, this.response);
-  if (this.code === 200) {
+  if (this.code >= 200 && this.code <= 399) {
     this.deferred.resolve(this.response);
   } else {
     this.deferred.reject({
@@ -203,14 +180,101 @@ MockRes.prototype.status = function(code) {
   this.code = code;
 };
 
+function hostName(req) {
+  var d = q.defer();
+  if (_hostName) {
+    d.resolve(_hostName);
+    return d.promise;
+  } else {
+    passOnToMLManage(
+      req,
+      new MockRes(d),
+      {
+        method: 'GET',
+        params: { format: 'json' },
+        path: '/manage/v2/hosts'
+      }
+    );
+    return d.promise.then(function(resp) {
+      _hostName = JSON.parse(resp)['host-default-list']['list-items']['list-item'][0].nameref;
+      return _hostName;
+    });
+  }
+}
+
+function createDatabase(req, databaseProperties) {
+  var d = q.defer();
+  var databaseName = databaseProperties['database-name'];
+  passOnToMLManage(
+    req,
+    new MockRes(d),
+    {
+      method: 'POST',
+      params: {},
+      path: '/manage/v2/databases',
+      data: databaseProperties
+    }
+  );
+  return d.promise.then(function() {
+    return hostName(req).then(function(hName) {
+      var promises = [];
+      var forestDefered;
+      var forestData;
+      for (var i = 1; i <= 3; i++) {
+        forestDefered = q.defer();
+        forestData = {
+            'forest-name': databaseName + '-0' + i,
+            host: hName,
+            database: databaseName
+          };
+        console.log(forestData);
+        (function(forestDefered, forestData) {
+          passOnToMLManage(
+            req,
+            new MockRes(forestDefered),
+            {
+              method: 'POST',
+              params: { format: 'json' },
+              path: '/manage/v2/forests',
+              data: forestData
+            }
+          );
+        })(forestDefered, forestData);
+        promises.push(forestDefered.promise);
+      }
+      return q.all(promises);
+    });
+  });
+}
+
+function databaseExists(req, databaseName) {
+  var d = q.defer();
+  passOnToMLManage(
+    req,
+    new MockRes(d),
+    {
+      method: 'GET',
+      params: {},
+      path: '/manage/v2/databases/' + databaseName
+    }
+  );
+  return d.promise.then(function() {
+    return true;
+  },
+  function() {
+    return false;
+  });
+}
+
 var manageML = {
   serverConfig: serverConfig,
   chartConfig: chartConfig,
   uiConfig: uiConfig,
   genericConfig: genericConfig,
+  hostName: hostName,
+  createDatabase: createDatabase,
+  databaseExists: databaseExists,
   database: function() {
-    console.log('serverConfigObj.database');
-    console.log(serverConfigObj.database);
     return serverConfigObj.database;
   },
   passOnToML: passOnToML,
