@@ -228,7 +228,7 @@
         <div class="panel-heading">Preview <a href="/">Explore</a><a class="pull-right" ng-click="addChart()"><i class="glyphicon glyphicon-plus-sign"></i> Add Widget</a></div>
         <div class="panel-body">
           <h3 ng-if="model.search.total === 0">No results to show</h3>
-          <ml-facets class="col-md-3" facets="model.search.facets" toggle="toggleFacet(facet, value)" active-facets="ctrl.mlSearch.activeFacets" negate="ctrl.toggleNegatedFacet(facet,value)"></ml-facets>
+          <ml-facets class="col-md-3 right-col" facets="model.search.facets" toggle="toggleFacet(facet, value)" active-facets="ctrl.mlSearch.activeFacets" negate="ctrl.toggleNegatedFacet(facet,value)"></ml-facets>
           <div class="col-md-9">
             <facet-charts charts="model.chartData.charts" ml-search="mlSearch" remove-chart="removeChart" edit-chart="editChart" callback="toggleFacet(facet, value)"></facet-charts>
             <ml-results results="model.search.results" template="app/search/search-results.html"></ml-results>

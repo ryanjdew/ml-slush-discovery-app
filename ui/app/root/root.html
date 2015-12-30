@@ -24,6 +24,7 @@
 <div class=" content">
   <div class="container">
     <div class="alert alert-danger" role="alert" ng-if="ctrl.messageBoardService.message()">
+      <a class="pull-right"><i class="glyphicon glyphicon-remove" ng-click="ctrl.messageBoardService.message(null)"></i></a>
       <message-board msg="ctrl.messageBoardService.message()"></message-board>
     </div>
     <div>
