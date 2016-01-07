@@ -75,12 +75,9 @@
   <annotation>Delta options here</annotation>
 
   <!-- Facet based on document collections, simple yet elegant -->
-  <constraint name="Collection">
+  <!--constraint name="Collection">
     <collection facet="true" />
-    <!-- optionally enable a prefix to see a specific subset of facets
-    <collection facet="true" prefix="data/" />
-    -->
-  </constraint>
+  </constraint-->
 
   <!-- example facet constraint below -->
   <!--

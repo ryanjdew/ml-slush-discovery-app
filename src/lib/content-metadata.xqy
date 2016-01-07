@@ -19,7 +19,7 @@ declare function data:get-localname-details(
 
     let $elements :=
      if($type = ("element", "element-attribute")) then
-        ($sampleDocuments/descendant-or-self::*[starts-with(local-name(), $localname,$collation)],
+        ($sampleDocuments/descendant-or-self::*[starts-with(string((local-name()[. ne ''],node-name())[1]), $localname,$collation)],
          $sampleProperties)
           else ()
     let $attributes := if($type = ("element-attribute", "attribute")) then $sampleDocuments/descendant-or-self::*/@*[starts-with(local-name(), $localname,$collation)] else ()
@@ -30,7 +30,7 @@ declare function data:get-localname-details(
         where empty(map:get($map, $key))
         return map:put($map, $key, <localname array="true">
                 <elementNamespace>{ namespace-uri($element) }</elementNamespace>
-                <element>{ local-name($element) }</element>
+                <element>{ (local-name($element)[. ne ''], string(node-name($element)))[1] }</element>
                 <path>{xdmp:path($element)}</path>
             </localname>)
     let $populate :=
@@ -56,29 +56,28 @@ declare function data:get-sample-docs(
 ) as node()*
 {
   let $sample-positions as xs:integer+ := (1 to $amount)
-  let $unique-root-qnames as xs:QName* := data:find-unique-root-qnames("xml")
+  let $unique-root-qnames as xs:QName* := (data:find-unique-root-qnames("xml"), data:find-unique-root-qnames("json"))
   for $root-qname as xs:QName in $unique-root-qnames
   return
-    cts:search(fn:collection()/element(),
-      cts:element-query($root-qname,cts:and-query(()),"self"),
-      "format-xml"
-    )[fn:position() = $sample-positions]
+    (
+      cts:search(fn:collection()/element(),
+        cts:element-query($root-qname,cts:and-query(()),"self"),
+        "format-xml"
+      )[fn:position() = $sample-positions],
+      cts:search(fn:collection()/*,
+        cts:json-property-scope-query(fn:string($root-qname), cts:and-query(())),
+        "format-json"
+      )[fn:position() = $sample-positions]
+    )
 };
 
 
 declare function data:get-sample-properties(
     $amount as xs:integer,
     $localname as xs:string
-) as element()*
+) as node()*
 {
-  let $sample-positions as xs:integer+ := (1 to $amount)
-  let $unique-root-qnames as xs:QName* := data:find-unique-root-qnames("xml")
-  for $root-qname as xs:QName in $unique-root-qnames
-  return
-    cts:search(fn:collection()/element(),
-      cts:element-query($root-qname,cts:and-query(()),"self"),
-      "format-xml"
-    )[fn:position() = $sample-positions]/property::*[starts-with(local-name(), $localname,"http://marklogic.com/collation//S1")]
+  data:get-sample-docs($amount)/property::*[starts-with(string((local-name()[. ne ''],node-name())[1]), $localname,"http://marklogic.com/collation//S1")]
 };
 
 declare variable $sample-positions as xs:integer+ := (1 to 5);
