@@ -344,8 +344,9 @@
           fileName = '/' + fileName;
         }
         promises.push(d.promise);
+        var contentType = file.type || 'text/plain';
         reader.onloadend = function () {
-          var contentBlock = header + 'Content-Type: ' + file.type + '\r\n';
+          var contentBlock = header + 'Content-Type: ' + contentType + '\r\n';
           contentBlock += 'Content-Disposition: attachment; filename="' + fileName +
           '"\r\n';
           contentBlock += 'Content-Length: ' + file.size + '\r\n\r\n';
@@ -358,7 +359,14 @@
       return $q.all(promises).then(function() {
         contents.push(footer);
         var fullContent = contents.join('');
-        return $http.post('/v1/documents', fullContent, {'headers':{'Content-Type':contenttype}});
+        return $http.post(
+          '/v1/documents',
+          fullContent,
+          {
+            'headers':{'Content-Type':contenttype},
+            'params': {'transform': 'expand'}
+          }
+        );
       });
     }
 

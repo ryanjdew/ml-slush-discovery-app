@@ -11,6 +11,8 @@
 
     var contentType = doc.headers('content-type');
 
+    ctrl.defaultTab = true;
+
     var x2js = new X2JS();
     /* jscs: disable */
     if (contentType.lastIndexOf('application/json', 0) === 0) {

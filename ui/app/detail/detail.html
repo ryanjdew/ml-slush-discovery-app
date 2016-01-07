@@ -1,7 +1,7 @@
 <div class="row detail">
   <div class="col-sm-8">
     <tabset type="pills">
-      <tab active="true">
+      <tab active="ctrl.defaultTab">
         <tab-heading>{{ctrl.type | uppercase}}</tab-heading>
         <div class="col-sm-9">
           <json-explorer ng-if="ctrl.type==='json'" data="ctrl.json"></json-explorer>
