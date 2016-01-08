@@ -38,6 +38,7 @@ function trns:transform(
 {
   expand:document(
     map:get($context, "uri"),
-    $content
+    $content,
+    fn:true()
   )
 };

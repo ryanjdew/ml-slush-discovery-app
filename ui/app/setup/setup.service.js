@@ -325,6 +325,17 @@
       ];
     };
 
+    function arrayBuffer2base64(arrayBuf) {
+      var bytes = new Uint8Array(arrayBuf),
+        len = bytes.byteLength,
+        binary = [];
+
+      for (var i = 0; i < len; i++) {
+        binary.push(String.fromCharCode( bytes[ i ] ));
+      }
+      return window.btoa( binary.join('') );
+    }
+
     function uploadBatch(files) {
       var promises = [];
       var epochTicks = 621355968000000000;
@@ -332,8 +343,8 @@
       var yourTicks = epochTicks + ((new Date()).getTime() * ticksPerMillisecond);
       var boundary = 'BOUNDARY' + yourTicks;
       var header = '--' + boundary + '\r\n';
-      var footer = '\r\n--' + boundary + '--\r\n';
-      var contenttype = 'multipart/mixed; boundary=' + boundary;
+      var footer = '--' + boundary + '--\r\n';
+      var mixedContentType = 'multipart/mixed; boundary=' + boundary;
 
       var contents = [];
       angular.forEach(files, function(file) {
@@ -345,28 +356,42 @@
         }
         promises.push(d.promise);
         var contentType = file.type || 'text/plain';
-        reader.onloadend = function () {
-          var contentBlock = header + 'Content-Type: ' + contentType + '\r\n';
-          contentBlock += 'Content-Disposition: attachment; filename="' + fileName +
+        reader.onload = function (event) {
+          var value = arrayBuffer2base64(event.target.result);
+          var contentBlockHeader = header + 'Content-Type: ' + contentType + '\r\n';
+          contentBlockHeader += 'Content-Disposition: attachment; filename="' + fileName +
           '"\r\n';
-          contentBlock += 'Content-Length: ' + file.size + '\r\n\r\n';
-          contentBlock += reader.result + '\r\n';
-          contents.push(contentBlock);
+          contentBlockHeader += 'Content-Transfer-Type: base64\r\n';
+          contentBlockHeader += 'Content-Length: ' + value.length + '\r\n\r\n';
+          contents.push(contentBlockHeader);
+          contents.push(value);
+          contents.push('\r\n');
           d.resolve();
         };
-        reader.readAsBinaryString(file);
+        reader.readAsArrayBuffer(file);
       });
       return $q.all(promises).then(function() {
+        var finalD = $q.defer();
+        var finalReader = new FileReader();
+        finalReader.onload = function (event) {
+          finalD.resolve(new Uint8Array(event.target.result));
+        };
+        console.log('creating blob');
         contents.push(footer);
-        var fullContent = contents.join('');
-        return $http.post(
-          '/v1/documents',
-          fullContent,
-          {
-            'headers':{'Content-Type':contenttype},
-            'params': {'transform': 'expand'}
-          }
-        );
+        console.log(contents);
+        var fullContent = new Blob(contents);
+        finalReader.readAsArrayBuffer(fullContent);
+        return finalD.promise.then(function(data) {
+          return $http.post(
+              '/v1/documents',
+              data,
+              {
+                'headers':{'Content-Type': mixedContentType},
+                'params': {'transform': 'expand'},
+                'transformRequest':[]
+              }
+            );
+        });
       });
     }
 
@@ -377,6 +402,7 @@
       var lastIndex = currentFilesToUpload - 1;
       var d = $q.defer();
       angular.forEach(allFiles, function(file, fileIndex) {
+
         currentSet.push(file);
         if (currentSet.length === 5 || fileIndex === lastIndex) {
           var currentSetCp = currentSet.slice(0, currentSet.length);
@@ -392,7 +418,7 @@
               }
             },
             function() {
-              d.reject();
+              d.reject({ data: ''});
             });
           };
           if ($http.pendingRequests.length > 8) {
