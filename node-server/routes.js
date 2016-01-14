@@ -37,9 +37,9 @@ router.post('/user/login', function(req, res) {
 
 router.get('/user/logout', function(req, res) {
   noCache(res);
-  delete req.session.user;
-  if (req.session.authenticator) {
-    delete req.session.authenticator;
+  if (req.session) {
+    authHelper.clearAuthenticator(req.session);
+    req.session.destroy();
   }
   res.send();
 });
@@ -253,8 +253,8 @@ function userProfile(req, res, username, password, isStatus) {
   };
   authHelper.getAuthorization(req.session, reqOptions.method, reqOptions.path,
     {
-      authHost: reqOptions.host,
-      authPort: reqOptions.port,
+      authHost: reqOptions.hostname || options.mlHost,
+      authPort: reqOptions.port || options.mlHttpPort,
       authUser: username,
       authPassword: password
     }

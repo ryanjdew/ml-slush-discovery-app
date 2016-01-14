@@ -122,7 +122,9 @@ function proxy(req, res) {
 
       // [GJo] (#67) forward all headers from MarkLogic
       for (var header in response.headers) {
-        res.header(header, response.headers[header]);
+        if (header !== 'www-authenticate') {
+          res.header(header, response.headers[header]);
+        }
       }
 
       response.on('data', function(chunk) {
@@ -146,8 +148,8 @@ function proxy(req, res) {
   };
   authHelper.getAuthorization(req.session, reqOptions.method, reqOptions.path,
     {
-      authHost: reqOptions.host,
-      authPort: reqOptions.port,
+      authHost: reqOptions.hostname || options.mlHost,
+      authPort: reqOptions.port || options.mlHttpPort,
       authUser: user ? user.name : options.defaultUser,
       authPassword: user ? user.password : options.defaultPass
     }

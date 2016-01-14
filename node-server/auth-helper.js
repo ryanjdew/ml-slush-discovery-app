@@ -11,35 +11,79 @@ var _ = require('underscore');
 var defaultOptions = {
   authHost: process.env.ML_HOST || config.marklogic.host,
   authPort: process.env.ML_PORT || config.marklogic.httpPort,
-  authUser: process.env.ML_APP_USER || config.marklogic.user,
-  authPassword: process.env.ML_APP_PASS || config.marklogic.password,
+  authUser: config.marklogic.user,
+  authPassword: config.marklogic.password,
   challengeMethod: 'HEAD',
   challengePath: '/v1/ping'
 };
 
-var authorizationFunctions = {};
+var authenticators = {};
+
+setInterval(function() {
+  for (var id in authenticators) {
+    if (isExpired(authenticators[id])) {
+      delete authenticators[id];
+    }
+  }
+}, 1000 * 60 * 30);
+
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
+
+function clearAuthenticator(session) {
+  if (session.authenticators) {
+    for (var key in session.authenticators) {
+      var authenticatorId = session.authenticators[key];
+      delete authenticators[authenticatorId];
+    }
+  }
+  delete session.authenticators;
+}
 
 function createAuthenticator(session, host, port, user, password, challenge) {
   var authenticator = www_authenticate.call(null, user, password)(challenge);
-  if (!session.authenticator) {
-    session.authenticator = {};
+  if (!session.authenticators) {
+    session.authenticators = {};
   }
-  session.authenticator[user + ':' + host + ':' + port] = authenticator;
-  if (!authorizationFunctions[host + ':' + port]) {
-    authorizationFunctions[host + ':' + port] = authenticator.authorize;
+  var authenticatorId = session.authenticators[user + ':' + host + ':' + port];
+  if (!authenticatorId) {
+    authenticatorId = guid();
+    session.authenticators[user + ':' + host + ':' + port] = authenticatorId;
   }
+
+  authenticators[authenticatorId] = authenticator;
   return authenticator;
 }
 
-function getAuthenticator(session, user, host, port) {
-  if (!session.authenticator) {
-    return null;
-  }
-  return session.authenticator[user + ':' + host + ':' + port];
+function timestampAuthenticator(authenticator) {
+  authenticator.lastAccessed = new Date();
 }
 
-function getAuthorizationFunction(host, port) {
-  return authorizationFunctions[host + ':' + port];
+var expirationTime = 1000 * 60 * 60 * 12;
+
+function isExpired(authenticator) {
+  return
+    authenticator.lastAccessed &&
+    ((new Date()) - authenticator.lastAccessed) < expirationTime;
+}
+
+function getAuthenticator(session, user, host, port) {
+  if (!session.authenticators) {
+    return null;
+  }
+  var authenticatorId = session.authenticators[user + ':' + host + ':' + port];
+  if (!authenticatorId) {
+    return null;
+  }
+  console.log('Get auth: ' + user + ':' + host + ':' + port);
+  return authenticators[authenticatorId];
 }
 
 function getAuthorization(session, reqMethod, reqPath, authOptions) {
@@ -49,8 +93,7 @@ function getAuthorization(session, reqMethod, reqPath, authOptions) {
   var mergedOptions = _.extend({}, defaultOptions, authOptions || {});
   var authenticator = getAuthenticator(session, mergedOptions.authUser, mergedOptions.authHost, mergedOptions.authPort);
   if (authenticator) {
-    authorization = getAuthorizationFunction(mergedOptions.authHost, mergedOptions.authPort)
-        .call(authenticator, reqMethod, reqPath);
+    authorization = authenticator.authorize(reqMethod, reqPath);
     d.resolve(authorization);
   } else {
     var challengeReq = http.request({
@@ -66,9 +109,7 @@ function getAuthorization(session, reqMethod, reqPath, authOptions) {
         authenticator = createAuthenticator(
           session, mergedOptions.authHost, mergedOptions.authPort, mergedOptions.authUser, mergedOptions.authPassword, challenge
         );
-
-        authorization = getAuthorizationFunction(mergedOptions.authHost, mergedOptions.authPort)
-            .call(authenticator, reqMethod, reqPath);
+        authorization = authenticator.authorize(reqMethod, reqPath);
         d.resolve(authorization);
       } else {
         session.authenticator = {};
@@ -81,7 +122,8 @@ function getAuthorization(session, reqMethod, reqPath, authOptions) {
 }
 
 var authHelper = {
-  getAuthorization: getAuthorization
+  getAuthorization: getAuthorization,
+  clearAuthenticator: clearAuthenticator
 };
 
 module.exports = authHelper;

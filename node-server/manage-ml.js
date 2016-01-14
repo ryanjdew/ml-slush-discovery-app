@@ -111,6 +111,7 @@ function passOnToML(req, res, transferOptions, port) {
     if (authorization) {
       reqOptions.headers.Authorization = authorization;
     }
+    console.log(reqOptions.headers);
     var mlReq = http.request(reqOptions, function(response) {
       for (var header in response.headers) {
         if (header !== 'www-authenticate') {
@@ -145,7 +146,7 @@ function passOnToML(req, res, transferOptions, port) {
   };
   authHelper.getAuthorization(session, reqOptions.method, reqOptions.path,
     {
-      authHost: reqOptions.host,
+      authHost: reqOptions.hostname || options.mlHost,
       authPort: reqOptions.port,
       authUser: user ? user.name : options.defaultUser,
       authPassword: user ? user.password : options.defaultPass
