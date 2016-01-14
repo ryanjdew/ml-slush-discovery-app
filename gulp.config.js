@@ -43,7 +43,8 @@ module.exports = function() {
      */
     // all javascript that we want to vet
     alljs: [
-      clientApp + '**/*.js'
+      clientApp + '**/*.js',
+      '!' + clientApp + '**/*.min.js'
     ],
     build: './dist/',
     client: client,

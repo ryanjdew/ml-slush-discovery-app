@@ -35,7 +35,6 @@ declare function expand:document(
           document { binary { xs:hexBinary(xs:base64Binary(xdmp:binary-decode($binary, "UTF-8"))) } }
     else
       $content
-  let $_log := xdmp:log(xdmp:describe($content, (),()))
   return
     if ($content-type eq "text/csv") then (
       expand:csv(

@@ -16,6 +16,7 @@
   "globals": {
     "angular": false,
     "google": false,
+    "jQuery": false,
     "$": false,
     "_": false,
     "vkbeautify" : false,
