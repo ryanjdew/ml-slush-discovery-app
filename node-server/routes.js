@@ -206,6 +206,7 @@ function userProfile(req, res, username, password, isStatus) {
         } else {
           res.statusCode = 401;
           res.send('Unauthenticated');
+          authHelper.clearAuthenticator(req.session);
         }
       } else if (response.statusCode === 404) {
         // authentication successful, but no profile defined

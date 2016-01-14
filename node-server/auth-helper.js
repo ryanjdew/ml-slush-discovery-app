@@ -59,11 +59,14 @@ function createAuthenticator(session, host, port, user, password, challenge) {
   }
 
   authenticators[authenticatorId] = authenticator;
+  timestampAuthenticator(authenticator);
   return authenticator;
 }
 
 function timestampAuthenticator(authenticator) {
-  authenticator.lastAccessed = new Date();
+  if (authenticator) {
+    authenticator.lastAccessed = new Date();
+  }
 }
 
 var expirationTime = 1000 * 60 * 60 * 12;
@@ -71,7 +74,7 @@ var expirationTime = 1000 * 60 * 60 * 12;
 function isExpired(authenticator) {
   return
     authenticator.lastAccessed &&
-    ((new Date()) - authenticator.lastAccessed) < expirationTime;
+    ((new Date()) - authenticator.lastAccessed) > expirationTime;
 }
 
 function getAuthenticator(session, user, host, port) {
@@ -83,7 +86,9 @@ function getAuthenticator(session, user, host, port) {
     return null;
   }
   console.log('Get auth: ' + user + ':' + host + ':' + port);
-  return authenticators[authenticatorId];
+  var authenticator = authenticators[authenticatorId];
+  timestampAuthenticator(authenticator);
+  return authenticator;
 }
 
 function getAuthorization(session, reqMethod, reqPath, authOptions) {
@@ -112,7 +117,7 @@ function getAuthorization(session, reqMethod, reqPath, authOptions) {
         authorization = authenticator.authorize(reqMethod, reqPath);
         d.resolve(authorization);
       } else {
-        session.authenticator = {};
+        session.authenticators = {};
         d.reject();
       }
     });
