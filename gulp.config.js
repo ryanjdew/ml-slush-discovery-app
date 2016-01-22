@@ -35,8 +35,8 @@ module.exports = function() {
       manageHttpPort: '8002',
       httpPort: '8040',
       xccPort: '8041',
-      user: 'discovery-app-user',
-      password: '4^<bv,\\5y{"[@+w&y4&|'
+      user: 'discovery-app-guest',
+      password: '81fdef92b84951a6'
     },
     /**
      * File paths
