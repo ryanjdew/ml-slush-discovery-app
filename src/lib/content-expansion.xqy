@@ -2,12 +2,22 @@ xquery version "1.0-ml";
 
 module namespace expand="http://marklogic.com/content-helpes/content-expansion";
 
+import module namespace sem = "http://marklogic.com/semantics"
+      at "/MarkLogic/semantics.xqy";
+
 declare namespace html = "http://www.w3.org/1999/xhtml";
 declare namespace ingest = "http://marklogic.com/dll/ingest-binaries";
 declare namespace zip = "xdmp:zip";
 
-declare option xdmp:mapping "false";
+declare variable $triple-types as map:map := map:new((
+    map:entry("text/turtle", "turtle"),
+    map:entry("text/n-triples", "ntriple"),
+    map:entry("application/rdf+xml", "rdfxml"),
+    map:entry("text/n3", "n3"),
+    map:entry("application/trig", "trig")
+  ));
 
+declare option xdmp:mapping "false";
 
 declare function expand:document(
   $uri as xs:string,
@@ -36,7 +46,14 @@ declare function expand:document(
     else
       $content
   return
-    if ($content-type eq "text/csv") then (
+    if ($content-type = map:keys($triple-types)) then (
+      expand:triples(
+        $uri,
+        $content,
+        $content-type
+      ),
+      $content
+    ) else if ($content-type eq "text/csv") then (
       expand:csv(
         $uri,
         $content
@@ -157,3 +174,23 @@ declare function expand:zip(
       )
     )
 };
+
+declare function expand:triples(
+  $uri as xs:string,
+  $content as document-node(),
+  $content-type as xs:string
+)
+{
+  let $new-uri := fn:replace($uri, "\.[^\.]+$", ".xml")
+  return
+    xdmp:document-insert($new-uri,
+      element sem:triples {
+        sem:rdf-parse($content, (map:get($triple-types, $content-type), "repair"))
+      },
+      (
+        xdmp:permission("rest-reader", "read"),
+        xdmp:permission("rest-writer", "update")
+      )
+    )
+};
+
