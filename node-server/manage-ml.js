@@ -16,11 +16,17 @@ var serverConfigObj = {
 
 var _hostName;
 
+console.log('loading config...');
 serverConfig().then(function(sConfig) {
   if (sConfig) {
+    console.log('config found!');
     serverConfigObj = sConfig;
     serverConfigObj.database = serverConfigObj.database || 'discovery-app-content';
+  } else {
+    console.log('config not found!');
   }
+}, function(rejection) {
+  console.log('config not found!');
 });
 
 function serverConfig(req, data) {
@@ -60,8 +66,8 @@ function genericConfig(name, req, res, data) {
     path: '/v1/documents'
   };
   if (data) {
-    opt.params['perm:discovery-app-role'] = 'read';
-    opt.params['perm:discovery-app-admin-role'] = 'update';
+    opt.params['perm:rest-reader'] = 'read';
+    opt.params['perm:rest-admin'] = 'update';
     opt.method = 'PUT';
     opt.data = data;
   }
@@ -111,7 +117,6 @@ function passOnToML(req, res, transferOptions, port) {
     if (authorization) {
       reqOptions.headers.Authorization = authorization;
     }
-    console.log(reqOptions.headers);
     var mlReq = http.request(reqOptions, function(response) {
       for (var header in response.headers) {
         if (header !== 'www-authenticate') {
@@ -206,6 +211,8 @@ function hostName(req) {
 function createDatabase(req, databaseProperties) {
   var d = q.defer();
   var databaseName = databaseProperties['database-name'];
+  databaseProperties['collection-lexicon'] = true;
+  databaseProperties['triple-index'] = true;
   passOnToMLManage(
     req,
     new MockRes(d),
@@ -228,7 +235,6 @@ function createDatabase(req, databaseProperties) {
             host: hName,
             database: databaseName
           };
-        console.log(forestData);
         (function(forestDefered, forestData) {
           passOnToMLManage(
             req,
