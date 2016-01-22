@@ -169,7 +169,11 @@
         <forest-id name="@ml.content-db"/>
         @ml.forest-data-dir-xml
       </forests>
+      <word-lexicons>
+        <word-lexicon>http://marklogic.com/collation/</word-lexicon>
+      </word-lexicons>
       <uri-lexicon>true</uri-lexicon>
+      <triple-index>true</triple-index>
       <collection-lexicon>true</collection-lexicon>
       <directory-creation>manual</directory-creation>
       <maintain-last-modified>false</maintain-last-modified>
