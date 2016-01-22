@@ -376,9 +376,7 @@
         finalReader.onload = function (event) {
           finalD.resolve(new Uint8Array(event.target.result));
         };
-        console.log('creating blob');
         contents.push(footer);
-        console.log(contents);
         var fullContent = new Blob(contents);
         finalReader.readAsArrayBuffer(fullContent);
         return finalD.promise.then(function(data) {
@@ -395,16 +393,42 @@
       });
     }
 
+    // group into buckets by size
+    var bucketSizeInBytes = 700000;
+
+
+    function sortFileList(allFiles) {
+      var sortedArray;
+      if (allFiles.sort) {
+        sortedArray = allFiles;
+      } else {
+        sortedArray = new Array(allFiles.length);
+        for (var i = 0; i < allFiles.length; i++) {
+          sortedArray[i] = allFiles[i];
+        }
+      }
+      return sortedArray;
+    }
+
+    function sortFiles(allFiles) {
+      allFiles.sort(function(a, b) {
+        return a.size - b.size;
+      });
+    }
+
     serverConfig.bulkUpload = function(allFiles) {
+      var sortedFiles = sortFileList(allFiles);
       var currentSet = [];
       var currentFilesToUpload = allFiles.length;
       var currentFilesUploaded = 0;
       var lastIndex = currentFilesToUpload - 1;
       var d = $q.defer();
-      angular.forEach(allFiles, function(file, fileIndex) {
-
+      var currentBucketSize = 0;
+      angular.forEach(sortedFiles, function(file, fileIndex) {
         currentSet.push(file);
-        if (currentSet.length === 5 || fileIndex === lastIndex) {
+        currentBucketSize = currentBucketSize + file.size;
+        if (currentBucketSize >= bucketSizeInBytes|| fileIndex === lastIndex) {
+          currentBucketSize = 0;
           var currentSetCp = currentSet.slice(0, currentSet.length);
           var runUpload = function() {
             uploadBatch(currentSetCp).then(function(data) {

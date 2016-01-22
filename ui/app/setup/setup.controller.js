@@ -97,6 +97,7 @@
         }).then(function() {
           $scope.error = null;
           init();
+          updateSearchResults();
         }, handleError);
       },
       addDatabase: function() {
