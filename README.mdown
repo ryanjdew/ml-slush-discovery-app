@@ -35,17 +35,33 @@ Install additional dependencies using the bower package manager:
 
     bower install
 
-If you want to upload a dictionary for spell-suggestions:
-
-    ./ml local deploy content
-
-On Windows:
-
-    ml.bat local deploy content
-
 Edit `./local.json` to set your desired ports
 
     gulp serve-local # this will watch the .less file for changes, compile them to .css, and run the node server
+
+After running `gulp serve-local` your browser will load the application. Follow the setup link on  the top of the page.
+
+![Setup Link](readme-resources/setup-link.png)
+
+Login with the credentials discovery-app-admin/DiscAdmin.
+
+![Login Page](readme-resources/login.png)
+
+From there you can load data into the database from the sample-content folder.
+
+![Load Content](readme-resources/load-data.png)
+
+You can then add a range index and search for the elements and properties in your database.
+
+![Add Range Index](readme-resources/range-index.png)
+
+On the contraints tab you can select the resample button to get suggested constraints based off of the indexes that exist. Then hit save to accept the suggested constraints and you will be redirected to the Results tab to preview what the search looks like.
+
+![Resample Constraints](readme-resources/resample-constraints.png)
+
+On the Results tab you there is a "Add Widget" link on the right. Clicking that will bring up a modal that will allow you to configure a chart. To see more details about Highcharts configurations you can go [here.](http://www.highcharts.com/docs/chart-concepts/series)
+
+![Add Chart](readme-resources/add-chart.png)
 
 # Installing as service
 

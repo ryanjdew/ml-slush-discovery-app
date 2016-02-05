@@ -459,6 +459,9 @@
       <collections>
       </collections>
       <privileges>
+        <privilege>
+          <privilege-name>xdmp:eval-in</privilege-name>
+        </privilege>
       </privileges>
     </role>
     <role>
@@ -481,6 +484,9 @@
       <collections>
       </collections>
       <privileges>
+        <privilege>
+          <privilege-name>unprotected-uri</privilege-name>
+        </privilege>
       </privileges>
     </role>
     <role>
@@ -489,12 +495,22 @@
       <role-names>
         <role-name>@ml.app-write-role</role-name>
         <role-name>rest-admin</role-name>
+        <role-name>admin</role-name>
       </role-names>
       <permissions>
       </permissions>
       <collections>
       </collections>
       <privileges>
+        <privilege>
+          <privilege-name>unprotected-uri</privilege-name>
+        </privilege>
+        <privilege>
+          <privilege-name>manage</privilege-name>
+        </privilege>
+        <privilege>
+          <privilege-name>manage-admin</privilege-name>
+        </privilege>
       </privileges>
     </role>
   </roles>
@@ -525,7 +541,7 @@
       <password>@ml.app-admin-user-password</password>
       <role-names>
         <role-name>rest-admin</role-name>
-        <role-name>@ml.app-write-role</role-name>
+        <role-name>@ml.app-admin-role</role-name>
       </role-names>
       <permissions/>
       <collections/>
