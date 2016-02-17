@@ -57,7 +57,7 @@
           );
         }
       }
-      superCtrl.search.apply(ctrl, qtext);
+      superCtrl.search.apply(ctrl, arguments);
     };
 
     ctrl.openStartDatePicker = function(contraintName, $event) {
