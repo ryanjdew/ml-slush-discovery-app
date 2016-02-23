@@ -15,13 +15,6 @@
     var ctrl = this;
     var mlSearch = searchFactory.newContext();
 
-    ctrl.dateFilters = {};
-    ctrl.dateStartOpened = {};
-    ctrl.dateEndOpened = {};
-    ctrl.pickerDateStart = {};
-    ctrl.pickerDateEnd = {};
-    ctrl.dateTimeConstraints = {};
-
     ServerConfig.getCharts().then(function(chartData) {
       ctrl.charts = chartData.charts;
     });
@@ -35,6 +28,14 @@
       ctrl.currentUser = newValue;
     });
 
+    /* BEGIN Date/DateTime constraint logic */
+    ctrl.dateFilters = {};
+    ctrl.dateStartOpened = {};
+    ctrl.dateEndOpened = {};
+    ctrl.pickerDateStart = {};
+    ctrl.pickerDateEnd = {};
+    ctrl.dateTimeConstraints = {};
+
     mlSearch.getStoredOptions().then(function(data) {
       angular.forEach(data.options.constraint, function(constraint) {
         if (constraint.range && (constraint.range.type === 'xs:date' || constraint.range.type === 'xs:dateTime')) {
@@ -44,9 +45,53 @@
           };
         }
       });
+
+      MLSearchController.call(ctrl, $scope, $location, mlSearch);
+
+      ctrl.init();
     });
 
-    ctrl.search = function(qtext) {
+    // implement superCtrl extension method
+    ctrl.parseExtraURLParams = function () {
+      var foundExtra = false;
+      var contraintName;
+      ctrl.pickerDateStart = {};
+      ctrl.pickerDateEnd = {};
+      angular.forEach($location.search(), function(val, key) {
+        var constraintName;
+        if (key.indexOf('startDate:') === 0) {
+          contraintName = key.substr(10);
+          ctrl.pickerDateStart[contraintName] = new Date(val);
+          ctrl._applyDateFilter(contraintName);
+          foundExtra = true;
+        } else if (key.indexOf('endDate:') === 0) {
+          contraintName = key.substr(8);
+          ctrl.pickerDateEnd[contraintName] = new Date(val);
+          ctrl._applyDateFilter(contraintName);
+          foundExtra = true;
+        }
+      });
+
+      return foundExtra;
+    };
+
+    // implement superCtrl extension method
+    ctrl.updateExtraURLParams = function () {
+      angular.forEach(ctrl.pickerDateStart, function(val, key) {
+        $location.search('startDate:' + key, _constraintToDateTime(key, val));
+      });
+      angular.forEach(ctrl.pickerDateEnd, function(val, key) {
+        $location.search('endDate:' + key, _constraintToDateTime(key, val));
+      });
+      angular.forEach($location.search(), function(val, key) {
+        if ((key.indexOf('startDate:') === 0 && !ctrl.pickerDateStart[key.substr(10)]) ||
+            (key.indexOf('endDate:') === 0 && !ctrl.pickerDateEnd[key.substr(8)])) {
+          $location.search(key, null);
+        }
+      });
+    };
+
+    ctrl._search = function () {
       ctrl.mlSearch.clearAdditionalQueries();
       for (var key in ctrl.dateFilters) {
         if (ctrl.dateFilters[key] && ctrl.dateFilters[key].length) {
@@ -57,7 +102,7 @@
           );
         }
       }
-      superCtrl.search.apply(ctrl, arguments);
+      superCtrl._search.call(ctrl);
     };
 
     ctrl.openStartDatePicker = function(contraintName, $event) {
@@ -72,33 +117,27 @@
       ctrl.dateEndOpened[contraintName] = true;
     };
 
-    ctrl.applyDateFilter = function(contraintName) {
+    ctrl._applyDateFilter = function(contraintName) {
       ctrl.dateFilters[contraintName] = [];
       if (ctrl.pickerDateStart[contraintName] && ctrl.pickerDateStart[contraintName] !== '') {
-        var startISO = ctrl.pickerDateStart[contraintName].toISOString();
-        var startValue;
-        if (ctrl.dateTimeConstraints[contraintName].type === 'xs:date') {
-          startValue = startISO.substr(0, startISO.indexOf('T')) + '-06:00';
-        } else {
-          startValue = startISO;
-        }
+        var startValue = _constraintToDateTime(contraintName, ctrl.pickerDateStart[contraintName]);
         ctrl.dateFilters[contraintName].push(qb.ext.rangeConstraint(contraintName, 'GE', startValue));
       }
       if (ctrl.pickerDateEnd[contraintName] && ctrl.pickerDateEnd[contraintName] !== '') {
-        var endISO = ctrl.pickerDateEnd[contraintName].toISOString();
-        var endValue;
-        if (ctrl.dateTimeConstraints[contraintName].type === 'xs:date') {
-          endValue = endISO.substr(0, endISO.indexOf('T')) + '-06:00';
-        } else {
-          endValue = endISO;
-        }
+        var endValue = _constraintToDateTime(contraintName, ctrl.pickerDateEnd[contraintName]);
         ctrl.dateFilters[contraintName].push(qb.ext.rangeConstraint(contraintName, 'LE', endValue));
       }
+    };
+
+    ctrl.applyDateFilter = function(contraintName) {
+      ctrl._applyDateFilter(contraintName);
       ctrl.search();
     };
 
     ctrl.clearDateFilter = function(contraintName) {
       ctrl.dateFilters[contraintName].length = 0;
+      ctrl.pickerDateStart[contraintName] = null;
+      ctrl.pickerDateEnd[contraintName] = null;
       ctrl.search();
     };
 
@@ -107,9 +146,20 @@
       startingDay: 1
     };
 
-    MLSearchController.call(ctrl, $scope, $location, mlSearch);
-
-    ctrl.init();
+    function _constraintToDateTime(contraintName, dateObj) {
+      var constraintType = ctrl.dateTimeConstraints[contraintName].type;
+      if (dateObj) {
+        var dateISO = dateObj.toISOString();
+        var dateValue = dateISO;
+        if (constraintType === 'xs:date') {
+          dateValue = dateISO.substr(0, dateISO.indexOf('T')) + '-06:00';
+        }
+        return dateValue;
+      } else {
+        return null;
+      }
+    }
+    /* END Date/DateTime constraint logic */
 
   }
 }());
