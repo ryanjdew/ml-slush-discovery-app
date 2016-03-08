@@ -357,7 +357,12 @@
         promises.push(d.promise);
         var contentType = file.type || 'text/plain';
         reader.onload = function (event) {
-          var value = arrayBuffer2base64(event.target.result);
+          var value;
+          if (/^(text\/.*|application\/(json|xml)).*$/) {
+            value = new Uint8Array(event.target.result);
+          } else {
+            value = arrayBuffer2base64(event.target.result);
+          }
           var contentBlockHeader = header + 'Content-Type: ' + contentType + '\r\n';
           contentBlockHeader += 'Content-Disposition: attachment; filename="' + fileName +
           '"\r\n';

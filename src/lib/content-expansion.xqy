@@ -39,8 +39,11 @@ declare function expand:document(
           xdmp:log(("couldn't decode", $content))
         )
       return
-        if (fn:matches($content-type, "^(text/.*|application/(.+\+)?(xml|json))$") and $binary/binary()) then
-          document {xdmp:binary-decode($binary, "UTF-8")}
+        if (fn:matches($content-type, "^(text/.*|application/(.+\+)?(xml|json))$")) then
+          if ($binary/binary()) then
+            document {xdmp:binary-decode($binary, "UTF-8")}
+          else
+            $content
         else
           document { binary { xs:hexBinary(xs:base64Binary(xdmp:binary-decode($binary, "UTF-8"))) } }
     else
