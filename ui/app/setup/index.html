@@ -110,16 +110,17 @@
       <div class="panel panel-default">
         <div class="clearfix panel-heading">Constraints <button ng-click="resampleConstraints()" class="btn btn-primary pull-right">Resample</button><button ng-click="addConstraint()" class="btn btn-primary pull-right">Add</button></div>
         <div class="panel-body">
-          <table>
+          <table id="constraint-table">
           <thead>
             <tr><th class="col-sm-3">Label</th><th class="col-sm-4">Source</th><th class="col-sm-1">Faceted</th><th class="col-sm-1"></th></tr>
           </thead>
-          <tbody>
-            <tr ng-repeat="constraint in model.constraints track by $index">
-            <td class="col-sm-3"><input type="text" ng-model="constraint.name"/></td>
-            <td class="col-sm-4" ng-init="details = (constraint.range || constraint.word)"><span ng-if="constraint.range">Range</span><span ng-if="constraint.word">Word</span><span ng-if="constraint.collection">Collection</span>: {{(constraint.range || constraint.word).field.name || (constraint.range || constraint.word).attribute.name || (constraint.range || constraint.word).element.name || constraint.collection.prefix}} (<span ng-if="(constraint.range || constraint.word).attribute">attribute</span><span ng-if="(constraint.range || constraint.word).element && !(constraint.range || constraint.word).attribute">element</span><span ng-if="(constraint.range || constraint.word).field">field</span><span ng-if="constraint.collection">prefix</span>)</td>
-            <td class="col-sm-1"><input type="checkbox" ng-model="(constraint.range || constraint.word || constraint.collection).facet"/></td>
-            <td class="col-sm-1"><a class="pull-right" ng-click="removeConstraint($index)"><i class="glyphicon glyphicon-trash"></i></a></td>
+          <tbody as-sortable="sortableOptions" ng-model="model.constraints"
+>
+            <tr ng-repeat="constraint in model.constraints track by $index"  as-sortable-item>
+            <td class="col-sm-3" as-sortable-item-handle><input type="text" ng-model="constraint.name"/></td>
+            <td class="col-sm-4" as-sortable-item-handle><span ng-if="constraint.range">Range</span><span ng-if="constraint.word">Word</span><span ng-if="constraint.collection">Collection</span>: {{(constraint.range || constraint.word).field.name || (constraint.range || constraint.word).attribute.name || (constraint.range || constraint.word).element.name || constraint.collection.prefix}} (<span ng-if="(constraint.range || constraint.word).attribute">attribute</span><span ng-if="(constraint.range || constraint.word).element && !(constraint.range || constraint.word).attribute">element</span><span ng-if="(constraint.range || constraint.word).field">field</span><span ng-if="constraint.collection">prefix</span>)</td>
+            <td class="col-sm-1" as-sortable-item-handle><input type="checkbox" ng-model="(constraint.range || constraint.word || constraint.collection).facet"/></td>
+            <td class="col-sm-1" as-sortable-item-handle><a class="pull-right" data-no-drag ng-click="removeConstraint($index)"><i class="glyphicon glyphicon-trash"></i></a></td>
             </tr>
           </tbody>
           </table>

@@ -89,6 +89,10 @@
 
     angular.extend($scope, {
       model: model,
+      constraintSortableOptions: {
+        containment: '#constraint-table',
+        containerPositioning: 'relative'
+      },
       state: 'database',
       mlSearch: mlSearch,
       setDatabase: function() {
