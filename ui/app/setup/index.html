@@ -37,7 +37,7 @@
       <div class="form-group">
         <label class="control-label">Directory</label>
         <div ng-show="isUploading">
-          <progressbar max="currentFilesToUpload" value="currentFilesUploaded" ></progressbar>
+          <progressbar max="currentFilesToUpload" value="currentFilesUploaded"></progressbar>
         </div>
         <div ng-hide="isUploading">
           <input class="form-control" id="directoryUploader" name="directory" type="file" multiple webkitdirectory>
@@ -58,7 +58,12 @@
         <div class="panel-body">
           <table>
             <thead>
-              <tr><th>Name</th><th>Type</th><th>Collation</th><th class="col-sm-1"></th></tr>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Collation</th>
+                <th class="col-sm-1"></th>
+              </tr>
             </thead>
             <tbody>
               <tr ng-repeat="index in model.rangeIndexes['range-index-list'] track by $index">
@@ -76,12 +81,17 @@
         <div class="panel-body">
           <table>
             <thead>
-              <tr><th>Name</th><th></th><th class="col-sm-1"></th></tr>
+              <tr>
+                <th>Name</th>
+                <th></th>
+                <th class="col-sm-1"></th>
+              </tr>
             </thead>
             <tbody>
               <tr ng-repeat="field in model.fields['field-list'] track by $index">
                 <td><a ng-click="editField(field)">{{field['field-name']}}</a></td>
-                <td><span ng-repeat="includedElement in field['included-element']">{{includedElement.localname}} <span ng-if="!$last">, </span></span></td>
+                <td><span ng-repeat="includedElement in field['included-element']">{{includedElement.localname}} <span ng-if="!$last">, </span></span>
+                </td>
                 <td class="col-sm-1"><a class="pull-right" ng-click="removeField($index)"><i class="glyphicon glyphicon-trash"></i></a></td>
               </tr>
             </tbody>
@@ -93,7 +103,11 @@
         <div class="panel-body">
           <table>
             <thead>
-              <tr><th>Name</th><th>Coordinate System</th><th class="col-sm-1"></th></tr>
+              <tr>
+                <th>Name</th>
+                <th>Coordinate System</th>
+                <th class="col-sm-1"></th>
+              </tr>
             </thead>
             <tbody>
               <tr ng-repeat="index in model.geospatialIndexes['geospatial-index-list'] track by $index">
@@ -108,134 +122,149 @@
     </div>
     <div ng-show="state === 'constraints'">
       <div class="panel panel-default">
-        <div class="clearfix panel-heading">Constraints <button ng-click="resampleConstraints()" class="btn btn-primary pull-right">Resample</button><button ng-click="addConstraint()" class="btn btn-primary pull-right">Add</button></div>
+        <div class="clearfix panel-heading">Constraints
+          <button ng-click="resampleConstraints()" class="btn btn-primary pull-right">Resample</button>
+          <button ng-click="addConstraint()" class="btn btn-primary pull-right">Add</button>
+        </div>
         <div class="panel-body">
           <table id="constraint-table">
-          <thead>
-            <tr><th class="col-sm-3">Label</th><th class="col-sm-4">Source</th><th class="col-sm-1">Faceted</th><th class="col-sm-1"></th></tr>
-          </thead>
-          <tbody as-sortable="sortableOptions" ng-model="model.constraints"
->
-            <tr ng-repeat="constraint in model.constraints track by $index"  as-sortable-item>
-            <td class="col-sm-3" as-sortable-item-handle><input type="text" ng-model="constraint.name"/></td>
-            <td class="col-sm-4" as-sortable-item-handle><span ng-if="constraint.range">Range</span><span ng-if="constraint.word">Word</span><span ng-if="constraint.collection">Collection</span>: {{(constraint.range || constraint.word).field.name || (constraint.range || constraint.word).attribute.name || (constraint.range || constraint.word).element.name || constraint.collection.prefix}} (<span ng-if="(constraint.range || constraint.word).attribute">attribute</span><span ng-if="(constraint.range || constraint.word).element && !(constraint.range || constraint.word).attribute">element</span><span ng-if="(constraint.range || constraint.word).field">field</span><span ng-if="constraint.collection">prefix</span>)</td>
-            <td class="col-sm-1" as-sortable-item-handle><input type="checkbox" ng-model="(constraint.range || constraint.word || constraint.collection).facet"/></td>
-            <td class="col-sm-1" as-sortable-item-handle><a class="pull-right" data-no-drag ng-click="removeConstraint($index)"><i class="glyphicon glyphicon-trash"></i></a></td>
-            </tr>
-          </tbody>
-          </table>
-        </div>
-        <div class="clearfix panel-footer">
-          <button ng-click="submitConstraints()" class="clearfix btn btn-primary pull-right">Save</button>
-        </div>
-        </div>
-      </div>
-    </div>
-    <div ng-show="state === 'suggestions'">
-      <div class="panel panel-default">
-        <div class="clearfix panel-heading">Suggestions <button ng-click="getDefaultSourceOpts()" class="btn btn-primary pull-right">Resample</button></div>
-        <p>Requires a range index in the source database</p>
-        <div class="panel-body">
-          <table>
-          <tbody>
-            <tr>
-            <td>Default source: </td>
-            <td><select ng-model="model.defaultSource">
-              <option ng-repeat="option in model.suggestOptions track by $index"
-                  value="{{option.value}}"
-                  ng-selected="{{option.selected}}"
-                >{{option.name}}</option>
-            </select></td>
-            </tr>
-          </tbody>
-          </table>
-        </div>
-        <div class="clearfix panel-footer">
-          <button ng-click="saveDefaultSource()" class="clearfix btn btn-primary pull-right">Save</button>
-        </div>
-      </div>
-    </div>
-    <div ng-show="state === 'uiConfig'">
-      <div class="panel panel-default">
-        <div class="clearfix panel-heading">UI Configuration</div>
-        <div class="panel-body">
-          <table>
+            <thead>
+              <tr>
+                <th class="col-sm-4">Label</th>
+                <th class="col-sm-3">Source</th>
+                <th class="col-sm-1">Faceted</th>
+                <th class="col-sm-1"></th>
+              </tr>
+            </thead>
             <tbody>
-              <tr>
-                <td colspan="2">Page: </td>
-              </tr>
-              <tr>
-                <td>Title: </td>
-                <td>
-                  <input type="text" ng-model="model.uiConfig.page.title"/>
+              <tr ng-repeat="constraint in model.constraints track by $index">
+                <td class="col-sm-4"><span class="col-sm-2 btn-group btn-group-vertical btn-group-xs">
+                  <a class="btn btn-sm btn-success" ng-click="reorderConstraint($index, $index - 1)"><span class="glyphicon glyphicon-chevron-up">&nbsp;</span></a>
+                  <a class="btn btn-sm btn-danger" ng-click="reorderConstraint($index, $index + 1)"><span class="glyphicon glyphicon-chevron-down">&nbsp;</span></a>
+                  </span>
+                  <input class="col-sm-10" type="text" ng-model="constraint.name" />
                 </td>
-              </tr>
-              <tr>
-                <td colspan="2">Header: </td>
-              </tr>
-              <tr>
-                <td>Company Logo: </td>
-                <td>
-                  <select ng-model="model.uiConfig.logo.type">
-                    <option value="image">Image</option>
-                    <option value="text">Text</option>
-                  </select>
-                  <input type="text" ng-model="model.uiConfig.logo.value"/>
+                <td class="col-sm-3"><span ng-if="constraint.range">Range</span><span ng-if="constraint.word">Word</span><span ng-if="constraint.collection">Collection</span>: {{(constraint.range || constraint.word).field.name || (constraint.range || constraint.word).attribute.name || (constraint.range || constraint.word).element.name || constraint.collection.prefix}} (<span ng-if="(constraint.range || constraint.word).attribute">attribute</span><span ng-if="(constraint.range || constraint.word).element && !(constraint.range || constraint.word).attribute">element</span><span ng-if="(constraint.range || constraint.word).field">field</span><span ng-if="constraint.collection">prefix</span>)</td>
+                <td class="col-sm-1">
+                  <input type="checkbox" ng-model="(constraint.range || constraint.word || constraint.collection).facet" />
                 </td>
-              </tr>
-              <tr>
-                <td colspan="2">Footer: </td>
-              </tr>
-              <tr>
-                <td>Copyright year: </td>
-                <td>
-                  <input type="text" ng-model="model.uiConfig.footer.copyright.year"/>
-                </td>
-              </tr>
-              <tr>
-                <td>Copyright holder: </td>
-                <td>
-                  <input type="text" ng-model="model.uiConfig.footer.copyright.holder"/>
-                </td>
-              </tr>
-              <tr>
-                <td>Copyright holder link: </td>
-                <td>
-                  <input type="text" ng-model="model.uiConfig.footer.copyright.link"/>
-                </td>
-              </tr>
-              <tr>
-                <td>License text: </td>
-                <td>
-                  <input type="text" ng-model="model.uiConfig.footer.license.text"/>
-                </td>
-              </tr>
-              <tr>
-                <td>License link: </td>
-                <td>
-                  <input type="text" ng-model="model.uiConfig.footer.license.link"/>
-                </td>
+                <td class="col-sm-1"><a class="pull-right" ng-click="removeConstraint($index)"><i class="glyphicon glyphicon-trash"></i></a></td>
               </tr>
             </tbody>
           </table>
         </div>
         <div class="clearfix panel-footer">
-          <button ng-click="setUiConfig()" class="clearfix btn btn-primary pull-right">Save</button>
-        </div>
-      </div>
-    </div>
-    <div ng-show="state === 'appearance'">
-      <div class="panel panel-default">
-        <div class="panel-heading">Preview <a href="/">Explore</a><a class="pull-right" ng-click="addChart()"><i class="glyphicon glyphicon-plus-sign"></i> Add Widget</a></div>
-        <div class="panel-body">
-          <h3 ng-if="model.search.total === 0">No results to show</h3>
-          <ml-facets class="col-md-3 right-col" facets="model.search.facets" toggle="toggleFacet(facet, value)" active-facets="ctrl.mlSearch.activeFacets" negate="ctrl.toggleNegatedFacet(facet,value)"></ml-facets>
-          <div class="col-md-9">
-            <facet-charts charts="model.chartData.charts" ml-search="mlSearch" remove-chart="removeChart" edit-chart="editChart" callback="toggleFacet(facet, value)"></facet-charts>
-            <ml-results results="model.search.results" template="app/search/search-results.html"></ml-results>
-          </div>
+          <button ng-click="submitConstraints()" class="clearfix btn btn-primary pull-right">Save</button>
         </div>
       </div>
     </div>
   </div>
+  <div ng-show="state === 'suggestions'">
+    <div class="panel panel-default">
+      <div class="clearfix panel-heading">Suggestions
+        <button ng-click="getDefaultSourceOpts()" class="btn btn-primary pull-right">Resample</button>
+      </div>
+      <p>Requires a range index in the source database</p>
+      <div class="panel-body">
+        <table>
+          <tbody>
+            <tr>
+              <td>Default source: </td>
+              <td>
+                <select ng-model="model.defaultSource">
+                  <option ng-repeat="option in model.suggestOptions track by $index" value="{{option.value}}" ng-selected="{{option.selected}}">{{option.name}}</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="clearfix panel-footer">
+        <button ng-click="saveDefaultSource()" class="clearfix btn btn-primary pull-right">Save</button>
+      </div>
+    </div>
+  </div>
+  <div ng-show="state === 'uiConfig'">
+    <div class="panel panel-default">
+      <div class="clearfix panel-heading">UI Configuration</div>
+      <div class="panel-body">
+        <table>
+          <tbody>
+            <tr>
+              <td colspan="2">Page: </td>
+            </tr>
+            <tr>
+              <td>Title: </td>
+              <td>
+                <input type="text" ng-model="model.uiConfig.page.title" />
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">Header: </td>
+            </tr>
+            <tr>
+              <td>Company Logo: </td>
+              <td>
+                <select ng-model="model.uiConfig.logo.type">
+                  <option value="image">Image</option>
+                  <option value="text">Text</option>
+                </select>
+                <input type="text" ng-model="model.uiConfig.logo.value" />
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">Footer: </td>
+            </tr>
+            <tr>
+              <td>Copyright year: </td>
+              <td>
+                <input type="text" ng-model="model.uiConfig.footer.copyright.year" />
+              </td>
+            </tr>
+            <tr>
+              <td>Copyright holder: </td>
+              <td>
+                <input type="text" ng-model="model.uiConfig.footer.copyright.holder" />
+              </td>
+            </tr>
+            <tr>
+              <td>Copyright holder link: </td>
+              <td>
+                <input type="text" ng-model="model.uiConfig.footer.copyright.link" />
+              </td>
+            </tr>
+            <tr>
+              <td>License text: </td>
+              <td>
+                <input type="text" ng-model="model.uiConfig.footer.license.text" />
+              </td>
+            </tr>
+            <tr>
+              <td>License link: </td>
+              <td>
+                <input type="text" ng-model="model.uiConfig.footer.license.link" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="clearfix panel-footer">
+        <button ng-click="setUiConfig()" class="clearfix btn btn-primary pull-right">Save</button>
+      </div>
+    </div>
+  </div>
+  <div ng-show="state === 'appearance'">
+    <div class="panel panel-default">
+      <div class="panel-heading">Preview <a href="/">Explore</a><a class="pull-right" ng-click="addChart()"><i class="glyphicon glyphicon-plus-sign"></i> Add Widget</a></div>
+      <div class="panel-body">
+        <h3 ng-if="model.search.total === 0">No results to show</h3>
+        <ml-facets class="col-md-3 right-col" facets="model.search.facets" toggle="toggleFacet(facet, value)" active-facets="ctrl.mlSearch.activeFacets" negate="ctrl.toggleNegatedFacet(facet,value)"></ml-facets>
+        <div class="col-md-9">
+          <facet-charts charts="model.chartData.charts" ml-search="mlSearch" remove-chart="removeChart" edit-chart="editChart" callback="toggleFacet(facet, value)"></facet-charts>
+          <ml-results results="model.search.results" template="app/search/search-results.html"></ml-results>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
