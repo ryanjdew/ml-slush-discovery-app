@@ -170,7 +170,7 @@
       },
       loadData: function() {
         var uploaderInput = document.getElementById('directoryUploader');
-        var allFiles = uploaderInput.files;
+        var allFiles = ServerConfig.arrangeFiles(uploaderInput.files);
         $scope.isUploading = true;
         $scope.currentFilesToUpload = allFiles.length;
         $scope.currentFilesUploaded = 0;

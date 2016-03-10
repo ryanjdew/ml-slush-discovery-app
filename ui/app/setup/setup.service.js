@@ -358,7 +358,7 @@
         var contentType = file.type || 'text/plain';
         reader.onload = function (event) {
           var value;
-          if (/^(text\/.*|application\/(json|xml)).*$/) {
+          if (/^(text|application)\/(json|xml).*$/.test(contentType)) {
             value = new Uint8Array(event.target.result);
           } else {
             value = arrayBuffer2base64(event.target.result);
@@ -412,24 +412,29 @@
           sortedArray[i] = allFiles[i];
         }
       }
-      return sortedArray;
+      return sortFiles(sortedArray);
     }
 
     function sortFiles(allFiles) {
-      allFiles.sort(function(a, b) {
+      return allFiles.sort(function(a, b) {
         return a.size - b.size;
       });
     }
 
+    serverConfig.arrangeFiles = function(allFiles) {
+      return _.filter(sortFileList(allFiles), function(val) {
+        return val.name.indexOf('.') !== 0;
+      });
+    };
+
     serverConfig.bulkUpload = function(allFiles) {
-      var sortedFiles = sortFileList(allFiles);
       var currentSet = [];
       var currentFilesToUpload = allFiles.length;
       var currentFilesUploaded = 0;
       var lastIndex = currentFilesToUpload - 1;
       var d = $q.defer();
       var currentBucketSize = 0;
-      angular.forEach(sortedFiles, function(file, fileIndex) {
+      angular.forEach(allFiles, function(file, fileIndex) {
         currentSet.push(file);
         currentBucketSize = currentBucketSize + file.size;
         if (currentBucketSize >= bucketSizeInBytes|| fileIndex === lastIndex) {
