@@ -31,8 +31,9 @@ On Windows, that would be:
     ml.bat local bootstrap
     ml.bat local deploy modules
 
-Install additional dependencies using the bower package manager:
+Install additional dependencies using the npm and bower package managers:
 
+    npm install
     bower install
 
 Edit `./local.json` to set your desired ports
