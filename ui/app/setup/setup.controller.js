@@ -24,6 +24,8 @@
     var model = {};
     var mlSearch = searchFactory.newContext();
 
+    $scope.decodeURIComponent = win.decodeURIComponent;
+
     function moveArrayItem(array, old_index, new_index) {
       while (old_index < 0) {
           old_index += array.length;
@@ -92,6 +94,9 @@
         model.geospatialIndexes = config.geospatialIndexes;
         model.searchOptions = config.searchOptions;
         model.constraints = config.searchOptions.options.constraint;
+        angular.forEach(model.constraints, function(constraint) {
+          constraint.name = decodeURIComponent(constraint.name);
+        });
         model.defaultSource = convertToOption(config.searchOptions);
         model.uiConfig = config.uiConfig;
         model.suggestOptions = constructDefaultSourceOptions(
@@ -278,7 +283,13 @@
         moveArrayItem(model.constraints, index, newIndex);
       },
       submitConstraints: function() {
-        model.searchOptions.options.constraint = model.constraints;
+        var constraints = [];
+        angular.forEach(model.constraints, function(constraint) {
+          var newConstraint = angular.copy(constraint);
+          newConstraint.name = encodeURIComponent(constraint.name);
+          constraints.push(newConstraint);
+        });
+        model.searchOptions.options.constraint = constraints;
         ServerConfig.setSearchOptions(model.searchOptions).then(function() {
           updateSearchResults().then(function() {
             $scope.state = 'appearance';

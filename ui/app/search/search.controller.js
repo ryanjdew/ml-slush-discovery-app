@@ -5,15 +5,17 @@
   angular.module('app.search')
     .controller('SearchCtrl', SearchCtrl);
 
-  SearchCtrl.$inject = ['$scope', '$location', 'userService', 'MLSearchFactory', 'ServerConfig', 'MLQueryBuilder'];
+  SearchCtrl.$inject = ['$scope', '$location', '$window', 'userService', 'MLSearchFactory', 'ServerConfig', 'MLQueryBuilder'];
 
   // inherit from MLSearchController
   var superCtrl = MLSearchController.prototype;
   SearchCtrl.prototype = Object.create(superCtrl);
 
-  function SearchCtrl($scope, $location, userService, searchFactory, ServerConfig, qb) {
+  function SearchCtrl($scope, $location, $window, userService, searchFactory, ServerConfig, qb) {
     var ctrl = this;
     var mlSearch = searchFactory.newContext();
+
+    $scope.decodeURIComponent = $window.decodeURIComponent;
 
     ServerConfig.getCharts().then(function(chartData) {
       ctrl.charts = chartData.charts;
