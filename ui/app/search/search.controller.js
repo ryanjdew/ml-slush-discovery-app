@@ -56,20 +56,19 @@
     // implement superCtrl extension method
     ctrl.parseExtraURLParams = function () {
       var foundExtra = false;
-      var contraintName;
       ctrl.pickerDateStart = {};
       ctrl.pickerDateEnd = {};
       angular.forEach($location.search(), function(val, key) {
         var constraintName;
         if (key.indexOf('startDate:') === 0) {
-          contraintName = key.substr(10);
-          ctrl.pickerDateStart[contraintName] = new Date(val);
-          ctrl._applyDateFilter(contraintName);
+          constraintName = key.substr(10);
+          ctrl.pickerDateStart[constraintName] = new Date(val);
+          ctrl._applyDateFilter(constraintName);
           foundExtra = true;
         } else if (key.indexOf('endDate:') === 0) {
-          contraintName = key.substr(8);
-          ctrl.pickerDateEnd[contraintName] = new Date(val);
-          ctrl._applyDateFilter(contraintName);
+          constraintName = key.substr(8);
+          ctrl.pickerDateEnd[constraintName] = new Date(val);
+          ctrl._applyDateFilter(constraintName);
           foundExtra = true;
         }
       });

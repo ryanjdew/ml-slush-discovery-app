@@ -5,13 +5,17 @@
   angular.module('app.search')
     .directive('facetCharts', FacetChartsDirective);
 
-  FacetChartsDirective.$inject = ['$q', 'HighchartsHelper', 'MLRest', 'MLSearchFactory'];
+  FacetChartsDirective.$inject = ['$q', 'CommonUtil', 'HighchartsHelper', 'MLRest', 'MLSearchFactory', 'ServerConfig'];
 
-  function FacetChartsDirective($q, HighchartsHelper, MLRest, searchFactory) {
+  function FacetChartsDirective($q, CommonUtil, HighchartsHelper, MLRest, searchFactory, ServerConfig) {
 
     function link(scope, element, attrs) {
       scope.options = scope.options || 'all';
       scope.mlSearch = scope.mlSearch || searchFactory.newContext();
+      scope.reorderCharts = function(oldIndex, newIndex) {
+        CommonUtil.moveArrayItem(scope.charts, oldIndex, newIndex);
+        ServerConfig.setCharts({ charts: scope.charts});
+      };
     }
     // directive factory creates a link function
     return {

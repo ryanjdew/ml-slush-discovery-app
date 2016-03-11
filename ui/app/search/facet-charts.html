@@ -4,6 +4,10 @@
       <div class="row" ng-if="removeChart">
         <a class="pull-right" ng-click="removeChart($index)"><i class="glyphicon glyphicon-trash">&nbsp;</i></a>
         <a class="pull-right" ng-click="editChart(chart, $index)"><i class="glyphicon glyphicon-cog">&nbsp;</i></a>
+        <div class="pull-right btn-group">
+          <a class="btn btn-xs btn-success" ng-click="reorderCharts($index, $index - 1)"><span class="glyphicon glyphicon-chevron-up">&nbsp;</span></a>
+          <a class="btn btn-xs btn-danger" ng-click="reorderCharts($index, $index + 1)"><span class="glyphicon glyphicon-chevron-down">&nbsp;</span></a>
+        </div>
       </div>
       <div class="clearfix">
         <ml-highchart highchart-config="chart" ml-search="mlSearch"></ml-highchart>

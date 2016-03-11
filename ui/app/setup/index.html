@@ -139,8 +139,8 @@
             <tbody>
               <tr ng-repeat="constraint in model.constraints track by $index">
                 <td class="col-sm-4"><span class="col-sm-2 btn-group btn-group-vertical btn-group-xs">
-                  <a class="btn btn-sm btn-success" ng-click="reorderConstraint($index, $index - 1)"><span class="glyphicon glyphicon-chevron-up">&nbsp;</span></a>
-                  <a class="btn btn-sm btn-danger" ng-click="reorderConstraint($index, $index + 1)"><span class="glyphicon glyphicon-chevron-down">&nbsp;</span></a>
+                  <a class="btn btn-xs btn-success" ng-click="reorderConstraint($index, $index - 1)"><span class="glyphicon glyphicon-chevron-up">&nbsp;</span></a>
+                  <a class="btn btn-xs btn-danger" ng-click="reorderConstraint($index, $index + 1)"><span class="glyphicon glyphicon-chevron-down">&nbsp;</span></a>
                   </span>
                   <input class="col-sm-10" type="text" ng-model="constraint.name" />
                 </td>
