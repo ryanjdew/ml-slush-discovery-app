@@ -1,12 +1,14 @@
 <div class="col-md-12">
-  <div ng-repeat="chart in charts" class="col-md-12">
+  <div ng-repeat="chart in charts" ng-class="{'col-md-12': chart.discoveryWidth !== 'half', 'col-md-6': chart.discoveryWidth === 'half'}">
     <div>
       <div class="row" ng-if="removeChart">
         <a class="pull-right" ng-click="removeChart($index)"><i class="glyphicon glyphicon-trash">&nbsp;</i></a>
         <a class="pull-right" ng-click="editChart(chart, $index)"><i class="glyphicon glyphicon-cog">&nbsp;</i></a>
         <div class="pull-right btn-group">
-          <a class="btn btn-xs btn-success" ng-click="reorderCharts($index, $index - 1)"><span class="glyphicon glyphicon-chevron-up">&nbsp;</span></a>
-          <a class="btn btn-xs btn-danger" ng-click="reorderCharts($index, $index + 1)"><span class="glyphicon glyphicon-chevron-down">&nbsp;</span></a>
+          <a title="Set full width" ng-if="chart.discoveryWidth === 'half'" class="btn btn-xs btn-primary" ng-click="setWidth($index, 'full')"><span class="glyphicon glyphicon-chevron-left">&nbsp;</span></a>
+          <a title="Set half width" ng-if="chart.discoveryWidth !== 'half'" class="btn btn-xs btn-primary" ng-click="setWidth($index, 'half')"><span class="glyphicon glyphicon-chevron-right">&nbsp;</span></a>
+          <a title="Move above" class="btn btn-xs btn-success" ng-click="reorderCharts($index, $index - 1)"><span class="glyphicon glyphicon-chevron-up">&nbsp;</span></a>
+          <a title="Move below" class="btn btn-xs btn-danger" ng-click="reorderCharts($index, $index + 1)"><span class="glyphicon glyphicon-chevron-down">&nbsp;</span></a>
         </div>
       </div>
       <div class="clearfix">

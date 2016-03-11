@@ -5,9 +5,9 @@
   angular.module('app.search')
     .directive('facetCharts', FacetChartsDirective);
 
-  FacetChartsDirective.$inject = ['$q', 'CommonUtil', 'HighchartsHelper', 'MLRest', 'MLSearchFactory', 'ServerConfig'];
+  FacetChartsDirective.$inject = ['$q', '$timeout', 'CommonUtil', 'HighchartsHelper', 'MLRest', 'MLSearchFactory', 'ServerConfig'];
 
-  function FacetChartsDirective($q, CommonUtil, HighchartsHelper, MLRest, searchFactory, ServerConfig) {
+  function FacetChartsDirective($q, $timeout, CommonUtil, HighchartsHelper, MLRest, searchFactory, ServerConfig) {
 
     function link(scope, element, attrs) {
       scope.options = scope.options || 'all';
@@ -16,6 +16,12 @@
         CommonUtil.moveArrayItem(scope.charts, oldIndex, newIndex);
         ServerConfig.setCharts({ charts: scope.charts});
       };
+      scope.setWidth = function(index, widthVal) {
+        scope.charts[index].discoveryWidth = widthVal;
+        ServerConfig.setCharts({ charts: scope.charts});
+        $timeout(function() { scope.$broadcast('highchartsng.reflow'); }, 10);
+      };
+      $timeout(function() { scope.$broadcast('highchartsng.reflow'); });
     }
     // directive factory creates a link function
     return {

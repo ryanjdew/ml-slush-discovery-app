@@ -204,6 +204,9 @@
           }
         });
       },
+      redrawCharts: function() {
+        $timeout(function() {$scope.$broadcast('highchartsng.reflow');});
+      },
       editChart: function(eChart, index) {
         editChartConfigDialog(model.search.facets, eChart).then(function(chart) {
           model.chartData.charts[index] = chart;

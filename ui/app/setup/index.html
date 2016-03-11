@@ -25,7 +25,7 @@
       <li role="presentation" ng-class="{'active': state === 'constraints'}"><a ng-click="state = 'constraints'">Constraints <span ng-if="model.isInErrorState" class="alert-danger" title="Constraints don't match indexes"><i class="glyphicon glyphicon-exclamation-sign"></i></span></a></li>
       <li role="presentation" ng-class="{'active': state === 'suggestions'}"><a ng-click="state = 'suggestions'">Suggestions <span ng-if="model.isInErrorState" class="alert-danger" title="Constraints don't match indexes"><i class="glyphicon glyphicon-exclamation-sign"></i></span></a></li>
       <li role="presentation" ng-class="{'active': state === 'uiConfig'}"><a ng-click="state = 'uiConfig'">UI Config</a></li>
-      <li role="presentation" ng-class="{'active': state === 'appearance'}"><a ng-click="state = 'appearance'">Results</a></li>
+      <li role="presentation" ng-class="{'active': state === 'appearance'}"><a ng-click="state = 'appearance'; redrawCharts();">Results</a></li>
     </ul>
     <div ng-show="state === 'database'">
       <div class="form-group">
