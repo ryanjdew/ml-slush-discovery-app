@@ -70,7 +70,7 @@ declare function expand:document(
     ) else if (fn:matches($content-type, "^(text/.*|application/(.+\+)?(xml|json))$")) then (
       $content
     ) else (
-      expand:binary($uri, $content),
+      expand:binary($uri, $content, $content-type),
       $content
     )
 };
@@ -92,18 +92,33 @@ declare function expand:decode-hex($hexBinary as document-node())
 
 declare function expand:binary(
   $uri as xs:string,
-  $content as document-node()
+  $content as document-node(),
+  $content-type as xs:string
 ) as empty-sequence()
 {
-  let $filter := xdmp:document-filter($content)
   let $metadata :=
-    for $meta in $filter//html:meta
-    return
-      element { xs:QName(concat("ingest:", $meta/@name)) } {
-        data($meta/@content)
+    if (fn:contains($content-type, "application/pdf")) then
+      try {
+        fn:tail(xdmp:pdf-convert($content, fn:tokenize($uri, "/")[fn:last()]))/element()
+      } catch ($e) {
+        xdmp:document-filter($content)
       }
+    else
+      xdmp:document-filter($content)
   return (
-    xdmp:document-set-property($uri, <ingest:metadata>{$metadata}</ingest:metadata>)
+    xdmp:document-insert($uri || ".xml",
+      element binary-details {
+        element binary-file-location {$uri},
+        element binary-content-type {$content-type},
+        element metadata {
+          $metadata
+        }
+      },
+      (
+        xdmp:permission("rest-reader", "read"),
+        xdmp:permission("rest-writer", "update")
+      )
+    )
   )
 };
 
