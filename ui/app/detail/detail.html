@@ -12,7 +12,7 @@
             <div ng-if="ctrl.binaryType === 'pdf'">
               <object data="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary" content-type="{{ctrl.binaryContentType}}" class="preview-binary"></object>
             </div>
-            <div ng-if="ctrl.binaryType === 'pdf'">
+            <div ng-if="ctrl.binaryType === 'image'">
               <img ng-src="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary"></object>
             </div>
             <div ng-if="ctrl.binaryType === 'other'">
