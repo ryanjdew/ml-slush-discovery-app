@@ -1,5 +1,6 @@
 <div class="row detail">
   <div class="col-sm-8">
+    <h3><search-image doc-type="ctrl.binaryContentType || ('application/' + ctrl.type)" image-type="'details'"></search-image>{{ctrl.binaryFilePath || ctrl.uri}}</h3>
     <tabset type="pills">
       <tab active="ctrl.defaultTab">
         <tab-heading>{{ctrl.type | uppercase}}</tab-heading>
@@ -13,7 +14,7 @@
               <object data="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary" content-type="{{ctrl.binaryContentType}}" class="preview-binary"></object>
             </div>
             <div ng-if="ctrl.binaryType === 'image'">
-              <img ng-src="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary"></object>
+              <img ng-src="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary" />
             </div>
             <div ng-if="ctrl.binaryType === 'other'">
               <div ng-bind-html="ctrl.htmlContents"></div>
