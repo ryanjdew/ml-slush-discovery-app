@@ -26,6 +26,14 @@
         ctrl.binaryFilePath = parsedXML.getElementsByTagName('binary-file-location')[0].childNodes[0].nodeValue;
         ctrl.binaryContentType = parsedXML.getElementsByTagName('binary-content-type')[0].childNodes[0].nodeValue;
         ctrl.type = 'binary';
+        if (/image\//.test(ctrl.binaryContentType)) {
+          ctrl.binaryType = 'image';
+        } else if (/application\/pdf/.test(ctrl.binaryContentType)) {
+          ctrl.binaryType = 'pdf';
+        } else {
+          ctrl.binaryType = 'other';
+          ctrl.htmlContents = parsedXML.getElementsByTagName('html')[0].getElementsByTagName('body')[0].innerHTML;
+        }
       } else {
         ctrl.type = 'xml';
       }

@@ -9,7 +9,15 @@
           <a ng-if="ctrl.type==='binary' && !ctrl.binaryFilePath" target="_blank" ng-href="/v1/documents?uri={{ctrl.uri}}&transform=download" class="btn btn-default">Download</a>
           <div ng-if="ctrl.binaryFilePath">
             <a target="_blank" ng-href="/v1/documents?uri={{ctrl.binaryFilePath}}&transform=download" class="btn btn-default">Download</a>
-            <object data="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary" content-type="{{ctrl.binaryContentType}}" class="preview-binary"></object>
+            <div ng-if="ctrl.binaryType === 'pdf'">
+              <object data="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary" content-type="{{ctrl.binaryContentType}}" class="preview-binary"></object>
+            </div>
+            <div ng-if="ctrl.binaryType === 'pdf'">
+              <img ng-src="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary"></object>
+            </div>
+            <div ng-if="ctrl.binaryType === 'other'">
+              <div ng-bind-html="ctrl.htmlContents"></div>
+            </div>
           </div>
         </div>
       </tab>
