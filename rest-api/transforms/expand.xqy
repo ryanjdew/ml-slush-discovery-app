@@ -39,6 +39,7 @@ function trns:transform(
   expand:document(
     map:get($context, "uri"),
     $content,
-    fn:true()
+    fn:true(),
+    fn:tokenize(map:get($params, "collections"), ",")[. ne ""]
   )
 };

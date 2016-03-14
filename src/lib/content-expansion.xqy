@@ -22,7 +22,8 @@ declare option xdmp:mapping "false";
 declare function expand:document(
   $uri as xs:string,
   $content as document-node(),
-  $shouldDecode as xs:boolean
+  $shouldDecode as xs:boolean,
+  $collections as xs:string*
 ) as document-node()
 {
   let $content-type := xdmp:uri-content-type($uri)
@@ -53,24 +54,26 @@ declare function expand:document(
       expand:triples(
         $uri,
         $content,
-        $content-type
+        $content-type,
+        $collections
       ),
       $content
     ) else if ($content-type eq "text/csv") then (
       expand:csv(
         $uri,
-        $content
+        $content,
+        $collections
       ),
       document {
         "ExpandedToJson"
       }
     ) else if ($content-type eq "application/zip") then (
-      expand:zip($uri, $content),
+      expand:zip($uri, $content, $collections),
       $content
     ) else if (fn:matches($content-type, "^(text/.*|application/(.+\+)?(xml|json))$")) then (
       $content
     ) else (
-      expand:binary($uri, $content, $content-type),
+      expand:binary($uri, $content, $content-type, $collections),
       $content
     )
 };
@@ -93,7 +96,8 @@ declare function expand:decode-hex($hexBinary as document-node())
 declare function expand:binary(
   $uri as xs:string,
   $content as document-node(),
-  $content-type as xs:string
+  $content-type as xs:string,
+  $collections as xs:string*
 ) as empty-sequence()
 {
   let $metadata :=
@@ -117,14 +121,16 @@ declare function expand:binary(
       (
         xdmp:permission("rest-reader", "read"),
         xdmp:permission("rest-writer", "update")
-      )
+      ),
+      $collections
     )
   )
 };
 
 declare function expand:csv(
   $uri as xs:string,
-  $content as document-node()
+  $content as document-node(),
+  $collections as xs:string*
 ) as empty-sequence()
 {
   let $uri-base := fn:replace($uri, "\.[^\.]+$", "/")
@@ -154,13 +160,15 @@ declare function expand:csv(
       (
         xdmp:permission("rest-reader", "read"),
         xdmp:permission("rest-writer", "update")
-      )
+      ),
+      $collections
     )
 };
 
 declare function expand:zip(
   $uri as xs:string,
-  $content as document-node()
+  $content as document-node(),
+  $collections as xs:string*
 ) as empty-sequence()
 {
   let $uri-base := fn:replace($uri, "\.[^\.]+$", "/")
@@ -184,19 +192,22 @@ declare function expand:zip(
       expand:document(
         $file-full-uri,
         $file-content,
-        fn:false()
+        fn:false(),
+        $collections
       ),
       (
         xdmp:permission("rest-reader", "read"),
         xdmp:permission("rest-writer", "update")
-      )
+      ),
+      $collections
     )
 };
 
 declare function expand:triples(
   $uri as xs:string,
   $content as document-node(),
-  $content-type as xs:string
+  $content-type as xs:string,
+  $collections as xs:string*
 )
 {
   let $new-uri := fn:replace($uri, "\.[^\.]+$", ".xml")

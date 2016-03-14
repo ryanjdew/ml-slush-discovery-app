@@ -336,7 +336,7 @@
       return window.btoa( binary.join('') );
     }
 
-    function uploadBatch(files) {
+    function uploadBatch(files, collections) {
       var promises = [];
       var epochTicks = 621355968000000000;
       var ticksPerMillisecond = 10000;
@@ -347,6 +347,20 @@
       var mixedContentType = 'multipart/mixed; boundary=' + boundary;
 
       var contents = [];
+      if (collections && collections.length) {
+        var collectionsMeta = '<?xml version="1.0" encoding="UTF-8"?>\r\n' +
+            '<rapi:metadata xmlns:rapi="http://marklogic.com/rest-api">\r\n' +
+            '  <rapi:collections>\r\n';
+        angular.forEach(collections, function(collection) {
+          collectionsMeta += '    <rapi:collection>' + collection + '</rapi:collection>\r\n';
+        });
+        collectionsMeta += '  </rapi:collections>\r\n</rapi:metadata>';
+        contents.push(header);
+        contents.push('Content-Type: application/xml\r\nContent-Disposition: inline; category=metadata\r\nContent-Length: ' + collectionsMeta.length);
+        contents.push('\r\n\r\n');
+        contents.push(collectionsMeta + '\r\n');
+      }
+
       angular.forEach(files, function(file) {
         var reader = new FileReader(),
             fileName = file.webkitRelativePath || file.name,
@@ -390,7 +404,10 @@
               data,
               {
                 'headers':{'Content-Type': mixedContentType},
-                'params': {'transform': 'expand'},
+                'params': {
+                  'transform': 'expand',
+                  'trans:collections': collections ? collections.join(',') : null
+                },
                 'transformRequest':[]
               }
             );
@@ -427,7 +444,7 @@
       });
     };
 
-    serverConfig.bulkUpload = function(allFiles) {
+    serverConfig.bulkUpload = function(allFiles, collections) {
       var currentSet = [];
       var currentFilesToUpload = allFiles.length;
       var currentFilesUploaded = 0;
@@ -441,7 +458,7 @@
           currentBucketSize = 0;
           var currentSetCp = currentSet.slice(0, currentSet.length);
           var runUpload = function() {
-            uploadBatch(currentSetCp).then(function(data) {
+            uploadBatch(currentSetCp, collections).then(function(data) {
               //$scope.loadDataInfo = data;
               //model.dataCollections.push(data.collection);
               currentFilesUploaded += currentSetCp.length;

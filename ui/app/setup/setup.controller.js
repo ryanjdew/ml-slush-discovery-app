@@ -23,7 +23,9 @@
     editChartConfigDialog,
     CommonUtil
   ) {
-    var model = {};
+    var model = {
+      uploadCollections: []
+    };
     var mlSearch = searchFactory.newContext();
 
     $scope.decodeURIComponent = win.decodeURIComponent;
@@ -164,7 +166,7 @@
         $scope.isUploading = true;
         $scope.currentFilesToUpload = allFiles.length;
         $scope.currentFilesUploaded = 0;
-        ServerConfig.bulkUpload(allFiles).then(function(data) {
+        ServerConfig.bulkUpload(allFiles, $scope.model.uploadCollections).then(function(data) {
             updateSearchResults().then(function() {
               $scope.state = 'appearance';
             });
@@ -174,6 +176,7 @@
             } catch (e) {}
             $scope.currentFilesToUpload = 0;
             $scope.currentFilesUploaded = 0;
+            $scope.model.uploadCollections.length = 0;
           }, handleError,
           function(updatedCount) {
             $scope.currentFilesUploaded = updatedCount;

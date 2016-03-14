@@ -42,14 +42,16 @@
         <div ng-hide="isUploading">
           <input class="form-control" id="directoryUploader" name="directory" type="file" multiple webkitdirectory>
         </div>
+        <label class="control-label">Upload with Collections <a ng-click="model.uploadCollections.push('')"><i class="glyphicon glyphicon-plus-sign"></i> Add</a></label>
+        <div ng-repeat="collection in model.uploadCollections track by $index" class="col-sm-12">
+          <div class="input-group">
+            <input class="form-control" ng-model="model.uploadCollections[$index]" type="text">
+            <a class="input-group-addon btn btn-danger" ng-click="model.uploadCollections.splice($index, 1)"><span class="glyphicon glyphicon-trash"></span></a>
+          </div>
+        </div>
       </div>
       <div class="clearfix">
         <button ng-click="loadData()" class="clearfix btn btn-primary pull-right">Load</button>
-      </div>
-      <h4>Previously Loaded Collections</h4>
-      <div ng-repeat="collection in model.dataCollections" class="col-sm-12">
-        {{collection}}
-        <a ng-click="removeCollection($index)"><span class="glyphicon glyphicon-trash"></span></a>
       </div>
     </div>
     <div ng-show="state === 'indexes'">
