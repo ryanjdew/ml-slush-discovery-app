@@ -38,6 +38,7 @@
           model.search = data;
         },
         function() {
+          model.search = {};
           model.isInErrorState = true;
         });
     }
