@@ -169,6 +169,7 @@
         ServerConfig.bulkUpload(allFiles, $scope.model.uploadCollections).then(function(data) {
             updateSearchResults().then(function() {
               $scope.state = 'appearance';
+              $scope.redrawCharts();
             });
             $scope.isUploading = false;
             try {
