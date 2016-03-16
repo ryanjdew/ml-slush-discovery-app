@@ -1,0 +1,24 @@
+<options xmlns="http://marklogic.com/appservices/search">
+  <operator name="results">
+    <state name="compact">
+      <transform-results apply="snippet">
+        <preferred-elements>
+          <element ns="" name="body" />
+        </preferred-elements>
+        <max-matches>1</max-matches>
+        <max-snippet-chars>150</max-snippet-chars>
+        <per-match-tokens>20</per-match-tokens>
+      </transform-results>
+    </state>
+    <state name="detailed">
+      <transform-results apply="snippet">
+        <preferred-elements>
+          <element ns="" name="body" />
+        </preferred-elements>
+        <max-matches>2</max-matches>
+        <max-snippet-chars>400</max-snippet-chars>
+        <per-match-tokens>30</per-match-tokens>
+      </transform-results>
+    </state>
+  </operator>
+</options>

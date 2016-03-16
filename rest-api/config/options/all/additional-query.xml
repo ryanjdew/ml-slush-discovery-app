@@ -1,0 +1,9 @@
+<options xmlns="http://marklogic.com/appservices/search">
+  <additional-query>
+    <cts:not-query xmlns:cts="http://marklogic.com/cts">
+      <cts:directory-query depth="infinity">
+        <cts:uri>/discovery-app/config/</cts:uri>
+      </cts:directory-query>
+    </cts:not-query>
+  </additional-query>
+</options>

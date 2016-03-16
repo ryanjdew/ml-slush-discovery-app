@@ -1,3 +1,4 @@
+require 'lib/RoxyHttp'
 #
 # Put your custom functions in this class in order to keep the files under lib untainted
 #
@@ -25,6 +26,28 @@ class ServerConfig
                       -P #{ @properties['ml.app-port'] }!
   end
 
+  alias_method :original_deploy_rest, :deploy_rest
+
+  def deploy_rest
+    optionFiles = Dir[ServerConfig.expand_path("../../../rest-api/config/options/all/*")]
+    headers = {
+      'Content-Type' => 'application/xml'
+    }
+    optionFiles.each { |filePath|
+      file = open(filePath, "rb")
+      contents = file.read
+      searchOptionPart = File.basename(filePath, ".*")
+      url = "http://#{@properties['ml.server']}:#{@properties['ml.app-port']}/v1/config/query/all/#{searchOptionPart}"
+      puts url
+      r = go(url, "PUT", headers, nil, contents)
+      if (r.code.to_i < 200 && r.code.to_i > 206)
+        @logger.error("code: #{r.code.to_i} body:#{r.body}")
+      end
+    }
+
+    deploy_ext()
+    deploy_transform()
+  end
   #
   # you can define your own methods and call them from the command line
   # just like other roxy commands

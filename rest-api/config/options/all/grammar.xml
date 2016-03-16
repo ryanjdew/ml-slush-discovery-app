@@ -1,0 +1,20 @@
+<options xmlns="http://marklogic.com/appservices/search">
+  <grammar>
+    <quotation>"</quotation>
+    <implicit>
+      <cts:and-query strength="20" xmlns:cts="http://marklogic.com/cts" />
+    </implicit>
+    <starter strength="30" apply="grouping" delimiter=")">(</starter>
+    <starter strength="40" apply="prefix" element="cts:not-query">-</starter>
+    <joiner strength="10" apply="infix" element="cts:or-query" tokenize="word">OR</joiner>
+    <joiner strength="20" apply="infix" element="cts:and-query" tokenize="word">AND</joiner>
+    <joiner strength="30" apply="infix" element="cts:near-query" tokenize="word">NEAR</joiner>
+    <joiner strength="30" apply="near2" consume="2" element="cts:near-query">NEAR/</joiner>
+    <joiner strength="50" apply="constraint">:</joiner>
+    <joiner strength="50" apply="constraint" compare="LT" tokenize="word">LT</joiner>
+    <joiner strength="50" apply="constraint" compare="LE" tokenize="word">LE</joiner>
+    <joiner strength="50" apply="constraint" compare="GT" tokenize="word">GT</joiner>
+    <joiner strength="50" apply="constraint" compare="GE" tokenize="word">GE</joiner>
+    <joiner strength="50" apply="constraint" compare="NE" tokenize="word">NE</joiner>
+  </grammar>
+</options>
