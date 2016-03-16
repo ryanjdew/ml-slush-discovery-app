@@ -36,7 +36,20 @@ Install additional dependencies using the npm and bower package managers:
     npm install
     bower install
 
-Edit `./local.json` to set your desired ports. If the `local.json` file doesn't exist, one with default settings can be created with the command `gulp init-local`.
+Edit `./local.json` to set your ports, marklogic host, and credentials if needed. If the `local.json` file doesn't exist, one with default settings can be created with the command `gulp init-local`. The contents of `local.json` will appear as below.
+
+```json
+{
+  "ml-version": "8",
+  "ml-host": "localhost",
+  "ml-admin-user": "admin",
+  "ml-admin-pass": "admin",
+  "ml-app-user": "discovery-app-guest",
+  "ml-app-pass": "81fdef92b84951a6",
+  "ml-http-port": "8040",
+  "node-port": 9070
+}
+```
 
     gulp serve-local # this will watch the .less file for changes, compile them to .css, and run the node server
 
