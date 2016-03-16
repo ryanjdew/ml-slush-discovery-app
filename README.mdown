@@ -36,7 +36,7 @@ Install additional dependencies using the npm and bower package managers:
     npm install
     bower install
 
-Edit `./local.json` to set your desired ports
+Edit `./local.json` to set your desired ports. If the `local.json` file doesn't exist, one with default settings can be created with the command `gulp init-local`.
 
     gulp serve-local # this will watch the .less file for changes, compile them to .css, and run the node server
 
@@ -104,3 +104,7 @@ The application assumes that you're storing JSON data. This shows up in the
 default format request for the MLRest service's `searchContext`, the
 `detailController`'s (`detail-ctrl.js`) request to get a document, and in the
 out-of-the-box detail view.
+
+# Troubleshooting
+
+If you encounter any issues, please first ensure that you have the latest code from this repository with `git pull`. After you are updated with the latest, go through the steps in the ["Running the application" section](#running-the-application). If you still have issues, please open an issue against the project.
