@@ -50,7 +50,7 @@ Edit `./local.json` to set your ports, marklogic host, and credentials if needed
   "node-port": 9070
 }
 ```
-
+Now run:
     gulp serve-local # this will watch the .less file for changes, compile them to .css, and run the node server
 
 After running `gulp serve-local` your browser will load the application. Follow the setup link on  the top of the page.
