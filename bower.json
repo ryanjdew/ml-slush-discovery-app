@@ -44,7 +44,7 @@
   },
   "private": true,
   "resolutions": {
-    "angular": "1.4.8",
+    "angular": "~1.4.4",
     "angular-bootstrap": "~0.13.3",
     "lodash": "~3.10.1"
   }
