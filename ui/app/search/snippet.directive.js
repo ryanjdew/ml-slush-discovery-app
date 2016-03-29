@@ -27,11 +27,12 @@
 
     var ctrl = this;
     angular.extend(ctrl, {
+      snippetType: 'compact',
       setSnippetType: setSnippetType
     });
 
     function setSnippetType(type) {
-      $scope.snippetType = type;
+      ctrl.snippetType = type;
       $scope.setSnippet({type: type});
     }
   }
