@@ -88,9 +88,9 @@
         model.defaultSource = convertToOption(config.searchOptions);
         model.uiConfig = config.uiConfig;
         model.suggestOptions = constructDefaultSourceOptions(
-            model.constraints,
-            model.defaultSource
-          );
+          model.constraints,
+          model.defaultSource
+        );
         model.databaseOptions = config.databases;
         $scope.$emit('uiConfigChanged', model.uiConfig);
       });
@@ -146,7 +146,7 @@
           size: 'sm'
         }).result.then(function(dbName) {
           model.databaseOptions.push(dbName);
-          model.databaseOptions.sort(function (a, b) {
+          model.databaseOptions.sort(function(a, b) {
             return a.toLowerCase().localeCompare(b.toLowerCase());
           });
           model.databaseName = dbName;
@@ -189,6 +189,7 @@
           model.dataCollections.splice(index, 1);
           updateSearchResults().then(function() {
             $scope.state = 'appearance';
+            $scope.redrawCharts();
           });
         }, handleError);
       },
@@ -205,12 +206,14 @@
       editIndex: function(index) {
         editRangeIndexDialog(index).then(function(index) {
           if (index) {
-            ServerConfig.setRangeIndexes(model.rangeIndexes).then(updateSearchResults, handleError);
+            ServerConfig.setRangeIndexes(model.rangeIndexes).then(function() {
+              ServerConfig.setFields(model.fields).then(updateSearchResults, handleError);
+            }, handleError);
           }
         });
       },
       redrawCharts: function() {
-        $timeout(function() {$scope.$broadcast('highchartsng.reflow');});
+        $timeout(function() { $scope.$broadcast('highchartsng.reflow'); });
       },
       editChart: function(eChart, index) {
         editChartConfigDialog(model.search.facets, eChart).then(function(chart) {
@@ -231,7 +234,9 @@
       addIndex: function() {
         newRangeIndexDialog(model.fields['field-list']).then(function(index) {
           model.rangeIndexes['range-index-list'].push(index);
-          ServerConfig.setRangeIndexes(model.rangeIndexes).then(updateSearchResults, handleError);
+          ServerConfig.setRangeIndexes(model.rangeIndexes).then(function() {
+            ServerConfig.setFields(model.fields).then(updateSearchResults, handleError);
+          }, handleError);
         });
       },
       addGeospatialIndex: function() {
@@ -292,21 +297,21 @@
       saveDefaultSource: function() {
         var chosenOption = model.defaultSource;
         model.searchOptions.options['default-suggestion-source'] = {
-              'ref': chosenOption
-            };
+          'ref': chosenOption
+        };
         model.searchOptions.options['suggestion-source'] = [];
         angular.forEach(model.searchOptions.options.constraint, function(constraint) {
           if (constraint.range && constraint.range.type === 'xs:string') {
-            model.searchOptions.options['suggestion-source'].push({ ref: constraint.name});
+            model.searchOptions.options['suggestion-source'].push({ ref: constraint.name });
           }
         });
         ServerConfig.setSearchOptions(model.searchOptions).then(updateSearchResults, handleError);
       },
       getDefaultSourceOpts: function() {
         model.suggestOptions = constructDefaultSourceOptions(
-            model.searchOptions.options.constraint,
-            model.defaultSource
-          );
+          model.searchOptions.options.constraint,
+          model.defaultSource
+        );
       },
       resampleConstraints: function() {
         model.constraints = [];

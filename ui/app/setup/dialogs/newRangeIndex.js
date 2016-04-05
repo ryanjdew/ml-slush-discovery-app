@@ -51,13 +51,14 @@
           };
           var subPart = index[objProperty];
           if ($scope.indexType === 'element' || $scope.indexType === 'attribute') {
-            subPart.localname = selectedNode.attribute || selectedNode.element;
+            subPart.localname = selectedNode.attribute || selectedNode.element || selectedNode.localname;
             subPart['namespace-uri'] = selectedNode.attributeNamespace ||
-              selectedNode.elementNamespace;
+              selectedNode.elementNamespace || selectedNode.namespaceUri || '';
           }
           if ($scope.indexType === 'attribute') {
-            subPart['parent-localname'] = selectedNode.element;
-            subPart['parent-namespace-uri'] = selectedNode.elementNamespace;
+            subPart['parent-localname'] = selectedNode.element || selectedNode.parentLocalname;
+            subPart['parent-namespace-uri'] = selectedNode.elementNamespace ||
+                selectedNode.parentNamespaceUri || '';
           }
           if ($scope.indexType === 'field') {
             subPart['field-name'] = $scope.field['field-name'];
