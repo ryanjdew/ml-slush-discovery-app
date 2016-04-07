@@ -1,9 +1,22 @@
 <options xmlns="http://marklogic.com/appservices/search">
   <additional-query>
-    <cts:not-query xmlns:cts="http://marklogic.com/cts">
-      <cts:directory-query depth="infinity">
-        <cts:uri>/discovery-app/config/</cts:uri>
-      </cts:directory-query>
-    </cts:not-query>
+    <cts:and-query xmlns:cts="http://marklogic.com/cts">
+      <cts:not-query>
+        <cts:directory-query depth="infinity">
+          <cts:uri>/discovery-app/config/</cts:uri>
+        </cts:directory-query>
+      </cts:not-query>
+      <cts:or-query>
+        <cts:term-query>
+          <cts:key>2328177500544466626</cts:key>
+        </cts:term-query>
+        <cts:term-query>
+          <cts:key>12572403224569452887</cts:key>
+        </cts:term-query>
+        <cts:term-query>
+          <cts:key>1458993848217274698</cts:key>
+        </cts:term-query>
+      </cts:or-query>
+    </cts:and-query>
   </additional-query>
 </options>
