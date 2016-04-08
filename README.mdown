@@ -120,4 +120,4 @@ out-of-the-box detail view.
 
 # Troubleshooting
 
-If you encounter any issues, please first ensure that you have the latest code from this repository with `git pull`. After you are updated with the latest, go through the steps in the ["Running the application" section](#running-the-application). If you still have issues, please open an issue against the project.
+If you encounter any issues, please first ensure that you have the latest code from this repository with `git pull`. After you are updated with the latest, delete the bower_components and go through the steps in the ["Running the application" section](#running-the-application). If you still have issues, please open an issue against the project.

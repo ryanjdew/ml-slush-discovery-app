@@ -17,7 +17,6 @@
     'app.user',
     'ui.bootstrap',
     'ui.router',
-    'ui.tinymce',
     'app.common',
     'app.service',
     'ngRoute',

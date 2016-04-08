@@ -9,14 +9,14 @@
    * @name AddIndexCtrl
    * @description
    * Controller for {@link loginDialog}. The controller is injected by the
-   * $modal service. Provides a user interface for authenticating a user.
+   * $uibModal service. Provides a user interface for authenticating a user.
    * Upon instantiation the `loginDialogCtlr` creates an empty instance of
    * {@link ssSession} for handling authentication. See
    * <a href="http://angular-ui.github.io/bootstrap/"
    * target="_blank">ui.bootstrap.modal</a> for more information.
    *
    * @param {angular.Scope} $scope (injected)
-   * @param {ui.bootstrap.modal.$modalInstance} $modalInstance (injected)
+   * @param {ui.bootstrap.modal.$uibModalInstance} $uibModalInstance (injected)
    * @param {object} ssSession Session object
    * @param {object} mlAuth Authentication object
    *
@@ -25,8 +25,8 @@
    * @property {string} $scope.session.username The username input.
    * @property {string} $scope.session.password The password input.
    */
-  module.controller('AddIndexCtrl', ['$modalInstance', '$scope', 'fields', 'ServerConfig',
-    function($modalInstance, $scope, fields, ServerConfig) {
+  module.controller('AddIndexCtrl', ['$uibModalInstance', '$scope', 'fields', 'ServerConfig',
+    function($uibModalInstance, $scope, fields, ServerConfig) {
       $scope.indexType = 'element';
       $scope.fields = fields;
       $scope.dataTypes = ServerConfig.dataTypes();
@@ -67,7 +67,7 @@
           if (subPart['scalar-type'] === 'string') {
             subPart.collation = $scope.index.collation;
           }
-          $modalInstance.close(index);
+          $uibModalInstance.close(index);
         }
       };
     }
@@ -81,10 +81,10 @@
    * adding a range index to the application.
    */
   module.factory('newRangeIndexDialog', [
-    '$modal',
-    function($modal) {
+    '$uibModal',
+    function($uibModal) {
       return function(fields) {
-        return $modal.open({
+        return $uibModal.open({
           templateUrl: '/ui/app/setup/dialogs/newRangeIndex.html',
           controller: 'AddIndexCtrl',
           size: 'lg',

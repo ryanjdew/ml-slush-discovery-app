@@ -9,11 +9,11 @@
    * @name EditIndexCtrl
    * @description
    */
-  module.controller('EditConstraintCtrl', ['$modalInstance', '$scope', 'ServerConfig', 'index', 'indexType', function ($modalInstance, $scope, ServerConfig, index, indexType) {
+  module.controller('EditConstraintCtrl', ['$uibModalInstance', '$scope', 'ServerConfig', 'index', 'indexType', function ($uibModalInstance, $scope, ServerConfig, index, indexType) {
       $scope.indexType = indexType;
       $scope.index = index;
       $scope.save = function () {
-        $modalInstance.close($scope.index);
+        $uibModalInstance.close($scope.index);
       };
     }]);
 
@@ -25,8 +25,8 @@
    * adding a range index to the application.
    */
   module.factory('EditConstraintDialog', [
-    '$modal',
-    function ($modal) {
+    '$uibModal',
+    function ($uibModal) {
       return function (constraint) {
         var indexValue,
             indexType;
@@ -36,7 +36,7 @@
             indexValue = val;
           }
         });
-        return $modal.open({
+        return $uibModal.open({
             templateUrl: 'app/setup/dialogs/editGeospatialIndex.html',
             controller: 'EditConstraintCtrl',
             size: 'lg',

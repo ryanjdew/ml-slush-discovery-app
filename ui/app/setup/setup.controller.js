@@ -5,7 +5,7 @@
     .controller('SetupCtrl', SetupCtrl);
 
   SetupCtrl.$inject = [
-    '$modal', '$scope', '$timeout', 'ServerConfig',
+    '$uibModal', '$scope', '$timeout', 'ServerConfig',
     '$window', 'MLSearchFactory',
     'newGeospatialIndexDialog', 'editGeospatialIndexDialog',
     'newRangeIndexDialog', 'editRangeIndexDialog',
@@ -15,7 +15,7 @@
   ];
 
   function SetupCtrl(
-    $modal, $scope, $timeout, ServerConfig,
+    $uibModal, $scope, $timeout, ServerConfig,
     win, searchFactory,
     newGeospatialIndexDialog, editGeospatialIndexDialog,
     newRangeIndexDialog, editRangeIndexDialog,
@@ -115,7 +115,7 @@
         }, handleError);
       },
       addDatabase: function() {
-        $modal.open({
+        $uibModal.open({
           template: '<div>' +
             '<div class="modal-header">' +
             '<button type="button" class="close" ng-click="$dismiss()">' +
@@ -136,10 +136,10 @@
             '</form>' +
             '</div>' +
             '</div>',
-          controller: ['$modalInstance', '$scope', function($modalInstance, $scope) {
+          controller: ['$uibModalInstance', '$scope', function($uibModalInstance, $scope) {
             $scope.add = function() {
               if ($scope.dbName && $scope.dbName !== '') {
-                $modalInstance.close($scope.dbName);
+                $uibModalInstance.close($scope.dbName);
               }
             };
           }],

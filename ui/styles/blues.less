@@ -2,7 +2,7 @@
 @import "blues-variables.less";
 
 html {
-	background-color: #4e5d6c;
+  background-color: #4e5d6c;
 }
 
 body {
@@ -13,8 +13,36 @@ body {
   background-color: #2b3e50;
 
   .content {
-  	background-color: #2b3e50;
+    background-color: #2b3e50;
   }
+}
+
+/* header buttons */
+
+.nav.navbar-nav a:before  {
+    font-family: FontAwesome;
+    font-size: 24px;
+    display: inline-block;
+}
+
+.nav.navbar-nav .home a:before  {
+    content: '\f015';
+}
+
+.nav.navbar-nav .search a:before  {
+    content: '\f002';
+}
+
+.nav.navbar-nav .create a:before  {
+    content: '\f044';
+}
+
+.nav.navbar-nav a {
+  font-size: 0;
+}
+
+ul.nav.navbar-nav {
+    padding-top: 10px;
 }
 
 h1#logo {
@@ -63,16 +91,16 @@ footer#footer {
   border: none;
 
   .nav li a {
-  	color: @body-bg;;
+    color: @body-bg;;
   }
 
   .social-links a {
-  	width: 28px;
-  	height: 28px;
-  	background-color: #2b3e50;
-  	border: 2px solid #2b3e50;
-  	border-radius: 3px;
-	}
+    width: 28px;
+    height: 28px;
+    background-color: #2b3e50;
+    border: 2px solid #2b3e50;
+    border-radius: 3px;
+  }
 }
 
 /* adjustments for the dark bckground*/

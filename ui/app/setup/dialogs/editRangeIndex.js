@@ -9,14 +9,14 @@
    * @name EditIndexCtrl
    * @description
    * Controller for {@link loginDialog}. The controller is injected by the
-   * $modal service. Provides a user interface for authenticating a user.
+   * $uibModal service. Provides a user interface for authenticating a user.
    * Upon instantiation the `loginDialogCtlr` creates an empty instance of
    * {@link ssSession} for handling authentication. See
    * <a href="http://angular-ui.github.io/bootstrap/"
    * target="_blank">ui.bootstrap.modal</a> for more information.
    *
    * @param {angular.Scope} $scope (injected)
-   * @param {ui.bootstrap.modal.$modalInstance} $modalInstance (injected)
+   * @param {ui.bootstrap.modal.$uibModalInstance} $uibModalInstance (injected)
    * @param {object} ssSession Session object
    * @param {object} mlAuth Authentication object
    *
@@ -25,7 +25,7 @@
    * @property {string} $scope.session.username The username input.
    * @property {string} $scope.session.password The password input.
    */
-  module.controller('EditIndexCtrl', ['$modalInstance', '$scope', 'ServerConfig', 'index', 'indexType', function ($modalInstance, $scope, ServerConfig, index, indexType) {
+  module.controller('EditIndexCtrl', ['$uibModalInstance', '$scope', 'ServerConfig', 'index', 'indexType', function ($uibModalInstance, $scope, ServerConfig, index, indexType) {
       $scope.indexType = indexType;
       $scope.dataTypes = ServerConfig.dataTypes();
       $scope.index = index;
@@ -33,7 +33,7 @@
         if ($scope.index['scalar-type'] !== 'string') {
           $scope.index.collation = '';
         }
-        $modalInstance.close($scope.index);
+        $uibModalInstance.close($scope.index);
       };
     }]);
 
@@ -45,8 +45,8 @@
    * adding a range index to the application.
    */
   module.factory('editRangeIndexDialog', [
-    '$modal',
-    function ($modal) {
+    '$uibModal',
+    function ($uibModal) {
       return function (index) {
       	var indexValue,
             indexType;
@@ -56,7 +56,7 @@
             indexValue = val;
           }
         });
-        return $modal.open({
+        return $uibModal.open({
             templateUrl: '/ui/app/setup/dialogs/editRangeIndex.html',
             controller: 'EditIndexCtrl',
             size: 'lg',

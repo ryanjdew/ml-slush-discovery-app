@@ -23,7 +23,7 @@ angular.module('ui.dashboard', ['ui.bootstrap', 'ui.sortable']);
 
 angular.module('ui.dashboard')
 
-  .directive('dashboard', ['WidgetModel', 'WidgetDefCollection', '$modal', 'DashboardState', '$log', function (WidgetModel, WidgetDefCollection, $modal, DashboardState, $log) {
+  .directive('dashboard', ['WidgetModel', 'WidgetDefCollection', '$uibModal', 'DashboardState', '$log', function (WidgetModel, WidgetDefCollection, $uibModal, DashboardState, $log) {
 
     return {
       restrict: 'A',
@@ -157,7 +157,7 @@ angular.module('ui.dashboard')
          */
         scope.openWidgetSettings = function (widget) {
 
-          // Set up $modal options 
+          // Set up $uibModal options
           var options = _.defaults(
             { scope: scope },
             widget.settingsModalOptions,
@@ -169,9 +169,9 @@ angular.module('ui.dashboard')
               return widget;
             }
           };
-          
+
           // Create the modal
-          var modalInstance = $modal.open(options);
+          var modalInstance = $uibModal.open(options);
           var onClose = widget.onSettingsClose || scope.options.onSettingsClose;
           var onDismiss = widget.onSettingsDismiss || scope.options.onSettingsDismiss;
 
@@ -186,7 +186,7 @@ angular.module('ui.dashboard')
               scope.$emit('widgetChanged', widget);
             },
             function (reason) {
-              
+
               // Call the dismiss callback
               onDismiss(reason, scope);
 
@@ -677,8 +677,8 @@ angular.module('ui.dashboard')
 'use strict';
 
 angular.module('ui.dashboard')
-  .directive('dashboardLayouts', ['LayoutStorage', '$timeout', '$modal',
-    function(LayoutStorage, $timeout, $modal) {
+  .directive('dashboardLayouts', ['LayoutStorage', '$timeout', '$uibModal',
+    function(LayoutStorage, $timeout, $uibModal) {
       return {
         scope: true,
         templateUrl: function(element, attr) {
@@ -713,7 +713,7 @@ angular.module('ui.dashboard')
             var current = layoutStorage.getActiveLayout();
 
             if (current && current.dashboard.unsavedChangeCount) {
-              var modalInstance = $modal.open({
+              var modalInstance = $uibModal.open({
                 templateUrl: 'template/SaveChangesModal.html',
                 resolve: {
                   layout: function() {
@@ -825,17 +825,17 @@ angular.module('ui.dashboard')
 'use strict';
 
 angular.module('ui.dashboard')
-  .controller('SaveChangesModalCtrl', ['$scope', '$modalInstance', 'layout', function ($scope, $modalInstance, layout) {
-    
+  .controller('SaveChangesModalCtrl', ['$scope', '$uibModalInstance', 'layout', function ($scope, $uibModalInstance, layout) {
+
     // add layout to scope
     $scope.layout = layout;
 
     $scope.ok = function () {
-      $modalInstance.close();
+      $uibModalInstance.close();
     };
 
     $scope.cancel = function () {
-      $modalInstance.dismiss();
+      $uibModalInstance.dismiss();
     };
   }]);
 /*
@@ -857,7 +857,7 @@ angular.module('ui.dashboard')
 'use strict';
 
 angular.module('ui.dashboard')
-  .controller('WidgetSettingsCtrl', ['$scope', '$modalInstance', 'widget', function ($scope, $modalInstance, widget) {
+  .controller('WidgetSettingsCtrl', ['$scope', '$uibModalInstance', 'widget', function ($scope, $uibModalInstance, widget) {
     // add widget to scope
     $scope.widget = widget;
 
@@ -865,11 +865,11 @@ angular.module('ui.dashboard')
     $scope.result = jQuery.extend(true, {}, widget);
 
     $scope.ok = function () {
-      $modalInstance.close($scope.result);
+      $uibModalInstance.close($scope.result);
     };
 
     $scope.cancel = function () {
-      $modalInstance.dismiss('cancel');
+      $uibModalInstance.dismiss('cancel');
     };
 
     // Add parameter
@@ -920,7 +920,7 @@ angular.module('ui.dashboard')
 
     // constructor for widget model instances
     function WidgetModel(widgetDefinition, overrides) {
-  
+
       // Extend this with the widget definition object with overrides merged in (deep extended).
       angular.extend(this, defaults(), mergeme(angular.copy(widgetDefinition), overrides));
 
@@ -1022,7 +1022,7 @@ angular.module('ui.dashboard')
     }
 
     function WidgetDefCollection(widgetDefs) {
-      
+
       widgetDefs = widgetDefs.map(convertToDefinition);
 
       this.push.apply(this, widgetDefs);
@@ -1127,7 +1127,7 @@ angular.module('ui.dashboard')
       }
     };
 
-    
+
 
     function LayoutStorage(options) {
 
@@ -1286,7 +1286,7 @@ angular.module('ui.dashboard')
       },
 
       _handleSyncLoad: function(serialized) {
-        
+
         var deserialized;
 
         if (this.stringifyStorage) {
@@ -1377,14 +1377,14 @@ angular.module('ui.dashboard')
 
     DashboardState.prototype = {
       /**
-       * Takes array of widget instance objects, serializes, 
+       * Takes array of widget instance objects, serializes,
        * and saves state.
-       * 
+       *
        * @param  {Array} widgets  scope.widgets from dashboard directive
        * @return {Boolean}        true on success, false on failure
        */
       save: function (widgets) {
-        
+
         if (!this.storage) {
           return true;
         }
@@ -1406,7 +1406,7 @@ angular.module('ui.dashboard')
       /**
        * Loads dashboard state from the storage object.
        * Can handle a synchronous response or a promise.
-       * 
+       *
        * @return {Array|Promise} Array of widget definitions or a promise
        */
       load: function () {
