@@ -1,7 +1,4 @@
-# Contributing to Roxy
-
-Roxy welcomes new contributors. This document will guide you
-through the process.
+# Contributing
 
  - [Issues and Bugs](#issue)
  - [Feature Requests](#feature)
