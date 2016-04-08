@@ -3,15 +3,9 @@
 Roxy welcomes new contributors. This document will guide you
 through the process.
 
- - [Question or Problem?](#question)
  - [Issues and Bugs](#issue)
  - [Feature Requests](#feature)
  - [Submission Guidelines](#submit)
- 
-## <a name="question"></a> Got a Question or Problem?
-
-If you have questions about how to use Roxy, please direct these to the
-[Roxy Mailing List][mailing list].
 
 ## <a name="issue"></a> Found an Issue?
 If you find a bug in the source code or a mistake in the documentation, you can help us by
@@ -35,22 +29,20 @@ chances of your issue being dealt with quickly:
 
 * **Overview of the Issue** - if an error is being thrown a stack trace helps
 * **Motivation for or Use Case** - explain why this is a bug for you
-* **Roxy Version** - is it a named version or from our dev branch
-* **Operating System** - Mac, windows? details help
 * **Suggest a Fix** - if you can't fix the bug yourself, perhaps you can point to what might be
   causing the problem (line of code or commit)
 
 ### Submitting a Pull Request
 
-#### Fork Roxy
+#### Fork
 
-Fork the project [on GitHub](https://github.com/marklogic/roxy/fork) and clone
+Fork the project [on GitHub](https://github.com/ryanjdew/ml-slush-discovery-app/fork) and clone
 your copy.
 
 ```sh
-$ git clone git@github.com:username/roxy.git
-$ cd roxy
-$ git remote add upstream git://github.com/marklogic/roxy.git
+$ git clone git@github.com:username/ml-slush-discovery-app.git
+$ cd ml-slush-discovery-app
+$ git remote add upstream git://github.com/ryanjdew/ml-slush-discovery-app.git
 ```
 
 All bug fixes and new features go into the dev branch.
@@ -142,7 +134,7 @@ $ git push origin my-feature-branch
 
 #### Submit the pull request
 
-Go to https://github.com/username/roxy and select your feature branch. Click
+Go to https://github.com/username/ml-slush-discovery-app and select your feature branch. Click
 the 'Pull Request' button and fill out the form.
 
 Pull requests are usually reviewed within a few days. If you get comments
