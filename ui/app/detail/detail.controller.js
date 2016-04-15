@@ -1,9 +1,10 @@
-(function () {
+(function() {
   'use strict';
   angular.module('app.detail')
-  .controller('DetailCtrl', DetailCtrl);
+    .controller('DetailCtrl', DetailCtrl);
 
   DetailCtrl.$inject = ['doc', '$stateParams'];
+
   function DetailCtrl(doc, $stateParams) {
     var ctrl = this;
 
@@ -32,7 +33,41 @@
           ctrl.binaryType = 'pdf';
         } else {
           ctrl.binaryType = 'other';
-          ctrl.htmlContents = parsedXML.getElementsByTagName('html')[0].getElementsByTagName('body')[0].innerHTML;
+        }
+        var html = parsedXML.getElementsByTagName('html')[0];
+        var metaElements = html.getElementsByTagName('meta');
+        var halfWayPoint = Math.floor(metaElements.length / 2);
+        if (metaElements.length > 0) {
+          var i18n = {
+            'content-type': 'Content Type',
+            'size': 'Size',
+            'NormalizedDate': 'Date Time'
+          };
+          var metaHighlights = ['content-type', 'NormalizedDate', 'size', 'Word_Count', 'Typist'];
+          ctrl.meta = [{}, {}];
+          var metaCount = 0,
+            metaHighlightsCount = 0;
+
+          ctrl.metaHighlights = [{}, {}];
+          angular.forEach(metaElements, function(metaEl, index) {
+            var metaObj;
+            if (metaHighlights.indexOf(metaEl.getAttribute('name')) > -1) {
+              metaObj = ctrl.metaHighlights[metaHighlightsCount % 2];
+              metaHighlightsCount++;
+            } else {
+              metaObj = ctrl.meta[metaCount % 2];
+              metaCount++;
+              ctrl.hasMeta = true;
+            }
+            var metaName = i18n[metaEl.getAttribute('name')] || metaEl.getAttribute('name')
+              .replace(/([a-z])([A-Z])/g, '$1 $2')
+              .replace(/(\-|\_)/g, ' ');
+            metaObj[metaName] = metaEl.getAttribute('content') || ' ';
+          });
+        }
+        var body = html.getElementsByTagName('body')[0];
+        if (body) {
+          ctrl.html += body.innerHTML;
         }
       } else {
         ctrl.type = 'xml';
@@ -43,20 +78,20 @@
       /* jscs: enable */
     } else if (contentType.lastIndexOf('text/plain', 0) === 0) {
       ctrl.xml = doc.data;
-      ctrl.json = {'Document' : doc.data};
+      ctrl.json = { 'Document': doc.data };
       ctrl.type = 'text';
-    } else if (contentType.lastIndexOf('application', 0) === 0 ) {
+    } else if (contentType.lastIndexOf('application', 0) === 0) {
       ctrl.xml = 'Binary object';
-      ctrl.json = {'Document type' : 'Binary object'};
+      ctrl.json = { 'Document type': 'Binary object' };
       ctrl.type = 'binary';
     } else {
       ctrl.xml = 'Error occured determining document type.';
-      ctrl.json = {'Error' : 'Error occured determining document type.'};
+      ctrl.json = { 'Error': 'Error occured determining document type.' };
     }
 
     angular.extend(ctrl, {
-      doc : doc.data,
-      uri : uri
+      doc: doc.data,
+      uri: uri
     });
   }
 }());

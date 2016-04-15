@@ -22,13 +22,13 @@
 </nav>
 <!-- Add your site or application content here -->
 <div class=" content">
-  <div class="container">
+  <div>
     <div class="alert alert-danger" role="alert" ng-if="ctrl.messageBoardService.message()">
       <a class="pull-right"><i class="glyphicon glyphicon-remove" ng-click="ctrl.messageBoardService.message(null)"></i></a>
       <message-board msg="ctrl.messageBoardService.message()"></message-board>
     </div>
     <div>
-      <ui-view></ui-view>
+      <div class="container-fluid" ui-view></div>
     </div>
   </div>
 </div>

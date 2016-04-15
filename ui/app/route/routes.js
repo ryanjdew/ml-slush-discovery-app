@@ -48,12 +48,8 @@
           }
         }
       })
-      .state('root.landing', {
-        url: '/',
-        templateUrl: 'app/landing/landing.html'
-      })
       .state('root.search', {
-        url: '/search',
+        url: '/',
         templateUrl: 'app/search/search.html',
         controller: 'SearchCtrl',
         controllerAs: 'ctrl'
@@ -73,7 +69,7 @@
         url: '/detail{uri:path}',
         params: {
           uri: {
-            squash: true,
+            squash: false,
             value: null
           }
         },

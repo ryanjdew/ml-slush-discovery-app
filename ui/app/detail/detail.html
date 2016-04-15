@@ -1,40 +1,71 @@
 <div class="row detail">
   <div class="col-sm-8">
-    <h3><search-image doc-type="ctrl.binaryContentType || ('application/' + ctrl.type)" image-type="'details'"></search-image>{{ctrl.binaryFilePath || ctrl.uri}}</h3>
-    <uib-tabset type="pills">
-      <uib-tab active="ctrl.defaultTab">
-        <uib-tab-heading>{{ctrl.type | uppercase}}</uib-tab-heading>
-        <div class="col-sm-9">
-          <json-explorer ng-if="ctrl.type==='json'" data="ctrl.json"></json-explorer>
-          <pre ng-if="ctrl.type==='xml'" class="pre-xml">{{ctrl.xml}}</pre>
-          <a ng-if="ctrl.type==='binary' && !ctrl.binaryFilePath" target="_blank" ng-href="/v1/documents?uri={{ctrl.uri}}&transform=download" class="btn btn-default">Download</a>
-          <div ng-if="ctrl.binaryFilePath">
-            <a target="_blank" ng-href="/v1/documents?uri={{ctrl.binaryFilePath}}&transform=download" class="btn btn-default">Download</a>
-            <div ng-if="ctrl.binaryType === 'pdf'">
-              <object data="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary" content-type="{{ctrl.binaryContentType}}" class="preview-binary"></object>
+    <div class="clearfix">
+      <div class="col-md-2">
+        <search-image class="pull-left" doc-type="ctrl.binaryContentType || ctrl.contentType" image-type="'details'"></search-image>
+      </div>
+      <div class="col-md-10">
+        <div class="col-md-12"><h3>{{ ctrl.uri }}</h3></div>
+        <div class="col-md-6" ng-repeat="metablock in ctrl.metaHighlights">
+          <dl>
+            <dt class="row" ng-repeat-start="(key, val) in metablock">{{key}}</dt>
+            <dd class="col-md-12" ng-repeat-end>{{val}}</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <uib-tabset type="tabs">
+        <uib-tab active="ctrl.defaultTab">
+          <uib-tab-heading>{{ctrl.type | uppercase}}</uib-tab-heading>
+          <div class="col-sm-10">
+            <div ng-if="ctrl.type==='json'" class="well">
+              <json-explorer data="ctrl.json"></json-explorer>
             </div>
-            <div ng-if="ctrl.binaryType === 'image'">
-              <img ng-src="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary" />
-            </div>
-            <div ng-if="ctrl.binaryType === 'other'">
-              <div ng-bind-html="ctrl.htmlContents"></div>
+            <div ng-if="ctrl.type==='xml'" hljs hljs-source="ctrl.xml"></div>
+            <a ng-if="ctrl.type==='binary' && !ctrl.binaryFilePath" target="_blank" ng-href="/v1/documents?uri={{ctrl.uri}}&transform=download" class="btn btn-default">Download</a>
+            <div class="well" ng-if="ctrl.binaryFilePath">
+              <a target="_blank" ng-href="/v1/documents?uri={{ctrl.binaryFilePath}}&transform=download" class="btn btn-default">Download</a>
+              <div class="alert alert-info col-md-12">
+                <div class="col-md-6" ng-repeat="metablock in ctrl.meta">
+                  <dl>
+                    <dt class="row" ng-repeat-start="(key, val) in metablock">{{key}}</dt>
+                    <dd class="col-md-12" ng-repeat-end>{{val}}</dd>
+                  </dl>
+                </div>
+              </div>
+              <div ng-if="ctrl.binaryType === 'pdf'">
+                <object data="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary" content-type="{{ctrl.binaryContentType}}" class="preview-binary"></object>
+              </div>
+              <div ng-if="ctrl.binaryType === 'image'">
+                <img ng-src="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary" />
+              </div>
+              <div ng-if="ctrl.binaryType === 'other'">
+                <div ng-bind-html="ctrl.html"></div>
+              </div>
             </div>
           </div>
-        </div>
-      </uib-tab>
-      <uib-tab ng-if="ctrl.type!=='json'">
-        <uib-tab-heading>JSON</uib-tab-heading>
-        <div class="col-sm-9">
-          <json-explorer data="ctrl.json"></json-explorer>
-        </div>
-      </uib-tab>
-      <uib-tab ng-if="ctrl.type!=='xml'">
-        <uib-tab-heading >XML</uib-tab-heading>
-        <div class="col-sm-9">
-          <pre class="pre-xml">{{ctrl.xml}}</pre>
-        </div>
-      </uib-tab>
-    </uib-tabset>
+        </uib-tab>
+        <uib-tab ng-if="ctrl.html && ctrl.binaryType !== 'other'">
+          <uib-tab-heading>HTML</uib-tab-heading>
+          <div class="col-sm-10">
+            <div class="well" ng-bind-html="ctrl.html"></div>
+          </div>
+        </uib-tab>
+        <uib-tab ng-if="ctrl.type!=='json'">
+          <uib-tab-heading>JSON</uib-tab-heading>
+          <div class="col-sm-10">
+            <div class="well">
+              <json-explorer data="ctrl.json"></json-explorer>
+            </div>
+          </div>
+        </uib-tab>
+        <uib-tab ng-if="ctrl.type!=='xml'">
+          <uib-tab-heading>XML</uib-tab-heading>
+          <div class="col-sm-10" hljs hljs-no-escape hljs-source="ctrl.xml"></div>
+        </uib-tab>
+      </uib-tabset>
+    </div>
   </div>
   <div class="col-sm-4">
     <!-- show (links to) similar documents -->

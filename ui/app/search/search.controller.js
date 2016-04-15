@@ -15,6 +15,8 @@
     var ctrl = this;
     var mlSearch = searchFactory.newContext();
 
+    ctrl.pageExtensions = [];
+
     $scope.decodeURIComponent = $window.decodeURIComponent;
 
     ServerConfig.getCharts().then(function(chartData) {
