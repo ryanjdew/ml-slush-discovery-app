@@ -3,7 +3,7 @@
     <div class="col-md-12">
       <ml-input qtext="ctrl.qtext" search="ctrl.search(qtext)" suggest="ctrl.suggest(val)" template="fa" class="search"></ml-input>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h4><strong>Facets</strong><small class="pull-right"><a ng-click="ctrl.clearFacets()">clear all </a></small></h4></div>
@@ -22,7 +22,7 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-8">
+    <div class="col-sm-9">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h4>Search Results</h4></div>
@@ -31,12 +31,12 @@
           <div ng-if="ctrl.response.total > 0" class="results">
             <facet-charts charts="ctrl.charts" ml-search="ctrl.mlSearch"></facet-charts>
             <div class="pagination-ctrls">
+              <div class="row">
+                <ml-snippet class="pull-right" set-snippet="ctrl.setSnippet(type)"></ml-snippet>
+              </div>
               <div>
                 <uib-pagination class="pagination pagination-sm" ng-model="ctrl.page" ng-change=" ctrl.search()" max-size="10" boundary-links="true" total-items="ctrl.response.total" items-per-page="ctrl.response['page-length']">
                 </uib-pagination>
-              </div>
-              <div>
-                <ml-snippet class="pull-right" set-snippet="ctrl.setSnippet(type)"></ml-snippet>
               </div>
             </div>
             <ml-metrics search="ctrl.response"></ml-metrics>
@@ -50,27 +50,13 @@
     </div>
   </div>
   <div ng-if="ctrl.pageExtensions.length" class="col-sm-3">
-    <uib-accordion close-others="false" ng-init="icons.open = true">
-      <uib-accordion-group is-open="icons.open">
+    <uib-accordion ng-repeat="pageExtension in ctrl.pageExtensions" close-others="false" ng-if="pageExtension.active" ng-init="pageExtension.open = true">
+      <uib-accordion-group is-open="pageExtension.open">
         <uib-accordion-heading>
-          <strong>File Icon Examples</strong>
-          <a class="pull-right"><span class="glyphicon" ng-class="{'glyphicon-chevron-down': icons.open, 'glyphicon-chevron-right': !icons.open}"></span></a>
+          <strong>{{pageExtension.name}}</strong>
+          <a class="pull-right"><span class="glyphicon" ng-class="{'glyphicon-chevron-down': pageExtension.open, 'glyphicon-chevron-right': !pageExtension.open}"></span></a>
         </uib-accordion-heading>
-        <div class="text-center">
-          <span class="document-type-icon document-type-icon-sm" document-content-type="application/msword"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="application/vnd.ms-excel"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="application/xml"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="image/jpeg"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="image/gif"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="audio/mpeg"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="application/pdf"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="application/psd"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="audio/wma"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="audio/wav"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="video/mpeg"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="video/mov"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="video/avi"></span>
-          <span class="document-type-icon document-type-icon-sm" document-content-type="text/csv"></span>
+        <div compile="pageExtension.html">
         </div>
       </uib-accordion-group>
     </uib-accordion>

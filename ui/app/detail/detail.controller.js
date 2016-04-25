@@ -3,10 +3,12 @@
   angular.module('app.detail')
     .controller('DetailCtrl', DetailCtrl);
 
-  DetailCtrl.$inject = ['doc', '$stateParams'];
+  DetailCtrl.$inject = ['doc', 'RegisteredComponents', '$stateParams'];
 
-  function DetailCtrl(doc, $stateParams) {
+  function DetailCtrl(doc, RegisteredComponents, $stateParams) {
     var ctrl = this;
+
+    ctrl.pageExtensions = RegisteredComponents.pageExtensions();
 
     var uri = $stateParams.uri;
 

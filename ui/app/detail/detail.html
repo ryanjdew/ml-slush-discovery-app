@@ -75,5 +75,15 @@
         <ml-similar uri="{{ctrl.uri}}" limit="5"></ml-similar>
       </div>
     </div>
+    <uib-accordion ng-repeat="pageExtension in ctrl.pageExtensions" close-others="false" ng-if="pageExtension.active" ng-init="pageExtension.open = true">
+      <uib-accordion-group is-open="pageExtension.open">
+        <uib-accordion-heading>
+          <strong>{{pageExtension.name}}</strong>
+          <a class="pull-right"><span class="glyphicon" ng-class="{'glyphicon-chevron-down': pageExtension.open, 'glyphicon-chevron-right': !pageExtension.open}"></span></a>
+        </uib-accordion-heading>
+        <div compile="pageExtension.html">
+        </div>
+      </uib-accordion-group>
+    </uib-accordion>
   </div>
 </div>

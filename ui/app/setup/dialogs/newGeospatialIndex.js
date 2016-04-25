@@ -31,6 +31,7 @@
     $scope.add = function() {
       var index = {};
       index[$scope.indexType] = {
+        'coordinate-system': 'wgs84',
         'range-value-positions': true,
         'invalid-values': 'ignore'
       };
@@ -64,7 +65,7 @@
     function($uibModal) {
       return function() {
         return $uibModal.open({
-          templateUrl: '/ui/app/setup/newGeospatialIndex.html',
+          templateUrl: 'app/setup/dialogs/newGeospatialIndex.html',
           controller: 'AddGeospatialIndexCtrl',
           size: 'lg'
         }).result;
