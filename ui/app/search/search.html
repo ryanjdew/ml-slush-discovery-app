@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-sm-9" ng-class="{'col-sm-offset-1': !ctrl.pageExtensions.length }">
+  <div class="col-sm-9" ng-class="{'col-sm-offset-1': !ctrl.hasPageExtensions }">
     <div class="col-md-12">
       <ml-input qtext="ctrl.qtext" search="ctrl.search(qtext)" suggest="ctrl.suggest(val)" template="fa" class="search"></ml-input>
     </div>
@@ -49,8 +49,8 @@
       </div>
     </div>
   </div>
-  <div ng-if="ctrl.pageExtensions.length" class="col-sm-3">
-    <uib-accordion ng-repeat="pageExtension in ctrl.pageExtensions" close-others="false" ng-if="pageExtension.active" ng-init="pageExtension.open = true">
+  <div ng-show="ctrl.hasPageExtensions" class="col-sm-3">
+    <uib-accordion ng-repeat="pageExtension in ctrl.pageExtensions" close-others="false" ng-show="pageExtension.active" ng-init="pageExtension.open = true">
       <uib-accordion-group is-open="pageExtension.open">
         <uib-accordion-heading>
           <strong>{{pageExtension.name}}</strong>

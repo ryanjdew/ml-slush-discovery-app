@@ -17,6 +17,16 @@
 
     ctrl.pageExtensions = RegisteredComponents.pageExtensions();
 
+    ctrl.hasPageExtensions = false;
+
+    $scope.$watch(function() {
+      return _.filter(ctrl.pageExtensions, function(val) {
+        return val.active;
+      }).length;
+    },function(newVal) {
+      ctrl.hasPageExtensions = newVal > 0;
+    });
+
     $scope.decodeURIComponent = $window.decodeURIComponent;
 
     ServerConfig.getCharts().then(function(chartData) {

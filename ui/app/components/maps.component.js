@@ -41,10 +41,8 @@
           return mapItems.length > 0;
         }
 
-        $scope.$watch(function() { return ctrl.facets; }, function(newVal) {
-          if (newVal) {
-            componentInfo.active = hasMarkers();
-          }
+        $scope.$watch(function() { return hasMarkers(); }, function(newVal) {
+          componentInfo.active = hasMarkers();
         });
 
 

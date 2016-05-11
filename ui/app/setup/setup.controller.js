@@ -291,6 +291,7 @@
         ServerConfig.setSearchOptions(model.searchOptions).then(function() {
           updateSearchResults().then(function() {
             $scope.state = 'appearance';
+            $scope.redrawCharts();
           });
         }, handleError);
       },

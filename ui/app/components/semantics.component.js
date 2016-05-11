@@ -1,22 +1,24 @@
 (function() {
   'use strict';
+  var searchComponentInfo = {
+          name: 'Semantic Description',
+          html: '<semantic-describe query="ctrl.qtext"></semantic-describe>',
+          extendPage: 'root.search',
+          active: true
+        };
+  var detailsComponentInfo = {
+          name: 'Semantic Description',
+          html: '<semantic-describe document="ctrl.uri"></semantic-describe>',
+          extendPage: 'root.detail',
+          active: true
+        };
 
   angular.module('app.components')
     .run([
       'RegisteredComponents',
       function(RegisteredComponents) {
-        RegisteredComponents.registerComponent({
-          name: 'Semantic Description',
-          html: '<semantic-describe document="ctrl.uri"></semantic-describe>',
-          extendPage: 'root.detail',
-          active: true
-        });
-        RegisteredComponents.registerComponent({
-          name: 'Semantic Description',
-          html: '<semantic-describe query="ctrl.uri"></semantic-describe>',
-          extendPage: 'root.search',
-          active: true
-        });
+        RegisteredComponents.registerComponent(searchComponentInfo);
+        RegisteredComponents.registerComponent(detailsComponentInfo);
       }
     ])
     .component('semanticDescribe', {
@@ -29,12 +31,16 @@
           '</div>',
       controller: ['$http', '$scope', function($http, $scope) {
         var ctrl = $scope.$ctrl;
+        var componentInfo = (ctrl.document) ? detailsComponentInfo : searchComponentInfo;
 
         $http.get(
           '/v1/resources/sparql-describe',
           { params: { query: ctrl.query, document: ctrl.document}}
         ).then(function(response) {
           ctrl.semanticItems = response.data.results;
+          componentInfo.active = ctrl.semanticItems && ctrl.semanticItems.length > 0;
+        }, function () {
+          componentInfo.active = false;
         });
 
       }],
