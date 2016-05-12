@@ -3,12 +3,21 @@
   angular.module('app.detail')
     .controller('DetailCtrl', DetailCtrl);
 
-  DetailCtrl.$inject = ['doc', 'RegisteredComponents', '$stateParams'];
+  DetailCtrl.$inject = ['$scope', 'doc', 'RegisteredComponents', '$stateParams'];
 
-  function DetailCtrl(doc, RegisteredComponents, $stateParams) {
+  function DetailCtrl($scope, doc, RegisteredComponents, $stateParams) {
     var ctrl = this;
 
     ctrl.pageExtensions = RegisteredComponents.pageExtensions();
+    ctrl.hasPageExtensions = false;
+
+    $scope.$watch(function() {
+      return _.filter(ctrl.pageExtensions, function(val) {
+        return val.active;
+      }).length;
+    },function(newVal) {
+      ctrl.hasPageExtensions = newVal > 0;
+    });
 
     var uri = $stateParams.uri;
 
