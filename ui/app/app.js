@@ -7,6 +7,7 @@
     'ml.search.tpls',
     'ml.utils',
     'ngJsonExplorer',
+    'app.components',
     'app.create',
     'app.detail',
     'app.error',
@@ -25,6 +26,7 @@
     'ui.dashboard',
     'ngTable',
     'marklogic.widgets',
+    'ml.google-maps',
     'ml.report',
     'ml-index-builder',
     'compile'

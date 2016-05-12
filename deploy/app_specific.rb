@@ -18,12 +18,13 @@ class ServerConfig
 
   # then you would define your new method
   def deploy_modules
-    original_deploy_modules
-
+    password_prompt
+    system %Q!mlpm install!
     system %Q!mlpm deploy -u #{ @properties['ml.user'] } \
                       -p #{ @ml_password } \
                       -H #{ @properties['ml.server'] } \
                       -P #{ @properties['ml.app-port'] }!
+    original_deploy_modules
   end
 
   alias_method :original_deploy_rest, :deploy_rest

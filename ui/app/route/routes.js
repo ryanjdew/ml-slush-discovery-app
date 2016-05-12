@@ -48,12 +48,8 @@
           }
         }
       })
-      .state('root.landing', {
-        url: '/',
-        templateUrl: 'app/landing/landing.html'
-      })
       .state('root.search', {
-        url: '/search',
+        url: '/',
         templateUrl: 'app/search/search.html',
         controller: 'SearchCtrl',
         controllerAs: 'ctrl'
@@ -73,7 +69,7 @@
         url: '/detail{uri:path}',
         params: {
           uri: {
-            squash: true,
+            squash: false,
             value: null
           }
         },
@@ -83,7 +79,7 @@
         resolve: {
           doc: function(MLRest, $stateParams) {
             var uri = $stateParams.uri;
-            return MLRest.getDocument(uri, { format: 'json' }).then(function(response) {
+            return MLRest.getDocument(uri, { format: 'json', transform: 'data-to-html-display' }).then(function(response) {
               return response;
             });
           }

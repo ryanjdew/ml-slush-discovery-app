@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/bower_components/ng-json-explorer/dist/angular-json-explorer.css" />
     <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
     <link rel="stylesheet" href="/bower_components/ng-table/dist/ng-table.min.css" />
+    <link rel="stylesheet" href="/bower_components/ml-google-maps-ng/dist/ml-google-maps-ng.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -30,6 +31,7 @@
 
     <ui-view></ui-view>
 
+    <script src='//maps.googleapis.com/maps/api/js?v=3.&libraries=drawing&sensor=false'></script>
     <!-- build:js js/lib.js -->
     <!-- bower:js -->
     <script src="/bower_components/jquery/dist/jquery.js"></script>
@@ -66,12 +68,16 @@
     <script src="/bower_components/angular-google-maps/dist/angular-google-maps.js"></script>
     <script src="/bower_components/jquery-ui/jquery-ui.js"></script>
     <script src="/bower_components/angular-ui-sortable/sortable.js"></script>
+    <script src="/bower_components/angular-ui-utils/ui-utils.js"></script>
+    <script src="/bower_components/angular-ui-map/ui-map.js"></script>
+    <script src="/bower_components/ml-google-maps-ng/dist/ml-google-maps-ng.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:js js/app.js -->
     <!-- inject:js -->
     <script src="/ui/app/common/common.module.js"></script>
+    <script src="/ui/app/components/components.module.js"></script>
     <script src="/ui/app/create/create.module.js"></script>
     <script src="/ui/app/detail/detail.module.js"></script>
     <script src="/ui/app/detail/similar.module.js"></script>
@@ -86,6 +92,9 @@
     <script src="/ui/app/app.js"></script>
     <script src="/ui/app/common/search-image.directive.js"></script>
     <script src="/ui/app/common/utility.service.js"></script>
+    <script src="/ui/app/components/components.service.js"></script>
+    <script src="/ui/app/components/maps.component.js"></script>
+    <script src="/ui/app/components/semantics.component.js"></script>
     <script src="/ui/app/create/create.controller.js"></script>
     <script src="/ui/app/detail/detail.controller.js"></script>
     <script src="/ui/app/detail/similar-directive.js"></script>

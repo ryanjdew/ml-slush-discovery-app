@@ -291,6 +291,7 @@
         ServerConfig.setSearchOptions(model.searchOptions).then(function() {
           updateSearchResults().then(function() {
             $scope.state = 'appearance';
+            $scope.redrawCharts();
           });
         }, handleError);
       },
@@ -350,6 +351,74 @@
                 'collation': value.collation
               };
             }
+            model.constraints.push(constraint);
+          }
+        });
+        angular.forEach(model.geospatialIndexes['geospatial-index-list'], function(val) {
+          var indexType = Object.keys(val)[0];
+          var value = val[indexType];
+          var constraint;
+          var geoObj = {
+            heatmap: {
+              s: 23.2,
+              w: -118.3,
+              n: 23.3,
+              e: -118.2,
+              latdivs: 4,
+              londivs: 4
+            }
+          };
+          if (indexType === 'geospatial-element-index') {
+            constraint = {
+              name: value.localname,
+              'geo-elem': geoObj
+            };
+            geoObj.element = {
+              ns: value['namespace-uri'],
+              name: value.localname
+            };
+          } else if (indexType === 'geospatial-element-pair-index') {
+            constraint = {
+              name: value['latitude-localname'] + ' ' + value['longitude-localname'],
+              'geo-elem-pair': geoObj
+            };
+            geoObj.parent = {
+              ns: value['parent-namespace-uri'],
+              name: value['parent-localname']
+            };
+            geoObj.lat = {
+              ns: value['latitude-namespace-uri'],
+              name: value['latitude-localname']
+            };
+            geoObj.lon = {
+              ns: value['longitude-namespace-uri'],
+              name: value['longitude-localname']
+            };
+          } else if (indexType === 'geospatial-attribute-pair-index') {
+            constraint = {
+              name: value['latitude-localname'] + ' ' + value['longitude-localname'],
+              'geo-attr-pair': geoObj
+            };
+            geoObj.parent = {
+              ns: value['parent-namespace-uri'],
+              name: value['parent-localname']
+            };
+            geoObj.lat = {
+              ns: value['latitude-namespace-uri'],
+              name: value['latitude-localname']
+            };
+            geoObj.lon = {
+              ns: value['longitude-namespace-uri'],
+              name: value['longitude-localname']
+            };
+          } else if (indexType === 'geospatial-path-index') {
+            constraint = {
+              name: value['path-index'],
+              'geo-path': geoObj
+            };
+            geoObj['path-index'] = value['path-index'];
+          }
+          if (constraint) {
             model.constraints.push(constraint);
           }
         });

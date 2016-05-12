@@ -6,7 +6,7 @@
     "angular": "~1.5.3",
     "angular-bootstrap": "^1.1",
     "angular-cookies": "~1.5.3",
-    "angular-highlightjs": "~0.4.3",
+    "angular-highlightjs": "~0.6.1",
     "angular-mocks": "~1.5.3",
     "angular-ui-router": "~0.2.15",
     "angular-x2js": "https://github.com/janmichaelyu/angular-x2js.git",
@@ -27,7 +27,8 @@
     "highcharts": "^4.2",
     "ml-highcharts-ng": ">=0.0.9",
     "angular-google-maps": "^2.2",
-    "angular-ui-sortable": "^0.14.0"
+    "angular-ui-sortable": "^0.14.0",
+    "ml-google-maps-ng": "^0.0.1"
   },
   "overrides": {
     "angular-highlightjs": {
