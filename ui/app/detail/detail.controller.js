@@ -72,7 +72,7 @@
               metaCount++;
               ctrl.hasMeta = true;
             }
-            var metaName = i18n[metaEl.getAttribute('name')] || metaEl.getAttribute('name')
+            var metaName = i18n[metaEl.getAttribute('name')] || metaEl.getAttribute('name') || metaEl.getAttribute('http-equiv')
               .replace(/([a-z])([A-Z])/g, '$1 $2')
               .replace(/(\-|\_)/g, ' ');
             metaObj[metaName] = metaEl.getAttribute('content') || ' ';
