@@ -49,10 +49,15 @@
     ctrl.pickerDateStart = {};
     ctrl.pickerDateEnd = {};
     ctrl.dateTimeConstraints = {};
+    ctrl.datePickerOptions = {
+      minDate: new Date(1900, 1, 1),
+      maxDate: new Date(2050, 12, 31)
+    };
 
     mlSearch.getStoredOptions().then(function(data) {
       angular.forEach(data.options.constraint, function(constraint) {
-        if (constraint.range && (constraint.range.type === 'xs:date' || constraint.range.type === 'xs:dateTime')) {
+        if (constraint.range && (constraint.range.type === 'xs:date' ||
+             constraint.range.type === 'xs:dateTime')) {
           ctrl.dateTimeConstraints[constraint.name] = {
             name: constraint.name,
             type: constraint.range.type
@@ -118,39 +123,42 @@
       superCtrl._search.call(ctrl);
     };
 
-    ctrl.openStartDatePicker = function(contraintName, $event) {
+    ctrl.openStartDatePicker = function(constraintName, $event) {
       $event.preventDefault();
       $event.stopPropagation();
-      ctrl.dateStartOpened[contraintName] = true;
+      ctrl.dateStartOpened[constraintName] = true;
     };
 
-    ctrl.openEndDatePicker = function(contraintName, $event) {
+    ctrl.openEndDatePicker = function(constraintName, $event) {
       $event.preventDefault();
       $event.stopPropagation();
-      ctrl.dateEndOpened[contraintName] = true;
+      ctrl.dateEndOpened[constraintName] = true;
     };
 
-    ctrl._applyDateFilter = function(contraintName) {
-      ctrl.dateFilters[contraintName] = [];
-      if (ctrl.pickerDateStart[contraintName] && ctrl.pickerDateStart[contraintName] !== '') {
-        var startValue = _constraintToDateTime(contraintName, ctrl.pickerDateStart[contraintName]);
-        ctrl.dateFilters[contraintName].push(qb.ext.rangeConstraint(contraintName, 'GE', startValue));
+    ctrl._applyDateFilter = function(constraintName) {
+      ctrl.dateFilters[constraintName] = [];
+      if (ctrl.pickerDateStart[constraintName] && ctrl.pickerDateStart[constraintName] !== '') {
+        var startValue =
+          _constraintToDateTime(constraintName, ctrl.pickerDateStart[constraintName]);
+        ctrl.dateFilters[constraintName]
+          .push(qb.ext.rangeConstraint(constraintName, 'GE', startValue));
       }
-      if (ctrl.pickerDateEnd[contraintName] && ctrl.pickerDateEnd[contraintName] !== '') {
-        var endValue = _constraintToDateTime(contraintName, ctrl.pickerDateEnd[contraintName]);
-        ctrl.dateFilters[contraintName].push(qb.ext.rangeConstraint(contraintName, 'LE', endValue));
+      if (ctrl.pickerDateEnd[constraintName] && ctrl.pickerDateEnd[constraintName] !== '') {
+        var endValue = _constraintToDateTime(constraintName, ctrl.pickerDateEnd[constraintName]);
+        ctrl.dateFilters[constraintName]
+          .push(qb.ext.rangeConstraint(constraintName, 'LE', endValue));
       }
     };
 
-    ctrl.applyDateFilter = function(contraintName) {
-      ctrl._applyDateFilter(contraintName);
+    ctrl.applyDateFilter = function(constraintName) {
+      ctrl._applyDateFilter(constraintName);
       ctrl.search();
     };
 
-    ctrl.clearDateFilter = function(contraintName) {
-      ctrl.dateFilters[contraintName].length = 0;
-      ctrl.pickerDateStart[contraintName] = null;
-      ctrl.pickerDateEnd[contraintName] = null;
+    ctrl.clearDateFilter = function(constraintName) {
+      ctrl.dateFilters[constraintName].length = 0;
+      ctrl.pickerDateStart[constraintName] = null;
+      ctrl.pickerDateEnd[constraintName] = null;
       ctrl.search();
     };
 
@@ -159,8 +167,8 @@
       startingDay: 1
     };
 
-    function _constraintToDateTime(contraintName, dateObj) {
-      var constraintType = ctrl.dateTimeConstraints[contraintName].type;
+    function _constraintToDateTime(constraintName, dateObj) {
+      var constraintType = ctrl.dateTimeConstraints[constraintName].type;
       if (dateObj) {
         var dateISO = dateObj.toISOString();
         var dateValue = dateISO;
