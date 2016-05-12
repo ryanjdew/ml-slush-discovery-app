@@ -21,6 +21,7 @@
         ServerConfig.setCharts({ charts: scope.charts});
         $timeout(function() { scope.$broadcast('highchartsng.reflow'); }, 10);
       };
+
       $timeout(function() { scope.$broadcast('highchartsng.reflow'); });
     }
     // directive factory creates a link function
@@ -33,7 +34,7 @@
         'mlSearch': '=',
         'searchOptions': '=',
         'charts': '=',
-        'callback': '&'
+        'callback': '='
       },
       link: link
     };
