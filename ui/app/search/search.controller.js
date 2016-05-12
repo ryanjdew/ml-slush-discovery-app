@@ -174,5 +174,23 @@
     }
     /* END Date/DateTime constraint logic */
 
+    function isFacetConstraint(constraintName) {
+      return constraintName && constraintName !== '$frequency';
+    }
+
+    ctrl.chartItemSelected = function(chart, name, x, y, z, seriesName) {
+      if (isFacetConstraint(chart.xAxisCategoriesMLConstraint)) {
+        ctrl.mlSearch.toggleFacet(chart.xAxisMLConstraint, x);
+      } else if (isFacetConstraint(chart.yAxisMLConstraint)) {
+        ctrl.mlSearch.toggleFacet(chart.yAxisMLConstraint, y);
+      } else if (isFacetConstraint(chart.zAxisMLConstraint)) {
+        ctrl.mlSearch.toggleFacet(chart.zAxisMLConstraint, z);
+      } else if (isFacetConstraint(chart.seriesNameMLConstraint)) {
+        ctrl.mlSearch.toggleFacet(chart.seriesNameMLConstraint, seriesName);
+      } else if (isFacetConstraint(chart.dataPointNameMLConstraint)) {
+        ctrl.mlSearch.toggleFacet(chart.dataPointNameMLConstraint, name);
+      }
+      ctrl.search();
+    };
   }
 }());

@@ -29,7 +29,7 @@
         <div class="panel-body">
           <h4 ng-if="ctrl.response.total === 0">No results to show</h4>
           <div ng-if="ctrl.response.total > 0" class="results">
-            <facet-charts charts="ctrl.charts" ml-search="ctrl.mlSearch"></facet-charts>
+            <facet-charts charts="ctrl.charts" ml-search="ctrl.mlSearch" callback="ctrl.chartItemSelected"></facet-charts>
             <div class="pagination-ctrls">
               <div class="row">
                 <ml-snippet class="pull-right" set-snippet="ctrl.setSnippet(type)"></ml-snippet>
