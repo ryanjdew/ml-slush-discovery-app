@@ -3,6 +3,9 @@
     <div class="clearfix">
       <div class="col-md-2">
         <search-image class="pull-left" doc-type="ctrl.binaryContentType || ctrl.contentType" image-type="'details'"></search-image>
+        <div class="col-sm-12">
+          <a ng-if="ctrl.binaryFilePath" target="_blank" ng-href="/v1/documents?uri={{ctrl.binaryFilePath}}&transform=download" class="btn btn-primary"><span class="glyphicon glyphicon-cloud-download">&nbsp;</span> Download</a>
+        </div>
       </div>
       <div class="col-md-10">
         <div class="col-md-12"><h3>{{ ctrl.uri }}</h3></div>
@@ -15,18 +18,12 @@
       </div>
     </div>
     <div class="row">
-      <uib-tabset type="tabs">
-        <uib-tab active="ctrl.defaultTab">
-          <uib-tab-heading>{{ctrl.type | uppercase}}</uib-tab-heading>
+      <uib-tabset active="ctrl.defaultTab" type="tabs">
+        <uib-tab ng-show="ctrl.html">
+          <uib-tab-heading>Display</uib-tab-heading>
           <div class="col-sm-10">
-            <div ng-if="ctrl.type==='json'" class="well">
-              <json-explorer data="ctrl.json"></json-explorer>
-            </div>
-            <div ng-if="ctrl.type==='xml'" hljs hljs-source="ctrl.xml"></div>
-            <a ng-if="ctrl.type==='binary' && !ctrl.binaryFilePath" target="_blank" ng-href="/v1/documents?uri={{ctrl.uri}}&transform=download" class="btn btn-default">Download</a>
-            <div class="well" ng-if="ctrl.binaryFilePath">
-              <a target="_blank" ng-href="/v1/documents?uri={{ctrl.binaryFilePath}}&transform=download" class="btn btn-default">Download</a>
-              <div class="alert alert-info col-md-12">
+            <div class="well">
+              <div ng-if="ctrl.meta.length" class="alert alert-info col-md-12">
                 <div class="col-md-6" ng-repeat="metablock in ctrl.meta">
                   <dl>
                     <dt class="row" ng-repeat-start="(key, val) in metablock">{{key}}</dt>
@@ -34,25 +31,24 @@
                   </dl>
                 </div>
               </div>
+              <div class="clearfix" ng-bind-html="ctrl.html"></div>
+            </div>
+          </div>
+        </uib-tab>
+        <uib-tab ng-show="ctrl.binaryType && ctrl.binaryType !== 'other'">
+          <uib-tab-heading>Binary Preview</uib-tab-heading>
+          <div class="col-sm-10">
+            <div class="well">
               <div ng-if="ctrl.binaryType === 'pdf'">
                 <object data="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary" content-type="{{ctrl.binaryContentType}}" class="preview-binary"></object>
               </div>
               <div ng-if="ctrl.binaryType === 'image'">
                 <img ng-src="/v1/documents?uri={{ctrl.binaryFilePath}}&format=binary" />
               </div>
-              <div ng-if="ctrl.binaryType === 'other'">
-                <div ng-bind-html="ctrl.html"></div>
-              </div>
             </div>
           </div>
         </uib-tab>
-        <uib-tab ng-if="ctrl.html && ctrl.binaryType !== 'other'">
-          <uib-tab-heading>HTML</uib-tab-heading>
-          <div class="col-sm-10">
-            <div class="well" ng-bind-html="ctrl.html"></div>
-          </div>
-        </uib-tab>
-        <uib-tab ng-if="ctrl.type!=='json'">
+        <uib-tab>
           <uib-tab-heading>JSON</uib-tab-heading>
           <div class="col-sm-10">
             <div class="well">
@@ -60,7 +56,7 @@
             </div>
           </div>
         </uib-tab>
-        <uib-tab ng-if="ctrl.type!=='xml'">
+        <uib-tab>
           <uib-tab-heading>XML</uib-tab-heading>
           <div class="col-sm-10" hljs hljs-no-escape hljs-source="ctrl.xml"></div>
         </uib-tab>

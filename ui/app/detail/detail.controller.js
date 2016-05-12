@@ -21,20 +21,22 @@
 
     var uri = $stateParams.uri;
 
-    var contentType = doc.headers('content-type');
+    ctrl.defaultTab = 0;
 
-    ctrl.defaultTab = true;
+    ctrl.html = doc.data.html;
 
     var x2js = new X2JS();
-    /* jscs: disable */
-    if (contentType.lastIndexOf('application/json', 0) === 0) {
+    if (doc.data.json) {
       /*jshint camelcase: false */
-      ctrl.xml = vkbeautify.xml(x2js.json2xml_str(doc.data));
-      ctrl.json = doc.data;
+      ctrl.xml = vkbeautify.xml(x2js.json2xml_str(doc.data.json));
+      ctrl.json = doc.data.json;
       ctrl.type = 'json';
-    } else if (contentType.lastIndexOf('application/xml', 0) === 0) {
-      if (doc.data.indexOf('binary-details') > -1) {
-        var parsedXML = jQuery.parseXML(doc.data);
+    } else if (doc.data.xml) {
+      ctrl.xml = vkbeautify.xml(doc.data.xml);
+      /*jshint camelcase: false */
+      ctrl.json = x2js.xml_str2json(doc.data.xml);
+      if (doc.data.xml.indexOf('binary-details') > -1) {
+        var parsedXML = jQuery.parseXML(doc.data.xml);
         ctrl.binaryFilePath = parsedXML.getElementsByTagName('binary-file-location')[0].childNodes[0].nodeValue;
         ctrl.binaryContentType = parsedXML.getElementsByTagName('binary-content-type')[0].childNodes[0].nodeValue;
         ctrl.type = 'binary';
@@ -78,26 +80,13 @@
         }
         var body = html.getElementsByTagName('body')[0];
         if (body) {
-          ctrl.html += body.innerHTML;
+          ctrl.html = body.innerHTML;
         }
       } else {
         ctrl.type = 'xml';
       }
-      ctrl.xml = vkbeautify.xml(doc.data);
-      /*jshint camelcase: false */
-      ctrl.json = x2js.xml_str2json(doc.data);
-      /* jscs: enable */
-    } else if (contentType.lastIndexOf('text/plain', 0) === 0) {
-      ctrl.xml = doc.data;
-      ctrl.json = { 'Document': doc.data };
-      ctrl.type = 'text';
-    } else if (contentType.lastIndexOf('application', 0) === 0) {
-      ctrl.xml = 'Binary object';
-      ctrl.json = { 'Document type': 'Binary object' };
-      ctrl.type = 'binary';
     } else {
-      ctrl.xml = 'Error occured determining document type.';
-      ctrl.json = { 'Error': 'Error occured determining document type.' };
+      ctrl.type = 'text';
     }
 
     angular.extend(ctrl, {
