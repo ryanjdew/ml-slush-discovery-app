@@ -187,7 +187,7 @@ function userProfile(req, res, username, password, isStatus) {
   var reqOptions = {
       hostname: options.mlHost,
       port: options.mlHttpPort,
-      path: '/v1/documents?uri=/api/users/' + username + '.json',
+      path: '/v1/resources/profile',
       headers: headers
     };
   var makeRequest = function(authorization) {
@@ -208,42 +208,29 @@ function userProfile(req, res, username, password, isStatus) {
           res.send('Unauthenticated');
           authHelper.clearAuthenticator(req.session);
         }
-      } else if (response.statusCode === 404) {
-        // authentication successful, but no profile defined
+      } else if (response.statusCode === 200) {
+        // authentication successful, remember the username
         req.session.user = {
           name: username,
           password: password
         };
-        res.status(200).send({
-          authenticated: true,
-          username: username,
-          profile: {}
+        response.on('data', function(chunk) {
+          var json = JSON.parse(chunk);
+          if (json.name !== undefined) {
+            res.status(200).send({
+              authenticated: true,
+              username: username,
+              profile: json
+            });
+          } else {
+            console.log('did not find chunk.name');
+          }
         });
       } else {
-        if (response.statusCode === 200) {
-          // authentication successful, remember the username
-          req.session.user = {
-            name: username,
-            password: password
-          };
-          response.on('data', function(chunk) {
-            var json = JSON.parse(chunk);
-            if (json.user !== undefined) {
-              res.status(200).send({
-                authenticated: true,
-                username: username,
-                profile: json.user
-              });
-            } else {
-              console.log('did not find chunk.user');
-            }
-          });
-        } else {
-          console.log('code: ' + response.statusCode);
-          response.on('data', function(chunk) {
-            console.log(JSON.parse(chunk));
-          });
-        }
+        console.log('code: ' + response.statusCode);
+        response.on('data', function(chunk) {
+          console.log(JSON.parse(chunk));
+        });
       }
     });
 

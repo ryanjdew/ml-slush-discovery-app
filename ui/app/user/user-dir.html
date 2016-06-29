@@ -1,16 +1,36 @@
 <div class="user pull-right">
   <!-- form to log in -->
-  <div class="navbar-form navbar-right" ng-if="!ctrl.userService.currentUser()" >
+  <div class="navbar-form navbar-right" ng-if="!ctrl.user" >
     <login ng-if="ctrl.loginService.loginMode() === 'top-right'" mode="inline"></login>
     <span ng-if="ctrl.loginService.loginMode() !== 'top-right'" class="profile-link"><a href ng-click="ctrl.loginService.loginPrompt()" class="btn btn-primary btn-sm">Login</a></span>
   </div>
   <!-- display the logged in user -->
-  <div class="welcome" ng-if="ctrl.userService.currentUser()">
-    <div class="navbar-collapse collapse">
-      <span class="glyphicon glyphicon-user"></span> {{ctrl.userService.currentUser().name}} | <span class="profile-link"><a href="/profile">Account</a></span>
-
-      <button class="btn btn-danger btn-xs" type="button" ng-click="ctrl.loginService.logout()">Logout</button>
-
-    </div><!--/.navbar-collapse -->
+  <div class="welcome" ng-if="ctrl.user && ctrl.user.name">
+    <div>
+      <span class="pull-left fa-stack fa-lg">
+      <i class="text-primary fa fa-circle fa-stack-2x"></i>
+      <i class="fa fa-user fa-stack-1x"></i>
+      </span>
+      <div class="btn-group user-links" uib-dropdown>
+        <button id="acct-button" type="button" class="btn btn-sm btn-default" uib-dropdown-toggle>
+          {{ctrl.user.fullname || ctrl.user.name}}</i> <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu-right" role="menu" data-no-collapse="true" aria-labelledby="acct-button" uib-dropdown-menu>
+          <li role="menuitem">
+            <a href="/profile">Account</a>
+          </li>
+          <li ng-if="ctrl.user.isAdmin" role="menuitem">
+            <a href="/setup">Setup</a>
+          </li>
+          <li ng-if="ctrl.user.isAdmin" role="menuitem">
+            <a href="/new-report">New Report</a>
+          </li>
+          <li role="menuitem">
+            <a ng-click="ctrl.loginService.logout()">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!--/.navbar-collapse -->
   </div>
 </div>

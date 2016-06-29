@@ -25,11 +25,13 @@
 
   function UserController($scope, userService, loginService) {
     var ctrl = this;
+    $scope.$watch(function() { return userService.currentUser(); }, function() {
+      ctrl.user = userService.currentUser();
+    }, true);
     angular.extend(ctrl, {
       username: null,
       password: null,
-      loginService: loginService,
-      userService: userService
+      loginService: loginService
     });
   }
 
