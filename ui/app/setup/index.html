@@ -211,17 +211,28 @@
                   <option value="image">Image</option>
                   <option value="text">Text</option>
                 </select>
-                <input type="text" ng-model="model.uiConfig.logo.value" />
+                <input ng-if="model.uiConfig.logo.type === 'text'" type="text" ng-model="model.uiConfig.logo.value" />
+                <div ng-if="model.uiConfig.logo.type === 'image'" class="text-center partner-img-select">
+                  <div>
+                    <img alt="Company Logo Preview" class="img-responsive" ng-src="{{model.uiConfig.logo.image ||  '//:0'}}" />
+                  </div>
+                  <label class="sr-only" for="logoImage{{$index}}">Company Image</label>
+                  <input type="file" ng-model="model.uiConfig.$file" onchange="angular.element(this).scope().previewImage(angular.element(this).scope().model.uiConfig, this.files)" />
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Primary Color:</td>
+              <td>
+                <div>
+                  <label class="sr-only" for="primaryColor">Primary Color</label>
+                  <input id="primaryColor" type="text" class="form-control" ng-model="model.uiConfig.color" placeholder="Primary Color" required>
+                </div>
+                <color-picker ng-model="model.uiConfig.color"></color-picker>
               </td>
             </tr>
             <tr>
               <td colspan="2">Footer: </td>
-            </tr>
-            <tr>
-              <td>Copyright year: </td>
-              <td>
-                <input type="text" ng-model="model.uiConfig.footer.copyright.year" />
-              </td>
             </tr>
             <tr>
               <td>Copyright holder: </td>
@@ -230,21 +241,9 @@
               </td>
             </tr>
             <tr>
-              <td>Copyright holder link: </td>
-              <td>
-                <input type="text" ng-model="model.uiConfig.footer.copyright.link" />
-              </td>
-            </tr>
-            <tr>
               <td>License text: </td>
               <td>
                 <input type="text" ng-model="model.uiConfig.footer.license.text" />
-              </td>
-            </tr>
-            <tr>
-              <td>License link: </td>
-              <td>
-                <input type="text" ng-model="model.uiConfig.footer.license.link" />
               </td>
             </tr>
           </tbody>
@@ -252,6 +251,7 @@
       </div>
       <div class="clearfix panel-footer">
         <button ng-click="setUiConfig()" class="clearfix btn btn-primary pull-right">Save</button>
+        <button ng-click="previewUiConfig()" class="clearfix btn btn-default pull-right">Preview</button>
       </div>
     </div>
   </div>

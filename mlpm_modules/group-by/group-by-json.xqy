@@ -10,7 +10,6 @@ module namespace grpj = "http://marklogic.com/cts/group-by/json";
 import module namespace cts = "http://marklogic.com/cts" at "./group-by.xqy";
 import module namespace ctx = "http://marklogic.com/cts-extensions"
   at "/ext/mlpm_modules/cts-extensions/cts-extensions.xqy";
-import module namespace sq = "http://marklogic.com/mlpm/structured-query" at "/lib/structured-query.xqy";
 
 declare option xdmp:mapping "false";
 
@@ -68,16 +67,11 @@ declare function grpj:query($query)
   let $computes := grpj:query-parser($query, xs:QName("cts:compute"))
   let $options := grpj:get-values($query, "options")
   let $result-type := (map:get($query, "result-type"), "group-by")[1]
-  let $filters := grpj:get-values($query, "filters")
-  let $search := grpj:get-values($filters, "search")
-  let $qtext := grpj:get-values($search, "qtext")
-  let $search-options := sq:options-from-json($search)
-  let $combined-query as cts:query? := sq:combine-cts(sq:to-cts(sq:from-json($filters), $search-options), sq:qtext-to-cts($qtext, $search-options))
   let $fn :=
     switch( $result-type )
-    case "group-by" return cts:group-by(?, ?, ?)
-    case "cross-product" return cts:cross-product(?, ?, ?)
-    case "cube" return cts:cube(?, ?, ?)
+    case "group-by" return cts:group-by(?, ?)
+    case "cross-product" return cts:cross-product(?, ?)
+    case "cube" return cts:cube(?, ?)
     default return fn:error(xs:QName("UNKOWN-FN"), "unknown group-by type: " || $result-type)
-  return $fn( ($rows, $columns, $computes), $options, $combined-query )
+  return $fn( ($rows, $columns, $computes), $options )
 };

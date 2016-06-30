@@ -3,9 +3,9 @@
   angular.module('app.setup')
     .factory('ServerConfig', ServerConfig);
 
-  ServerConfig.$inject = ['$http', '$q', '$timeout'];
+  ServerConfig.$inject = ['$http', '$q', '$timeout', 'UIService'];
 
-  function ServerConfig($http, $q, $timeout) {
+  function ServerConfig($http, $q, $timeout, UIService) {
     var serverConfig = {};
     var databasePropertiesPromise;
     serverConfig.get = function() {
@@ -261,19 +261,11 @@
     };
 
     serverConfig.getUiConfig = function() {
-      return $http.get('/api/server/ui-config')
-        .then(function(response) {
-            return response.data;
-          },
-          $q.reject);
+      return UIService.getUIConfig();
     };
 
     serverConfig.setUiConfig = function(uiConfig) {
-      return $http.put('/api/server/ui-config', uiConfig)
-        .then(function(response) {
-            return response.data;
-          },
-          $q.reject);
+      return UIService.setUIConfig(uiConfig);
     };
 
     serverConfig.getDatabases = function() {
@@ -418,7 +410,6 @@
     // group into buckets by size
     var bucketSizeInBytes = 700000;
 
-
     function sortFileList(allFiles) {
       var sortedArray;
       if (allFiles.sort) {
@@ -454,7 +445,7 @@
       angular.forEach(allFiles, function(file, fileIndex) {
         currentSet.push(file);
         currentBucketSize = currentBucketSize + file.size;
-        if (currentBucketSize >= bucketSizeInBytes|| fileIndex === lastIndex) {
+        if (currentBucketSize >= bucketSizeInBytes || fileIndex === lastIndex) {
           currentBucketSize = 0;
           var currentSetCp = currentSet.slice(0, currentSet.length);
           var runUpload = function() {

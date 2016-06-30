@@ -11,16 +11,16 @@
 
     service.moveArrayItem = function(array, oldIndex, newIndex) {
       while (oldIndex < 0) {
-          oldIndex += array.length;
+        oldIndex += array.length;
       }
       while (newIndex < 0) {
-          newIndex += array.length;
+        newIndex += array.length;
       }
       if (newIndex >= array.length) {
-          var k = newIndex - array.length;
-          while ((k--) + 1) {
-              array.push(undefined);
-          }
+        var k = newIndex - array.length;
+        while ((k--) + 1) {
+          array.push(undefined);
+        }
       }
       array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
       return array; // for testing purposes
