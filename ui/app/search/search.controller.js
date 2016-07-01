@@ -5,13 +5,21 @@
   angular.module('app.search')
     .controller('SearchCtrl', SearchCtrl);
 
-  SearchCtrl.$inject = ['$scope', '$location', '$window', 'userService', 'MLSearchFactory', 'RegisteredComponents', 'ServerConfig', 'MLQueryBuilder'];
+  SearchCtrl.$inject = [
+    '$scope', '$location', '$window',
+    'userService', 'MLSearchFactory', 'RegisteredComponents',
+    'ServerConfig', 'MLQueryBuilder'
+  ];
 
   // inherit from MLSearchController
   var superCtrl = MLSearchController.prototype;
   SearchCtrl.prototype = Object.create(superCtrl);
 
-  function SearchCtrl($scope, $location, $window, userService, searchFactory, RegisteredComponents, ServerConfig, qb) {
+  function SearchCtrl(
+    $scope, $location, $window,
+    userService, searchFactory,
+    RegisteredComponents, ServerConfig, qb
+  ) {
     var ctrl = this;
     var mlSearch = searchFactory.newContext();
 

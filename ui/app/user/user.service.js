@@ -29,9 +29,11 @@
 
       _currentUser = {
         name: data.username,
+        isAdmin: false
       };
 
       if ( data.profile ) {
+        _currentUser.isAdmin = data.profile.isAdmin;
         _currentUser.hasProfile = true;
         _currentUser.fullname = data.profile.fullname;
 

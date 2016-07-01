@@ -6,13 +6,11 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="/"><h1 id="logo">Sample App</h1></a>
+    <a class="navbar-brand" href="/"><h1 id="logo">{{ctrl.uiConfig.logo.text || 'Sample App'}}</h1></a>
   </div>
   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
     <ul class="nav navbar-nav">
       <li><a href="/">Home</a></li>
-      <li><a href="/setup">Setup</a></li>
-      <li><a href="/new-report">New Report</a></li>
       <li><a href="/analytics-dashboard/home">Analytics Dashboard</a></li>
     </ul>
     <ml-user mode="inline"></ml-user>
@@ -65,7 +63,7 @@
     </div>
     <div class="row copyright">
       <div class="col-sm-12 text-muted">
-        Copyright <sup>&copy;</sup> 2015 MarkLogic Corporation. MARKLOGIC <sup>&reg;</sup> is a registered trademark of MarkLogic Corporation.
+        Copyright <sup>&copy;</sup> {{ctrl.year}} {{ ctrl.uiConfig.footer.copyright.holder || 'MarkLogic Corporation'}}. {{ ctrl.uiConfig.footer.license.text || 'MARKLOGIC &reg; is a registered trademark of MarkLogic Corporation'}}.
       </div>
     </div>
   </div>

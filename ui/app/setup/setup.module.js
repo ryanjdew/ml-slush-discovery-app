@@ -3,5 +3,6 @@
 
   angular.module('app.setup',
     ['app.common', 'app.search', 'as.sortable',
-    'ml.highcharts', 'ml.search', 'ui.bootstrap.progressbar']);
+    'ml.highcharts', 'ml.search','mp.colorPicker',
+    'ui.bootstrap.progressbar']);
 }());

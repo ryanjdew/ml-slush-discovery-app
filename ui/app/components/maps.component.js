@@ -8,7 +8,7 @@
     active: true
   };
   angular.module('app.components')
-    .run(['RegisteredComponents', function(RegisteredComponents){
+    .run(['RegisteredComponents', function(RegisteredComponents) {
       RegisteredComponents.registerComponent(componentInfo);
     }])
     .component('searchMap', {
@@ -44,7 +44,6 @@
         $scope.$watch(function() { return hasMarkers(); }, function(newVal) {
           componentInfo.active = hasMarkers();
         });
-
 
         ctrl.boundsChanged = function() {
           // place your geospatial search code here, and make that update $scope.myFacets

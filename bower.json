@@ -28,7 +28,8 @@
     "ml-highcharts-ng": ">=0.0.9",
     "angular-google-maps": "^2.2",
     "angular-ui-sortable": "^0.14.0",
-    "ml-google-maps-ng": "^0.0.1"
+    "ml-google-maps-ng": "^0.0.1",
+    "angular-color-picker": "^1.0.10"
   },
   "overrides": {
     "angular-highlightjs": {

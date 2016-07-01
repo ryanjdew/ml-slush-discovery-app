@@ -68,8 +68,11 @@
         },
         template:
           '<span>' +
-          '<span ng-if="hasUpdatedIcon" class="document-type-icon {{className}}" document-content-type="{{docTypeCleaned}}"></span>' +
-          '<span ng-if="!hasUpdatedIcon" class="btn btn-primary btn-lg"><i class="fa {{ className }}">&nbsp;</i></span>' +
+            '<span ng-if="hasUpdatedIcon" class="document-type-icon {{className}}" ' +
+            'document-content-type="{{docTypeCleaned}}">' +
+            '</span>' +
+          '<span ng-if="!hasUpdatedIcon" class="btn btn-primary btn-lg">' +
+            '<i class="fa {{ className }}">&nbsp;</i></span>' +
           '</span>',
         link: function (scope, element) {
           var mimeTypeCleaned = cleanMimeType(scope.docType);

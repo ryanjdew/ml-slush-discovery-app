@@ -14,7 +14,8 @@
     service.registerComponent = function(component) {
       service._registeredComponents[component.name] = component;
       if (component.extendPage) {
-        service.pageExtensions[component.extendPage] = service.pageExtensions[component.extendPage] || [];
+        service.pageExtensions[component.extendPage] =
+          service.pageExtensions[component.extendPage] || [];
         service.pageExtensions[component.extendPage].push(component);
       }
     };

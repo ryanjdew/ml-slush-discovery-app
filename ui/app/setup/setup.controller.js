@@ -11,7 +11,7 @@
     'newRangeIndexDialog', 'editRangeIndexDialog',
     'fieldDialog',
     'EditChartConfigDialog',
-    'CommonUtil'
+    'CommonUtil', 'UIService'
   ];
 
   function SetupCtrl(
@@ -21,7 +21,7 @@
     newRangeIndexDialog, editRangeIndexDialog,
     fieldDialog,
     editChartConfigDialog,
-    CommonUtil
+    CommonUtil, UIService
   ) {
     var model = {
       uploadCollections: []
@@ -437,17 +437,36 @@
           }
         });
       },
+      previewUiConfig: function() {
+        UIService.setLayout(model.uiConfig);
+      },
       setUiConfig: function() {
-        ServerConfig.setUiConfig(model.uiConfig)
+        UIService.setUIConfig(model.uiConfig)
           .then(
             function() {
+              UIService.setLayout(model.uiConfig);
               updateSearchResults();
-              $scope.$emit('uiConfigChanged', model.uiConfig);
             }, handleError);
       },
       getUiConfig: function() {
-        model.uiConfig = ServerConfig.getUiConfig();
+        model.uiConfig = UIService.getUIConfig();
         return model.uiConfig;
+      },
+      previewImage: function(uiConfig, files) {
+        var file = files[0];
+        var reader  = new FileReader();
+
+        reader.onloadend = function () {
+          uiConfig.logo = uiConfig.logo || {};
+          uiConfig.logo.image = reader.result;
+          $scope.$apply();
+        };
+
+        if (file) {
+          reader.readAsDataURL(file);
+        } else {
+          uiConfig.logo.image = '';
+        }
       }
     });
   }

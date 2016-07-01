@@ -17,7 +17,7 @@
       return function(scope, element, attrs) {
         scope.$watch(
           function(scope) {
-             // watch the 'compile' expression for changes
+            // watch the 'compile' expression for changes
             return scope.$eval(attrs.compile);
           },
           function(value) {

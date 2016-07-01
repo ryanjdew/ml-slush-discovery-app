@@ -3,7 +3,7 @@
   <head>
     <base href="/">
     <meta charset="utf-8">
-    <title>discovery-app</title>
+    <title id="page-title">discovery-app</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
     <link rel="shortcut icon" href="/images/favicon.ico" />
@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
     <link rel="stylesheet" href="/bower_components/ng-table/dist/ng-table.min.css" />
     <link rel="stylesheet" href="/bower_components/ml-google-maps-ng/dist/ml-google-maps-ng.css" />
+    <link rel="stylesheet" href="/bower_components/angular-color-picker/angular-color-picker.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -26,6 +27,7 @@
 
     <link rel="stylesheet" href="/ui/app/styles/malhar-angular-dashboard.css">
     <link rel="stylesheet" href="/ui/app/styles/custom.css">
+    <style id="ui-styles" type="text/css"></style>
   </head>
   <body ng-app="app">
 
@@ -71,6 +73,7 @@
     <script src="/bower_components/angular-ui-utils/ui-utils.js"></script>
     <script src="/bower_components/angular-ui-map/ui-map.js"></script>
     <script src="/bower_components/ml-google-maps-ng/dist/ml-google-maps-ng.js"></script>
+    <script src="/bower_components/angular-color-picker/angular-color-picker.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -91,6 +94,7 @@
     <script src="/ui/app/user/user.module.js"></script>
     <script src="/ui/app/app.js"></script>
     <script src="/ui/app/common/search-image.directive.js"></script>
+    <script src="/ui/app/common/ui.service.js"></script>
     <script src="/ui/app/common/utility.service.js"></script>
     <script src="/ui/app/components/components.service.js"></script>
     <script src="/ui/app/components/maps.component.js"></script>
