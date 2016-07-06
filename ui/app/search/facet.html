@@ -1,13 +1,6 @@
 <div class="facet-list">
   <ml-chiclets ng-if="shouldNegate" active-facets="activeFacets" toggle="toggle({facet:facet, value:value})" truncate="{{ truncateLength }}"></ml-chiclets>
-  <div class="chiclets" ng-if="!shouldNegate">
-    <div ng-repeat="(index, facet) in facets | object2Array | filter:{selected: true}">
-      <div class="btn btn-primary" ng-repeat="value in facet.facetValues | filter:{selected: true}">
-        <span title="{{ value.name }}">{{ decodeURIComponent(facet.__key) }}: {{ value.name | truncate:truncateLength }}</span>
-        <span class="glyphicon glyphicon-remove-circle icon-white" ng-click="toggle({facet: facet.__key, value: value.name})"></span>
-      </div>
-    </div>
-  </div>
+  <div ng-if="(activeFacets | object2Array).length"><small class="pull-right"><a ng-click="ctrl.clearFacets()">clear all </a></small></div>
   <div class="facet" ng-if="filter(facet.facetValues, {selected: '!'+true}, false).length" ng-repeat="(index, facet) in facets | object2Array">
     <h3>{{ $parent.$parent.$parent.decodeURIComponent(facet.__key) }}</h3>
     <div ng-repeat="value in facet.facetValues | filter:{selected: '!'+true}:false">

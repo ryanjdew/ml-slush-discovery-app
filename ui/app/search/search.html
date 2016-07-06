@@ -3,8 +3,7 @@
     <div class="col-md-12">
       <ml-input qtext="ctrl.qtext" search="ctrl.search(qtext)" suggest="ctrl.suggest(val)" template="fa" class="search"></ml-input>
     </div>
-    <div class="col-sm-3">
-      <h4><strong>Facets</strong><small class="pull-right"><a ng-click="ctrl.clearFacets()">clear all </a></small></h4>
+    <div class="right-col col-sm-3">
       <div class="facet" ng-repeat="(constraintName, constraint) in ctrl.dateTimeConstraints">
         <h3>{{constraintName}}</h3>
         <div class="input-daterange input-group">

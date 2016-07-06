@@ -71,7 +71,7 @@
             '<span ng-if="hasUpdatedIcon" class="document-type-icon {{className}}" ' +
             'document-content-type="{{docTypeCleaned}}">' +
             '</span>' +
-          '<span ng-if="!hasUpdatedIcon" class="btn btn-primary btn-lg">' +
+          '<span ng-if="!hasUpdatedIcon" class="btn btn-primary btn-xs">' +
             '<i class="fa {{ className }}">&nbsp;</i></span>' +
           '</span>',
         link: function (scope, element) {
@@ -81,7 +81,7 @@
           if (scope.hasUpdatedIcon) {
             scope.docTypeCleaned = mimeTypeCleaned;
             if (scope.imageType && 'search' === scope.imageType) {
-              scope.className = 'document-type-icon-sm ';
+              scope.className = 'document-type-icon-xs ';
             } else {
               scope.className = 'document-type-icon-md ';
             }
