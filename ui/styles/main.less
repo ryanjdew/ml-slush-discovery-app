@@ -344,3 +344,26 @@ tr.as-sortable-item, tr.as-sortable-placeholder {
 .extend-fa-json:before {
   content: "{...}";
 }
+
+.margin-bottom-xs {margin-bottom: ceil(@line-height-computed / 4);}
+.margin-bottom-sm {margin-bottom: ceil(@line-height-computed / 2);}
+.margin-bottom-md {margin-bottom: @line-height-computed;}
+.margin-bottom-lg {margin-bottom: ceil(@line-height-computed * 2);}
+
+.hljs-tag, .hljs-tag .hljs-title {
+  color: green;
+  font-weight: normal;
+}
+
+div[hljs] > pre, div[hljs] > pre > code {
+  border: none;
+  background-color: inherit;
+}
+
+.object .prop\003E {
+  color: green;
+}
+
+.object .string {
+  color: black;
+}
