@@ -1,0 +1,35 @@
+<div>
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="$dismiss()">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only">Close</span>
+    </button>
+    <h4 class="modal-title">Add Label Part</h4>
+  </div>
+  <div class="modal-body">
+    <form name="form">
+      <div class="form-group">
+        <label class="control-label">Type</label>
+        <select class="form-control" name="partType" ng-model="part.type">
+          <option value="element">Element/JSON Property</option>
+          <option value="attribute">Attribute</option>
+          <option ng-if="!hasLabel" value="text">Text</option>
+        </select>
+        <div ng-if="hasLabel">
+          <label class="control-label">Label</label>
+          <input class="control-label" type="text" ng-model="part.label" />
+        </div>
+        <div ng-if="part.type === 'text'">
+          <label class="control-label">Text</label>
+          <input class="control-label" type="text" ng-model="part.value" />
+        </div>
+      </div>
+      <div ng-if="part.type !== 'text'">
+        <finder type="part.type" index="node"></finder>
+      </div>
+      <div class="clearfix">
+        <button type="button" class="btn btn-primary pull-right" ng-click="add()">Add</button>
+      </div>
+    </form>
+  </div>
+</div>

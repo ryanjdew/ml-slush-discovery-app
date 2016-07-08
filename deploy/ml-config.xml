@@ -560,6 +560,13 @@
       <role-name>a-privileged-role</role-name>
     </amp>
 -->
+    <amp>
+      <namespace>http://marklogic.com/discovery-app/extension-points/search-decorator</namespace>
+      <localname>decorator</localname>
+      <doc-uri>/extension-points/search-decorator.xqy</doc-uri>
+      <db-name>@ml.app-modules-db</db-name>
+      <role-name>dls-user</role-name>
+    </amp>
   </amps>
   <privileges xmlns="http://marklogic.com/xdmp/security">
 <!--
