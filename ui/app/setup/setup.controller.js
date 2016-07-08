@@ -9,6 +9,7 @@
     '$window', 'MLSearchFactory',
     'newGeospatialIndexDialog', 'editGeospatialIndexDialog',
     'newRangeIndexDialog', 'editRangeIndexDialog',
+    'newLabelPartDialog',
     'fieldDialog',
     'EditChartConfigDialog',
     'CommonUtil', 'UIService'
@@ -19,6 +20,7 @@
     win, searchFactory,
     newGeospatialIndexDialog, editGeospatialIndexDialog,
     newRangeIndexDialog, editRangeIndexDialog,
+    newLabelPartDialog,
     fieldDialog,
     editChartConfigDialog,
     CommonUtil, UIService
@@ -467,6 +469,32 @@
         } else {
           uiConfig.logo.image = '';
         }
+      },
+      removeLabelPart: function(index) {
+        model.uiConfig['result-label'].splice(index, 1);
+        $scope.setUiConfig();
+      },
+      addLabelPart: function() {
+        newLabelPartDialog().then(function(part) {
+          if (!model.uiConfig['result-label']) {
+            model.uiConfig['result-label'] = [];
+          }
+          model.uiConfig['result-label'].push(part);
+          $scope.setUiConfig();
+        });
+      },
+      removeResultMetadata: function(index) {
+        model.uiConfig['result-metadata'].splice(index, 1);
+        $scope.setUiConfig();
+      },
+      addResultMetadata: function() {
+        newLabelPartDialog(true).then(function(part) {
+          if (!model.uiConfig['result-metadata']) {
+            model.uiConfig['result-metadata'] = [];
+          }
+          model.uiConfig['result-metadata'].push(part);
+          $scope.setUiConfig();
+        });
       }
     });
   }

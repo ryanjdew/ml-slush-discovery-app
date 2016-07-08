@@ -134,3 +134,15 @@ function utilities:camel-case-to-hyphenated(
     )
   )
 };
+
+declare
+function utilities:document-from-discovery-app-db(
+  $uri as xs:string
+) as document-node()? {
+  if (xdmp:database() = xdmp:database("discovery-app-content")) then
+    fn:doc($uri)
+  else
+    xdmp:invoke-function(
+      function() { fn:doc($uri) }
+    , map:entry("database", xdmp:database("discovery-app-content")))
+};

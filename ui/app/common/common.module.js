@@ -12,6 +12,15 @@
         return out;
       };
     })
+    .filter('stringToObject', function() {
+      return function(input) {
+        try {
+          return JSON.parse(input);
+        } catch (e) {
+          return {};
+        }
+      };
+    })
     .directive('compile', function($compile) {
       // directive factory creates a link function
       return function(scope, element, attrs) {

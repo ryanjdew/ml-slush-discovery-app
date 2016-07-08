@@ -263,6 +263,32 @@
         <ml-facets template="app/search/facet.html" class="col-md-3 right-col" facets="model.search.facets" toggle="toggleFacet(facet, value)" active-facets="ctrl.mlSearch.activeFacets" negate="ctrl.toggleNegatedFacet(facet,value)"></ml-facets>
         <div class="col-md-9">
           <facet-charts charts="model.chartData.charts" ml-search="mlSearch" remove-chart="removeChart" edit-chart="editChart" callback="toggleFacet(facet, value)"></facet-charts>
+          <section>
+            <h3>Result display settings</h4>
+              <div class="margin-bottom-sm">
+                <strong>Title:</strong>
+                <span ng-repeat="part in model.uiConfig['result-label']" class="label   label-primary">
+                  <span ng-if="part.type === 'element'">Element/JSON Property:</span>
+                  <span ng-if="part.type === 'attribute'">Attribute:</span>
+                  <span ng-if="part.value.elementNamespace">{{part.value.elementNamespace}}:</span><span ng-if="part.type === 'text'">"</span>
+                  {{ part.value.element || part.value }}<span ng-if="part.type === 'text'">"</span><span ng-if="  part.value.attribute">/@<span ng-if="part.value.attributeNamespace">  {{part.value.attributeNamespace}}:</span>  {{part.value.attribute}}</span>
+                  <a ng-click="removeLabelPart($index)">&times;</a>
+                </span>
+              </div>
+              <button class="btn btn-primary" ng-click="addLabelPart()">Add Item</button>
+              <div class="margin-bottom-sm">
+                <strong>Metadata:</strong>
+                <span ng-repeat="part in model.uiConfig['result-metadata']" class="label   label-primary">
+                  <span ng-if="part.label">Label: "{{part.label}}"</span>
+                  <span ng-if="part.type === 'element'">Element/JSON Property:</span>
+                  <span ng-if="part.type === 'attribute'">Attribute:</span>
+                  <span ng-if="part.value.elementNamespace">{{part.value.elementNamespace}}:</span><span ng-if="part.type === 'text'">"</span>
+                  {{ part.value.element || part.value }}<span ng-if="part.type === 'text'">"</span><span ng-if="part.value.attribute">/@<span ng-if="part.value.attributeNamespace">  {{part.value.attributeNamespace}}:</span>  {{part.value.attribute}}</span>
+                  <a ng-click="removeMetadataPart($index)">&times;</a>
+                </span>
+              </div>
+              <button class="btn btn-primary" ng-click="addResultMetadata()">Add Item</button>
+            </section>
           <ml-results results="model.search.results" template="app/search/search-results.html"></ml-results>
         </div>
       </div>
