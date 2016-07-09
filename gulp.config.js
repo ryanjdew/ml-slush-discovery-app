@@ -56,8 +56,14 @@ module.exports = function() {
     tinymce: [
       bower.directory + 'tinymce-dist/**/*'
     ],
-    html: client + '**/*.html',
-    htmltemplates: clientApp + '**/*.html',
+    html: [
+      client + '**/*.html',
+      client + '**/**/*.html'
+    ],
+    htmltemplates: [
+      clientApp + '**/*.html',
+      clientApp + '**/**/*.html'
+    ],
     images: client + 'images/**/*.*',
     staticdata: client + '**/*.json',
     index: client + 'index.html',
