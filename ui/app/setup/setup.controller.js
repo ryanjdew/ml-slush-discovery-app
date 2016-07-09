@@ -186,6 +186,14 @@
             $scope.currentFilesUploaded = updatedCount;
           });
       },
+      clearData: function() {
+        ServerConfig.clearData().then(function(data) {
+            updateSearchResults().then(function() {
+              $scope.state = 'appearance';
+              $scope.redrawCharts();
+            });
+          }, handleError);
+      },
       removeCollection: function(index) {
         ServerConfig.removeDataCollection(model.dataCollections[index]).then(function() {
           model.dataCollections.splice(index, 1);
