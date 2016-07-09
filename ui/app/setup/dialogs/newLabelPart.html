@@ -13,19 +13,24 @@
         <select class="form-control" name="partType" ng-model="part.type">
           <option value="element">Element/JSON Property</option>
           <option value="attribute">Attribute</option>
+          <option value="path">Path</option>
           <option ng-if="!hasLabel" value="text">Text</option>
         </select>
         <div ng-if="hasLabel">
           <label class="control-label">Label</label>
-          <input class="control-label" type="text" ng-model="part.label" />
+          <input class="form-label" type="text" ng-model="part.label" />
+        </div>
+        <div ng-if="part.type === 'path'">
+          <label class="control-label">Path</label>
+          <input class="form-label" type="text" ng-model="$parent.path" />
         </div>
         <div ng-if="part.type === 'text'">
           <label class="control-label">Text</label>
-          <input class="control-label" type="text" ng-model="part.value" />
+          <input class="form-label" type="text" ng-model="part.value" />
         </div>
       </div>
-      <div ng-if="part.type !== 'text'">
-        <finder type="part.type" index="node"></finder>
+      <div ng-if="part.type !== 'text' && part.type !== 'path'">
+        <finder type="part.type" index="$parent.node"></finder>
       </div>
       <div class="clearfix">
         <button type="button" class="btn btn-primary pull-right" ng-click="add()">Add</button>
