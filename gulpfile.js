@@ -416,7 +416,7 @@ gulp.task('clean-code', function() {
  *  gulp test --startServers
  * @param  {Function} done - callback when complete
  */
-gulp.task('test', ['vet', 'templatecache'], function(done) {
+gulp.task('test', ['templatecache'], function(done) {
   startTests(true /*singleRun*/, done);
 });
 
