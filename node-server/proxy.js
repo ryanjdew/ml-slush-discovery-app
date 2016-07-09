@@ -136,7 +136,7 @@ function proxy(req, res) {
     });
 
     req.pipe(mlReq);
-    req.on("end", function() {
+    req.on('end', function() {
       mlReq.end();
     });
 

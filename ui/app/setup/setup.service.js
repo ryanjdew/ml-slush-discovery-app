@@ -474,6 +474,10 @@
       return d.promise;
     };
 
+    serverConfig.clearData = function() {
+      return $http.delete('/v1/search');
+    };
+
     return serverConfig;
   }
 }());

@@ -37,7 +37,7 @@
       <div class="form-group">
         <label class="control-label">Directory</label>
         <div ng-show="isUploading">
-          <progressbar max="currentFilesToUpload" value="currentFilesUploaded"></progressbar>
+          <uib-progressbar max="currentFilesToUpload" value="currentFilesUploaded"></uib-progressbar>
         </div>
         <div ng-hide="isUploading">
           <input class="form-control" id="directoryUploader" name="directory" type="file" multiple webkitdirectory>
@@ -52,6 +52,10 @@
       </div>
       <div class="clearfix">
         <button ng-click="loadData()" class="clearfix btn btn-primary pull-right">Load</button>
+      </div>
+      <h4>Clear Data</h4>
+      <div class="form-group">
+        <button type="button" class="btn btn-primary" confirmation-dialog="clearData()" confirmation-dialog-title="Clear Database" confirmation-dialog-message="Are you sure you want to clear the database?">Clear DB</button>
       </div>
     </div>
     <div ng-show="state === 'indexes'">

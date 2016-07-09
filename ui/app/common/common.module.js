@@ -21,7 +21,124 @@
         }
       };
     })
-    .directive('compile', function($compile) {
+    .factory('$dialog', ['$rootScope', '$uibModal',
+    function($rootScope, $modal) {
+
+      function dialog(modalOptions, resultFn) {
+        var modal = $modal.open(modalOptions);
+        if (resultFn) {
+          modal.result.then(resultFn);
+        }
+        modal.values = modalOptions;
+        return dialog;
+      }
+
+      function modalOptions(templateUrl, controller, scope) {
+        return {
+          templateUrl: templateUrl,
+          controller: controller,
+          scope: scope
+        };
+      }
+
+      return {
+        /**
+         * Creates and opens dialog.
+         */
+        dialog: dialog,
+
+        /**
+         * Returns 0-parameter function that opens dialog on evaluation.
+         */
+        simpleDialog: function(templateUrl, controller, resultFn) {
+          return function() {
+            return dialog(modalOptions(templateUrl, controller), resultFn);
+          };
+        },
+
+        /**
+         * Opens simple generic dialog presenting title, message (any html) and provided buttons.
+         */
+        messageBox: function(title, message, buttons, resultFn) {
+          var scope = angular.extend($rootScope.$new(false), {
+            title: title,
+            message: message,
+            buttons: buttons
+          });
+          return dialog(modalOptions('template/messageBox/message.html', 'MessageBoxController', scope), function(result) {
+            var value = resultFn ? resultFn(result) : undefined;
+            scope.$destroy();
+            return value;
+          });
+        }
+      };
+    }
+  ])
+  .run(['$templateCache',
+    function($templateCache) {
+      $templateCache.put('template/messageBox/message.html',
+        '<div class="modal-header"><h3>{{ title }}</h3></div>\n' +
+        '<div class="modal-body"><p ng-bind-html="message"></p></div>\n' +
+        '<div class="modal-footer"><button ng-repeat="btn in buttons" ng-click="close(btn.result)" class="btn" ng-class="btn.cssClass">{{ btn.label }}</button></div>\n');
+    }
+  ])
+  .controller('MessageBoxController', ['$scope', '$uibModalInstance',
+    function($scope, $modalInstance) {
+      $scope.close = function(result) {
+        $modalInstance.close(result);
+      };
+    }
+  ])
+  .directive('confirmationDialog', ['$dialog','$timeout','$parse',
+    function($dialog, $timeout, $parse) {
+      return {
+        restrict: 'A',
+        link: function($scope, element, attrs) {
+          var fn = $parse(attrs.confirmationDialog);
+          var yesFn = function() {
+                fn($scope, {});
+              };
+          var resultFn = function(result) {
+            if (result === 'yes') {
+              $timeout(yesFn);
+            }
+          };
+          element.bind('click', function() {
+            var title = attrs.confirmationDialogTitle;
+            var message = attrs.confirmationDialogMessage;
+            $dialog.messageBox(title, message, [{
+              label: 'Yes, I\'m sure',
+              cssClass: 'btn-primary',
+              result: 'yes'
+            }, {
+              label: 'No',
+              result: 'no'
+            }],
+            resultFn
+            );
+          });
+        }
+      };
+    }
+  ])
+  .directive('infoDialog', ['$dialog','$timeout','$parse',
+    function($dialog, $timeout, $parse) {
+      return {
+        restrict: 'A',
+        link: function($scope, element, attrs) {
+          element.bind('click', function() {
+            var title = attrs.infoDialogTitle || 'Information';
+            var message = attrs.infoDialog;
+            $dialog.messageBox(title, message, [{
+              label: 'Ok',
+              result: 'ok'
+            }]);
+          });
+        }
+      };
+    }
+  ])
+  .directive('compile', function($compile) {
       // directive factory creates a link function
       return function(scope, element, attrs) {
         scope.$watch(
