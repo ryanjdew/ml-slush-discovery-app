@@ -49,7 +49,7 @@ declare function search-dec:build-label($doc) as xs:string?
   fn:normalize-space(fn:string-join(
     for $label-part in $label-parts
     return
-      if ($label-part/type = ("element", "attribute")) then
+      if ($label-part/type = ("element", "attribute", "path")) then
         search-dec:get-value-from-part($doc, $label-part)
       else
         $label-part/value,
@@ -85,19 +85,22 @@ declare function search-dec:_build-metadata($doc, $parts, $base-object) as xs:st
 
 declare function search-dec:get-value-from-part($doc, $label-part)
 {
-  let $qname := fn:QName($label-part/value/elementNamespace, $label-part/value/element)
-  let $attribute-qname :=
-    if (fn:exists($label-part/value/attribute[fn:normalize-space(.)])) then
-      fn:QName($label-part/value/attributeNamespace, $label-part/value/attribute)
-    else
-      ()
-  let $elements := $doc//*[fn:node-name() eq $qname]
-  return
-    fn:string(
-      if (fn:exists($attribute-qname)) then
-        ($elements/@*[fn:node-name(.) eq $attribute-qname])[1]
+  if ($label-part/type = "path") then
+    fn:string(($doc ! xdmp:unpath(fn:string($label-part/value)))[1])
+  else
+    let $qname := fn:QName($label-part/value/elementNamespace, $label-part/value/element)
+    let $attribute-qname :=
+      if (fn:exists($label-part/value/attribute[fn:normalize-space(.)])) then
+        fn:QName($label-part/value/attributeNamespace, $label-part/value/attribute)
       else
-        $elements[1]
-    )
+        ()
+    let $elements := $doc//*[fn:node-name() eq $qname]
+    return
+      fn:string(
+        if (fn:exists($attribute-qname)) then
+          ($elements/@*[fn:node-name(.) eq $attribute-qname])[1]
+        else
+          $elements[1]
+      )
 };
 
