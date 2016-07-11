@@ -293,7 +293,7 @@ gulp.task('build', ['optimize', 'images', 'fonts', 'statics', 'tinymce'], functi
  * and inject them into the new index.html
  * @return {Stream}
  */
-gulp.task('optimize', ['inject', 'test'], function() {
+gulp.task('optimize', ['inject'/*, 'test'*/], function() {
   log('Optimizing the js, css, and html');
 
   // Filters are named for the gulp-useref path

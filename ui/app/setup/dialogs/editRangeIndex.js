@@ -57,7 +57,7 @@
           }
         });
         return $uibModal.open({
-            templateUrl: '/ui/app/setup/dialogs/editRangeIndex.html',
+            templateUrl: 'app/setup/dialogs/editRangeIndex.html',
             controller: 'EditIndexCtrl',
             size: 'lg',
             resolve: {

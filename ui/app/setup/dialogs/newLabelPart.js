@@ -30,7 +30,7 @@
     function($uibModal) {
       return function(hasLabel) {
         return $uibModal.open({
-          templateUrl: '/ui/app/setup/dialogs/newLabelPart.html',
+          templateUrl: 'app/setup/dialogs/newLabelPart.html',
           controller: 'AddLabelPartCtrl',
           size: 'lg',
           resolve: {
