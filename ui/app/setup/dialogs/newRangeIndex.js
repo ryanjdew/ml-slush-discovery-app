@@ -85,7 +85,7 @@
     function($uibModal) {
       return function(fields) {
         return $uibModal.open({
-          templateUrl: '/ui/app/setup/dialogs/newRangeIndex.html',
+          templateUrl: 'app/setup/dialogs/newRangeIndex.html',
           controller: 'AddIndexCtrl',
           size: 'lg',
           resolve: {

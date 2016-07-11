@@ -51,7 +51,7 @@
             'excluded-element': []
           };
         return $uibModal.open({
-            templateUrl: '/ui/app/setup/dialogs/field.html',
+            templateUrl: 'app/setup/dialogs/field.html',
             controller: 'FieldCtrl',
             size: 'lg',
             resolve: {
