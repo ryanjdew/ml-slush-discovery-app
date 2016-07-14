@@ -50,13 +50,13 @@ Edit `./local.json` to set your ports, marklogic host, and credentials if needed
 Now run:
     gulp serve-local # this will watch the .less file for changes, compile them to .css, and run the node server
 
-After running `gulp serve-local` your browser will load the application. Follow the setup link on  the top of the page.
-
-![Setup Link](readme-resources/setup-link.png)
-
-Login with the credentials discovery-app-admin/DiscAdmin.
+After running `gulp serve-local` your browser will load the application. Login with the credentials discovery-app-admin/DiscAdmin.
 
 ![Login Page](readme-resources/login.png)
+
+Follow the setup link in the user dropdown located at the top right of the page.
+
+![Setup Link](readme-resources/setup-link.png)
 
 From there you can load data into the database from the sample-content folder.
 
