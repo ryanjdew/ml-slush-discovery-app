@@ -1,0 +1,34 @@
+<div>
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="$dismiss()">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only">Close</span>
+    </button>
+    <h4 class="modal-title">Edit Range Index</h4>
+  </div>
+  <div class="modal-body">
+    <form name="form">
+      <div class="form-group">
+        <label class="control-label">Type of Constraint</label>
+        <select class="form-control" name="constraintType" ng-model="constraintType" ng-options="item as item for item in constraintTypes | orderBy:item">
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="control-label">Name</label>
+        <input type="text" class="form-control" name="constraintName" ng-model="constraint.name"/>
+      </div>
+      <div class="form-group">
+        <label class="control-label">Annotation</label>
+        <textarea class="form-control" name="constraintAnnotation" ng-model="constraint.annotation"></textarea>
+      </div>
+      <div class="form-group">
+        <div ng-repeat="(key, val) in constraint[constraintType]">
+          <constraint-form constraint-object="constraint[constraintType]" constraint-property-name="key" constraint-property="val"></constraint-form>
+        </div>
+      </div>
+      <div class="clearfix">
+        <button type="button" class="btn btn-primary pull-right" ng-click="save()">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

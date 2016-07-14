@@ -9,7 +9,7 @@
     '$window', 'MLSearchFactory',
     'newGeospatialIndexDialog', 'editGeospatialIndexDialog',
     'newRangeIndexDialog', 'editRangeIndexDialog',
-    'newLabelPartDialog',
+    'newLabelPartDialog', 'EditConstraintDialog',
     'fieldDialog',
     'EditChartConfigDialog',
     'CommonUtil', 'UIService'
@@ -20,7 +20,7 @@
     win, searchFactory,
     newGeospatialIndexDialog, editGeospatialIndexDialog,
     newRangeIndexDialog, editRangeIndexDialog,
-    newLabelPartDialog,
+    newLabelPartDialog, EditConstraintDialog,
     fieldDialog,
     editChartConfigDialog,
     CommonUtil, UIService
@@ -155,12 +155,13 @@
         });
       },
       addConstraint: function() {
-        model.constraints.push({
-          'name': 'collection',
-          'collection': {
-            'facet': true,
-            'prefix': null
-          }
+        EditConstraintDialog().then(function(constraint) {
+          model.constraints.push(constraint);
+        });
+      },
+      editConstraint: function(index) {
+        EditConstraintDialog(model.constraints[index]).then(function(constraint) {
+          model.constraints[index] = constraint;
         });
       },
       loadData: function() {
@@ -327,7 +328,10 @@
       resampleConstraints: function() {
         model.constraints = [];
         angular.forEach(model.rangeIndexes['range-index-list'], function(val) {
-          var value = val['range-element-index'] || val['range-element-attribute-index'] || val['range-field-index'] || val['range-path-index'];
+          var value = val['range-element-index'] ||
+            val['range-element-attribute-index'] ||
+            val['range-field-index'] ||
+            val['range-path-index'];
           var name = value.localname || value['field-name'] || value['path-expression'];
           if (name && name !== '') {
             var constraint = {
@@ -451,6 +455,19 @@
         UIService.setLayout(model.uiConfig);
       },
       setUiConfig: function() {
+        UIService.setUIConfig(model.uiConfig)
+          .then(
+            function() {
+              UIService.setLayout(model.uiConfig);
+              updateSearchResults();
+            }, handleError);
+      },
+      resetUiConfig: function() {
+        model.uiConfig.logo = null;
+        model.uiConfig.page = {};
+        model.uiConfig.color = null;
+        model.uiConfig.footer = {};
+
         UIService.setUIConfig(model.uiConfig)
           .then(
             function() {

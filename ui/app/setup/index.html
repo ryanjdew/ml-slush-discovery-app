@@ -154,7 +154,10 @@
                 <td class="col-sm-1">
                   <input type="checkbox" ng-model="(constraint.range || constraint.word || constraint.collection).facet" />
                 </td>
-                <td class="col-sm-1"><a class="pull-right" ng-click="removeConstraint($index)"><i class="glyphicon glyphicon-trash"></i></a></td>
+                <td class="col-sm-1">
+                  <a class="pull-right" ng-click="removeConstraint($index)"><i class="glyphicon glyphicon-trash"></i></a>
+                  <a class="pull-right" ng-click="editConstraint($index)"><i class="glyphicon glyphicon-pencil"></i></a>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -256,6 +259,7 @@
       <div class="clearfix panel-footer">
         <button ng-click="setUiConfig()" class="clearfix btn btn-primary pull-right">Save</button>
         <button ng-click="previewUiConfig()" class="clearfix btn btn-default pull-right">Preview</button>
+        <button ng-click="resetUiConfig()" class="clearfix btn btn-danger pull-right">Reset</button>
       </div>
     </div>
   </div>
