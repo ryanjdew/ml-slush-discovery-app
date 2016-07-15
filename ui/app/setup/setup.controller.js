@@ -84,6 +84,13 @@
         model.geospatialIndexes = config.geospatialIndexes;
         model.searchOptions = config.searchOptions;
         model.constraints = config.searchOptions.options.constraint;
+        model.sortOptions = _.filter(
+            config.searchOptions.options.operator,
+            function(val) {
+              return val.name === 'sort';
+            }
+          )[0];
+        model.newSortOptionDirection = 'ascending';
         angular.forEach(model.constraints, function(constraint) {
           constraint.name = decodeURIComponent(constraint.name);
         });
@@ -133,7 +140,8 @@
             '<input type="text" ng-model="dbName" />' +
             '</div>' +
             '<div class="clearfix">' +
-            '<button type="button" class="btn btn-primary pull-right" ng-click="add()">Add</button>' +
+            '<button type="button" class="btn btn-primary pull-right" ng-click="add()">' +
+            'Add</button>' +
             '</div>' +
             '</form>' +
             '</div>' +
@@ -324,6 +332,37 @@
           model.searchOptions.options.constraint,
           model.defaultSource
         );
+      },
+      addSortOption: function() {
+        if (model.newSortOptionName && model.newSortOptionRange) {
+          var selectedRange = model.newSortOptionRange.range;
+          model.sortOptions.state.push({
+            name: encodeURIComponent(model.newSortOptionName),
+            'sort-order': [
+              {
+                direction: model.newSortOptionDirection,
+                element: selectedRange.element,
+                attribute: selectedRange.attribute,
+                field: selectedRange.field,
+                'json-property': selectedRange['json-property']
+              }
+            ]
+          });
+        }
+      },
+      removeSortOption: function(index) {
+        model.sortOptions.state.splice(index, 1);
+      },
+      saveSortOptions: function() {
+        angular.forEach(model.searchOptions.options.constraint, function(constraint) {
+          constraint.name = encodeURIComponent(constraint.name);
+        });
+        ServerConfig.setSearchOptions(model.searchOptions).then(function() {
+          updateSearchResults().then(function() {
+            $scope.state = 'appearance';
+            $scope.redrawCharts();
+          });
+        }, handleError);
       },
       resampleConstraints: function() {
         model.constraints = [];

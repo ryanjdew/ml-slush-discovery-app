@@ -23,4 +23,11 @@
       </transform-results>
     </state>
   </operator>
+  <operator name="sort">
+    <state name="Score">
+      <sort-order direction="descending">
+        <score/>
+      </sort-order>
+    </state>
+  </operator>
 </options>
