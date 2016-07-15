@@ -11,7 +11,7 @@ var authHelper = require('./auth-helper');
 var options = require('./options');
 
 var serverConfigObj = {
-  database: 'discovery-app-content'
+  database: null
 };
 
 var _hostName;
@@ -21,7 +21,7 @@ serverConfig().then(function(sConfig) {
   if (sConfig) {
     console.log('config found!');
     serverConfigObj = sConfig;
-    serverConfigObj.database = serverConfigObj.database || 'discovery-app-content';
+    serverConfigObj.database = serverConfigObj.database;
   } else {
     console.log('config not found!');
   }
@@ -61,7 +61,7 @@ function genericConfig(name, req, res, data) {
     method: 'GET',
     params: {
       uri: '/discovery-app/config/' + name + '.json',
-      database: 'discovery-app-content'
+      database: null
     },
     path: '/v1/documents'
   };
@@ -96,10 +96,13 @@ function passOnToML(req, res, transferOptions, port) {
     if (key === 'database') {
       databaseInParams = true;
     }
-    params.push(key + '=' + transferOptions.params[key]);
+    if (transferOptions.params[key] !== null) {
+      params.push(key + '=' + transferOptions.params[key]);
+    }
   }
 
-  if (!(databaseInParams || /\/(v1\/config|manage)\//.test(transferOptions.path))) {
+  if (!(databaseInParams || /\/(v1\/config|manage)\//.test(transferOptions.path)) &&
+      serverConfigObj.database) {
     params.push('database=' + serverConfigObj.database);
   }
 
