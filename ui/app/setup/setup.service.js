@@ -398,6 +398,8 @@
                 'headers':{'Content-Type': mixedContentType},
                 'params': {
                   'transform': 'expand',
+                  'perm:rest-reader': 'read',
+                  'perm:rest-writer': 'update',
                   'trans:collections': collections ? collections.join(',') : null
                 },
                 'transformRequest':[]
