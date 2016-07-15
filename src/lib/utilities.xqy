@@ -2,6 +2,8 @@ xquery version "1.0-ml";
 
 module namespace utilities = "http://marklogic.com/utilities";
 
+import module namespace c = "http://marklogic.com/roxy/config"
+  at "/app/config/config.xqy";
 import module namespace json = "http://marklogic.com/xdmp/json"
     at "/MarkLogic/json/json.xqy";
 
@@ -139,10 +141,10 @@ declare
 function utilities:document-from-discovery-app-db(
   $uri as xs:string
 ) as document-node()? {
-  if (xdmp:database() = xdmp:database("discovery-app-content")) then
+  if (xdmp:database() = $c:content-database-id) then
     fn:doc($uri)
   else
     xdmp:invoke-function(
       function() { fn:doc($uri) }
-    , map:entry("database", xdmp:database("discovery-app-content")))
+    , map:entry("database", $c:content-database-id))
 };

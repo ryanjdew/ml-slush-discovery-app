@@ -2,6 +2,9 @@ xquery version "1.0-ml";
 
 module namespace ext = "http://marklogic.com/rest-api/resource/profile";
 
+import module namespace c = "http://marklogic.com/roxy/config"
+  at "/app/config/config.xqy";
+
 declare namespace roxy = "http://marklogic.com/roxy";
 declare namespace rapi = "http://marklogic.com/rest-api";
 
@@ -37,7 +40,7 @@ function ext:get(
       xdmp:to-json-string($user-doc +
       (object-node {
         "name": xdmp:get-current-user(),
-        "isAdmin": (xdmp:get-current-roles() = (xdmp:role("discovery-app-admin-role"), xdmp:role("rest-admin"), xdmp:role("admin")))
+        "isAdmin": (xdmp:get-current-roles() = ($c:admin-role-id, xdmp:role("rest-admin"), xdmp:role("admin")))
       }))
     }
 };
