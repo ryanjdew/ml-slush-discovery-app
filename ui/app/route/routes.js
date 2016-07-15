@@ -79,9 +79,11 @@
         resolve: {
           doc: function(MLRest, $stateParams) {
             var uri = $stateParams.uri;
-            return MLRest.getDocument(uri, { format: 'json', transform: 'data-to-html-display' }).then(function(response) {
-              return response;
-            });
+            return MLRest
+              .getDocument(uri, { format: 'json', transform: 'data-to-html-display' })
+              .then(function(response) {
+                return response;
+              });
           }
         }
       })
@@ -153,5 +155,5 @@
           }
         }
       });
-    }
+  }
 }());

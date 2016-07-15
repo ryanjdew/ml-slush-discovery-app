@@ -23,6 +23,18 @@
         <div class="pagination-ctrls">
           <div class="row">
             <ml-snippet class="pull-right" set-snippet="ctrl.setSnippet(type)"></ml-snippet>
+            <div class="row">
+              <div class="btn-group pull-right" uib-dropdown>
+                <button id="single-button" type="button" class="btn btn-sm btn-default" uib-dropdown-toggle>
+                Sort: <i>{{ctrl.mlSearch.getSort() || 'Score' | decodeString }}</i> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="single-button">
+                  <li role="menuitem" ng-repeat="sortOption in ctrl.sortOptions">
+                    <a href ng-click="ctrl.setSort(sortOption.name)">{{sortOption.name | decodeString}}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
           <div>
             <uib-pagination class="pagination pagination-sm" ng-model="ctrl.page" ng-change=" ctrl.search()" max-size="10" boundary-links="true" total-items="ctrl.response.total" items-per-page="ctrl.response['page-length']">

@@ -46,6 +46,11 @@
       ctrl.search();
     };
 
+    ctrl.setSort = function(type) {
+      mlSearch.setSort(type);
+      ctrl.search();
+    };
+
     $scope.$watch(userService.currentUser, function(newValue) {
       ctrl.currentUser = newValue;
     });
@@ -63,6 +68,13 @@
     };
 
     mlSearch.getStoredOptions().then(function(data) {
+      ctrl.sortOptions = (_.filter(
+        data.options.operator,
+        function(val) {
+          return val.name === 'sort';
+        }
+      )[0] || { state: []}).state;
+
       angular.forEach(data.options.constraint, function(constraint) {
         if (constraint.range && (constraint.range.type === 'xs:date' ||
              constraint.range.type === 'xs:dateTime')) {
@@ -97,7 +109,10 @@
           foundExtra = true;
         }
       });
-
+      if ($location.search().s) {
+        foundExtra = true;
+        mlSearch.setSort($location.search().s);
+      }
       return foundExtra;
     };
 
