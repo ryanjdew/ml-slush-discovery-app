@@ -342,6 +342,16 @@
       if (collections && collections.length) {
         var collectionsMeta = '<?xml version="1.0" encoding="UTF-8"?>\r\n' +
             '<rapi:metadata xmlns:rapi="http://marklogic.com/rest-api">\r\n' +
+            '  <rapi:permissions>\r\n' +
+            '   <rapi:permission>\r\n' +
+            '     <rapi:role-name>rest-reader</rapi:role-name>\r\n' +
+            '     <rapi:capability>read</rapi:capability>\r\n' +
+            '   </rapi:permission>\r\n' +
+            '   <rapi:permission>\r\n' +
+            '     <rapi:role-name>rest-writer</rapi:role-name>\r\n' +
+            '     <rapi:capability>read</rapi:capability>\r\n' +
+            '   </rapi:permission>\r\n' +
+            '  </rapi:permissions>\r\n' +
             '  <rapi:collections>\r\n';
         angular.forEach(collections, function(collection) {
           collectionsMeta += '    <rapi:collection>' + collection + '</rapi:collection>\r\n';
@@ -398,8 +408,6 @@
                 'headers':{'Content-Type': mixedContentType},
                 'params': {
                   'transform': 'expand',
-                  'perm:rest-reader': 'read',
-                  'perm:rest-writer': 'update',
                   'trans:collections': collections ? collections.join(',') : null
                 },
                 'transformRequest':[]
