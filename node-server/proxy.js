@@ -78,7 +78,8 @@ function proxy(req, res) {
   var origUrl = req.originalUrl;
   var separator = /\?/.test(origUrl) ? '&' : '?';
   var databaseParam;
-  if (/^\/(alert|documents|graphs|keyvalue|qbe|resources|search|suggest|values)/.test(req.path)) {
+  if (/^\/(alert|documents|graphs|keyvalue|qbe|resources|search|suggest|values)/.test(req.path) &&
+    manageML.database()) {
     databaseParam = separator + 'database=' + manageML.database();
   }
   if (databaseParam) {

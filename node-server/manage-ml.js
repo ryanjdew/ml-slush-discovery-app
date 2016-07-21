@@ -20,8 +20,9 @@ console.log('loading config...');
 serverConfig().then(function(sConfig) {
   if (sConfig) {
     console.log('config found!');
+    console.log(sConfig);
+    console.log('database: ' + sConfig.database);
     serverConfigObj = sConfig;
-    serverConfigObj.database = serverConfigObj.database;
   } else {
     console.log('config not found!');
   }
@@ -38,7 +39,11 @@ function serverConfig(req, data) {
       'server-config': serverConfigObj
     };
   }
-  genericConfig('server-config', req, new MockRes(d), putData);
+  if (putData) {
+    genericConfig('server-config', req, new MockRes(d), putData);
+  } else {
+    getServerConfig(req,  new MockRes(d));
+  }
   return d.promise.then(function(resData) {
     if (resData) {
       var resObj = JSON.parse(resData);
@@ -71,6 +76,23 @@ function genericConfig(name, req, res, data) {
     opt.method = 'PUT';
     opt.data = data;
   }
+  passOnToML(
+    req || {
+      headers: {}
+    },
+    res,
+    opt
+  );
+}
+
+function getServerConfig(req, res) {
+  var opt = {
+    method: 'GET',
+    params: {
+      database: null
+    },
+    path: '/v1/resources/server-config'
+  };
   passOnToML(
     req || {
       headers: {}
