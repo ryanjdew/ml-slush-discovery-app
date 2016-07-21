@@ -45,8 +45,8 @@
 
       }],
       bindings: {
-        query: '=',
-        document: '='
+        query: '?=',
+        document: '?='
       }
     });
 }());
