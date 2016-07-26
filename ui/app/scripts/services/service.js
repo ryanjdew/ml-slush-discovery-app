@@ -55,7 +55,7 @@ angular.module('app.service').service('ReportService', ['$http', '$q', 'MLRest',
 
     // HTTP header names are case-insensitive.
     //
-    // A multi-document read is distinguished from a normal search 
+    // A multi-document read is distinguished from a normal search
     // operation by setting the Accept header to multipart/mixed.
     //
     // Can use the 'category' parameter only with multipart/mixed accept.
@@ -72,7 +72,7 @@ angular.module('app.service').service('ReportService', ['$http', '$q', 'MLRest',
 
   this.createReport = function(report) {
     return mlRest.createDocument(report, {
-             directory: '/report/',
+             directory: '/discovery-app/config/report/',
              format: 'json',
              extension: '.json'
            });
@@ -104,7 +104,7 @@ angular.module('app.service').service('ReportService', ['$http', '$q', 'MLRest',
   };
 }]);
 
-angular.module('app.service').factory('WidgetDefinitions', ['SmartGridDataModel',  
+angular.module('app.service').factory('WidgetDefinitions', ['SmartGridDataModel',
   function(SmartGridDataModel) {
   return [
     {
