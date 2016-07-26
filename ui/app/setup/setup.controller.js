@@ -163,12 +163,13 @@
         });
       },
       addConstraint: function() {
-        EditConstraintDialog().then(function(constraint) {
+        EditConstraintDialog(model.rangeIndexes['range-index-list']).then(function(constraint) {
           model.constraints.push(constraint);
         });
       },
       editConstraint: function(index) {
-        EditConstraintDialog(model.constraints[index]).then(function(constraint) {
+        EditConstraintDialog(model.rangeIndexes['range-index-list'], model.constraints[index])
+        .then(function(constraint) {
           model.constraints[index] = constraint;
         });
       },

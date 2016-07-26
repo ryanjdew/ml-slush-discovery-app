@@ -10,7 +10,7 @@
     <form name="form">
       <div class="form-group">
         <label class="control-label">Type of Constraint</label>
-        <select class="form-control" name="constraintType" ng-model="constraintType" ng-options="item as item for item in constraintTypes | orderBy:item">
+        <select class="form-control" name="constraintType" ng-model="constraintType" ng-options="item as item for item in constraintTypes | orderBy:item" ng-disabled="!constraintTypes || constraintTypes.length <= 1">
         </select>
       </div>
       <div class="form-group">
@@ -20,6 +20,21 @@
       <div class="form-group">
         <label class="control-label">Annotation</label>
         <textarea class="form-control" name="constraintAnnotation" ng-model="constraint.annotation"></textarea>
+      </div>
+      <div ng-if="constraintType === 'range'">
+        <div class="form-group">
+          <label class="control-label">Range Index</label>
+          <select class="form-control" name="selectedRangeIndex" ng-model="$parent.selectedRangeIndex"  ng-options="item as item.$label for item in rangeIndexes | orderBy:$label">
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="control-label">Range Constraint Type</label>
+          <select class="form-control" name="rangeConstraintType" ng-model="$parent.rangeConstraintType">
+            <option value="raw">Raw</option>
+            <option value="bucket">Bucket</option>
+            <option value="computed-bucket">Computed Bucket</option>
+          </select>
+        </div>
       </div>
       <div class="form-group">
         <div ng-repeat="(key, val) in constraint[constraintType]">
