@@ -1,0 +1,22 @@
+import
+
+-input_file_path 
+/Users/Tom/Temp/projects/cookingshow/data/claims_dump.csv 
+
+-input_file_type 
+delimited_text 
+
+-output_uri_suffix 
+.xml
+
+-output_collections 
+csv
+
+-generate_uri 
+true
+
+-output_uri_replace 
+"/Users/Tom/Temp/projects/cookingshow/data/, ''" 
+
+-output_uri_prefix 
+/claims/

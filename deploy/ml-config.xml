@@ -240,6 +240,33 @@
       </fields>
 -->
       <range-element-indexes>
+        <range-element-index>
+          <scalar-type>string</scalar-type>
+          <localname>BRAND_NAME</localname>
+          <collation>http://marklogic.com/collation/</collation>
+          <range-value-positions>false</range-value-positions>
+          <invalid-values>ignore</invalid-values>
+        </range-element-index>
+        <range-element-index>
+          <scalar-type>int</scalar-type>
+          <localname>MBR_AGE</localname>
+          <range-value-positions>false</range-value-positions>
+          <invalid-values>ignore</invalid-values>
+        </range-element-index>
+        <range-element-index>
+          <scalar-type>string</scalar-type>
+          <localname>PHARM_DESC1</localname>
+          <collation>http://marklogic.com/collation/</collation>
+          <range-value-positions>false</range-value-positions>
+          <invalid-values>ignore</invalid-values>
+        </range-element-index>
+        <range-element-index>
+          <scalar-type>string</scalar-type>
+          <localname>SRC_ASO_IND</localname>
+          <collation>http://marklogic.com/collation/</collation>
+          <range-value-positions>false</range-value-positions>
+          <invalid-values>ignore</invalid-values>
+        </range-element-index>
         <!--
         Sample for:
           <name xmlns="http://marklogic.com/ns/sample">bob<name>
