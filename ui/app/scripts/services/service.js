@@ -46,7 +46,7 @@ angular.module('app.service').service('ReportService', ['$http', '$q', 'MLRest',
         'query': {
           'queries': [{
             'directory-query': {
-              uri: ['/report/']
+              uri: ['/discovery-app/config/report/']
             }
           }]
         }
