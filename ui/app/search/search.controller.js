@@ -51,6 +51,10 @@
       ctrl.search();
     };
 
+    ctrl.showMoreFacets = function(facet, facetName) {
+      mlSearch.showMoreFacets(facet, facetName);
+    };
+
     $scope.$watch(userService.currentUser, function(newValue) {
       ctrl.currentUser = newValue;
     });
