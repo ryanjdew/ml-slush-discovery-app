@@ -36,7 +36,7 @@
 
         function hasMarkers() {
           var mapItems = _.filter(ctrl.facets, function (facet) {
-            return facet.boxes;
+            return facet.boxes && facet.boxes.length > 0;
           });
           return mapItems.length > 0;
         }
