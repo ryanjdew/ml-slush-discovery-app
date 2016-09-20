@@ -148,7 +148,7 @@
                   <a class="btn btn-xs btn-success" ng-click="reorderConstraint($index, $index - 1)"><span class="glyphicon glyphicon-chevron-up">&nbsp;</span></a>
                   <a class="btn btn-xs btn-danger" ng-click="reorderConstraint($index, $index + 1)"><span class="glyphicon glyphicon-chevron-down">&nbsp;</span></a>
                   </span>
-                  <input class="col-sm-10" type="text" ng-model="constraint.name" />
+                  <input class="col-sm-10" encoded-value type="text" ng-model="constraint.name" />
                 </td>
                 <td class="col-sm-3"><span ng-if="constraint.range">Range</span><span ng-if="constraint.word">Word</span><span ng-if="constraint.collection">Collection</span><span ng-if="!(constraint.collection || constraint.range || constraint.word)">Geospatial</span>: {{(constraint.range || constraint.word).field.name || (constraint.range || constraint.word).attribute.name || (constraint.range || constraint.word).element.name || constraint.collection.prefix}} (<span ng-if="(constraint.range || constraint.word).attribute">attribute</span><span ng-if="(constraint.range || constraint.word).element && !(constraint.range || constraint.word).attribute">element</span><span ng-if="(constraint.range || constraint.word).field">field</span><span ng-if="constraint.collection">prefix</span>)</td>
                 <td class="col-sm-1">
@@ -186,7 +186,7 @@
               <td>Default source: </td>
               <td>
                 <select ng-model="model.defaultSource">
-                  <option ng-repeat="option in model.suggestOptions track by $index" value="{{option.value}}" ng-selected="{{option.selected}}">{{option.name}}</option>
+                  <option ng-repeat="option in model.suggestOptions track by $index" value="{{option.value}}" ng-selected="{{option.selected}}">{{option.name | decodeString}}</option>
                 </select>
               </td>
             </tr>
@@ -210,7 +210,7 @@
             <tr>
               <th><input type="text" ng-model="model.newSortOptionName" /></th>
               <th>
-                <select ng-model="model.newSortOptionRange" ng-options="constraint as constraint.name for constraint in model.constraints | filter:{ range: {}}">
+                <select ng-model="model.newSortOptionRange" ng-options="constraint as constraint.name | decodeString for constraint in model.constraints | filter:{ range: {}}">
                 </select>
               </th>
               <th>
