@@ -91,9 +91,6 @@
             }
           )[0];
         model.newSortOptionDirection = 'ascending';
-        angular.forEach(model.constraints, function(constraint) {
-          constraint.name = decodeURIComponent(constraint.name);
-        });
         model.defaultSource = convertToOption(config.searchOptions);
         model.uiConfig = config.uiConfig;
         model.suggestOptions = constructDefaultSourceOptions(
@@ -304,7 +301,6 @@
         var constraints = [];
         angular.forEach(model.constraints, function(constraint) {
           var newConstraint = angular.copy(constraint);
-          newConstraint.name = encodeURIComponent(constraint.name);
           constraints.push(newConstraint);
         });
         model.searchOptions.options.constraint = constraints;

@@ -74,7 +74,9 @@
             message: message,
             buttons: buttons
           });
-          return dialog(modalOptions('template/messageBox/message.html', 'MessageBoxController', scope), function(result) {
+          return dialog(
+            modalOptions('template/messageBox/message.html', 'MessageBoxController', scope),
+            function(result) {
             var value = resultFn ? resultFn(result) : undefined;
             scope.$destroy();
             return value;
@@ -88,7 +90,11 @@
       $templateCache.put('template/messageBox/message.html',
         '<div class="modal-header"><h3>{{ title }}</h3></div>\n' +
         '<div class="modal-body"><p ng-bind-html="message"></p></div>\n' +
-        '<div class="modal-footer"><button ng-repeat="btn in buttons" ng-click="close(btn.result)" class="btn" ng-class="btn.cssClass">{{ btn.label }}</button></div>\n');
+        '<div class="modal-footer">' +
+        '<button ng-repeat="btn in buttons" ng-click="close(btn.result)" ' +
+        ' class="btn" ng-class="btn.cssClass">' +
+        '{{ btn.label }}</button>' +
+        '</div>\n');
     }
   ])
   .controller('MessageBoxController', ['$scope', '$uibModalInstance',
@@ -168,5 +174,21 @@
           }
         );
       };
-    });
+    })
+  .directive('encodedValue', function() {
+    return {
+      require: 'ngModel',
+      link: function(scope, element, attrs, ngModelController) {
+        ngModelController.$parsers.push(function(data) {
+          //convert data from view format to model format
+          return encodeURIComponent(data); //converted
+        });
+
+        ngModelController.$formatters.push(function(data) {
+          //convert data from model format to view format
+          return decodeURIComponent(data); //converted
+        });
+      }
+    }
+  });;
 }());
