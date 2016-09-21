@@ -14,7 +14,7 @@
     "font-awesome": "~4.5.0",
     "highlightjs": "~8.7.0",
     "lodash": "~3.10.1",
-    "ml-search-ng": "~0.2.0",
+    "ml-search-ng": "~0.2.7",
     "ml-utils": "withjam/ml-utils",
     "ng-json-explorer": "8c2a0f9104",
     "ng-sortable": "^1.3.3",
