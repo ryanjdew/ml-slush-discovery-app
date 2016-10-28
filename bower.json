@@ -25,7 +25,7 @@
     "ng-table": "~0.8.3",
     "angular-recursion": "~1.0.5",
     "highcharts": "^4.2",
-    "ml-highcharts-ng": ">=0.0.9",
+    "ml-highcharts-ng": ">=0.0.11",
     "angular-google-maps": "^2.2",
     "angular-ui-sortable": "^0.14.0",
     "ml-google-maps-ng": "^0.0.1",
