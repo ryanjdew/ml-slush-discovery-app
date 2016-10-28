@@ -308,6 +308,7 @@
           updateSearchResults().then(function() {
             $scope.state = 'appearance';
             $scope.redrawCharts();
+            $scope.getDefaultSourceOpts();
           });
         }, handleError);
       },
@@ -351,9 +352,6 @@
         model.sortOptions.state.splice(index, 1);
       },
       saveSortOptions: function() {
-        angular.forEach(model.searchOptions.options.constraint, function(constraint) {
-          constraint.name = encodeURIComponent(constraint.name);
-        });
         ServerConfig.setSearchOptions(model.searchOptions).then(function() {
           updateSearchResults().then(function() {
             $scope.state = 'appearance';
