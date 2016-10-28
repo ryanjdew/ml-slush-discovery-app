@@ -1,7 +1,7 @@
 <form ng-submit="search({ qtext: qtext })" class="ml-input ml-search form-inline" role="search">
   <div class="input-group">
     <input ng-model="qtext" type="text" class="form-control" placeholder="Search..." autocomplete="off"
-        uib-typeahead="suggestion for suggestion in suggest({ val: $viewValue })" typeahead-suggest-on-select="true" typeahead-loading="loadingSuggestions" typeahead-min-length="3" typeahead-editable="true"/>
+        uib-typeahead="suggestion | decodeString for suggestion in suggest({ val: $viewValue })" typeahead-suggest-on-select="true" typeahead-loading="loadingSuggestions" typeahead-min-length="3" typeahead-editable="true"/>
     <span ng-show="qtext" ng-click="clear()" class="search-input-icon search-input-clear form-control-feedback">
       <i class="fa fa-times-circle"></i>
     </span>

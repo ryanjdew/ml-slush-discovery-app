@@ -14,11 +14,13 @@
     })
     .filter('decodeString', function() {
       return function(input) {
-        try {
-          return decodeURIComponent(input);
-        } catch (e) {
-          return {};
+        if (input) {
+          try {
+            return decodeURIComponent(input);
+          } catch (e) {
+          }
         }
+        return '';
       };
     })
     .filter('stringToObject', function() {
