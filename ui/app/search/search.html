@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-sm-9" ng-class="{'col-sm-offset-1': !ctrl.hasPageExtensions }">
     <div class="col-md-12">
-      <ml-input qtext="ctrl.qtext" search="ctrl.search(qtext)" suggest="ctrl.suggest(val)" template="fa" class="search"></ml-input>
+      <ml-input qtext="ctrl.qtext" search="ctrl.search(qtext)" suggest="ctrl.suggest(val)" template="app/search/ml-input-fa.html" class="search"></ml-input>
     </div>
     <div class="right-col col-sm-3">
       <div class="facet" ng-repeat="(constraintName, constraint) in ctrl.dateTimeConstraints">

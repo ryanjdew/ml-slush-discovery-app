@@ -186,7 +186,7 @@
               <td>Default source: </td>
               <td>
                 <select ng-model="model.defaultSource">
-                  <option ng-repeat="option in model.suggestOptions track by $index" value="{{option.value}}" ng-selected="{{option.selected}}">{{option.name | decodeString}}</option>
+                  <option ng-repeat="option in model.suggestOptions track by $index" value="{{option.value}}" ng-selected="{{option.selected || option.name === model.defaultSource}}">{{option.name | decodeString}}</option>
                 </select>
               </td>
             </tr>
