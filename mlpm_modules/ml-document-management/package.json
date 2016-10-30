@@ -1,0 +1,51 @@
+{
+  "name": "ml-document-management",
+  "version": "0.1.0",
+  "description": "AngularJS library for working with MarkLogic and Highcharts",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.5.2",
+    "gulp-gh-pages": "^0.5.4",
+    "gulp-jshint": "^1.12.0",
+    "gulp-minify-html": "^1.0.3",
+    "gulp-ng-html2js": "^0.2.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-rm": "^1.0.0",
+    "gulp-uglify": "^1.2.0",
+    "jasmine-core": "^2.3.4",
+    "jquery": "^2.1.4",
+    "jsdoc": "^3.3.1",
+    "jsdoc-baseline": "git://github.com/hegemonic/jsdoc-baseline.git#887a5a5",
+    "karma": "^0.12.37",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-coverage": "^0.4.2",
+    "karma-jasmine": "^0.3.8",
+    "karma-ng-json2js-preprocessor": "^1.0.0",
+    "karma-phantomjs-launcher": "^0.2.0",
+    "minimatch": "^3.0.2",
+    "phantomjs": "^1.9.17",
+    "phantomjs-polyfill": "0.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ryanjdew/ml-highcharts-ng.git"
+  },
+  "keywords": [
+    "AngularJS",
+    "MarkLogic",
+    "Document Management"
+  ],
+  "author": "Ryan Dew <ryan.j.dew@gmail.com>",
+  "license": "Apache License 2.0",
+  "bugs": {
+    "url": "https://github.com/ryanjdew/ml-highcharts-ng/issues"
+  },
+  "homepage": "https://github.com/ryanjdew/ml-highcharts-ng",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-gh-pages": "^0.5.4"
+  }
+}

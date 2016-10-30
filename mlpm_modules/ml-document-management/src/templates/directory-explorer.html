@@ -1,0 +1,62 @@
+<ul class="list-unstyled list-striped">
+  <li ng-class="{'active': isEven}">
+    <div style="width:0;height:0;overflow:hidden"><input type="file" name="_hidden_uploader_file" multiple /></div>
+    <a ng-click="uploadFile($event)">
+      <small class="fa-stack">
+        <em class="fa fa-plus fa-stack-1x" aria-hidden="true">&nbsp;</em>
+        <em class="fa fa-file-o fa-stack-2x" aria-hidden="true">&nbsp;</em>
+      </small> Add File</a>
+  </li>
+  <li ng-class="{'active': !isEven}">
+    <a ng-click="createDirectory()">
+      <small class="fa-stack">
+        <em class="fa fa-plus fa-stack-1x" aria-hidden="true">&nbsp;</em>
+        <em class="fa fa-folder-o fa-stack-2x" aria-hidden="true">&nbsp;</em>
+      </small> Add Folder</a>
+      <div ng-if="$createDirectory">
+        <input type="text" ng-model="model.newDirectoryName" />
+        <button type="button" class="btn btn-primary" ng-click="submitDirectory()">Create</button>
+      </div>
+  </li>
+  <li ng-class="{'active': (isEven && $even) || (!isEven && $odd)}" class="parent-directory" ng-repeat="directory in directories">
+    <span ng-click="closeDirectory(directory)" ng-if="directory.$open">
+      <em class="fa fa-caret-down" aria-hidden="true">&nbsp;</em>
+      <em class="fa fa-folder-open" aria-hidden="true">&nbsp;</em>
+    </span>
+    <span ng-click="openDirectory(directory)" ng-if="!directory.$open">
+      <em class="fa fa-caret-right" aria-hidden="true">&nbsp;</em>
+      <em class="fa fa-folder" aria-hidden="true">&nbsp;</em>
+    </span>
+    {{directory.name}}
+    <div ng-if="directory.$open" class="col-sm-12">
+      <ml-directory-explorer sub-uri="subUri + directory.name + '/'" is-even="(isEven && $even) || (!isEven && $odd)"></ml-directory-explorer>
+    </div>
+  </li>
+  <li ng-class="{'active': (isEven && $even && (directories.length % 2 === 0)) || (!isEven && !($odd && directories.length % 2 === 1))}" ng-repeat="doc in dirFiles">
+    <div class="col-sm-12">
+    <div class="col-sm-3">
+      <a ng-href="/v1/documents?uri={{doc.document}}" target="_blank" download="{{doc.fileName}}">
+        <em class="fa fa-file-o" aria-hidden="true">&nbsp;</em>
+        {{doc.title || doc.fileName}}
+        <span ng-if="doc.title">({{doc.fileName}})</span>
+      </a>
+    </div>
+    <div class="col-sm-3">
+      <span title="{{doc.description}}">{{doc.description}}</span>
+    </div>
+    <div class="col-sm-1">
+      <a ng-click="model.documentVersionsModal(doc.fileName, doc.document)">{{doc.version}}</a>
+    </div>
+    <div class="col-sm-2 margin-top-sm">
+      <span title="{{doc.checkoutMessage}}" ng-if="doc.isCheckedout" class="label label-danger">Checked Out</span>
+      <span ng-if="!doc.isCheckedout" class="label label-success">Checked In</span>
+    </div>
+    <div class="col-sm-3">
+      <button ng-if="!doc.isCheckedout || doc.isCheckedout === 'false'" class="btn btn-sm btn-primary" ng-click="model.checkoutDocument(doc)" ng-disabled="doc.isCheckedout === 'true'">Checkout</button>
+      <button ng-if="doc.checkedoutByCurrentUser && doc.checkedoutByCurrentUser !== 'false'" class="btn btn-sm btn-success" ng-click="model.checkinDocument(doc)">Check-in</button>
+      <button ng-if="doc.checkedoutByCurrentUser && doc.checkedoutByCurrentUser !== 'false'" class="btn btn-sm btn-warning" ng-click="model.editDocumentModal(caseUri, doc, docsMeta)"><em class="fa fa-pencil"  aria-hidden="true">&nbsp;</em> Edit</button>
+      <button title="Archive Document" ng-if="!doc.isCheckedout || doc.isCheckedout === 'false'" class="btn btn-sm btn-danger" ng-click="model.archiveDocument(doc)"><em class="fa fa-archive"  aria-hidden="true">&nbsp;</em> Archive</button>
+    </div>
+    </div>
+  </li>
+</ul>

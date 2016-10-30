@@ -1,0 +1,28 @@
+{
+  "name": "ml-document-management-ng",
+  "authors": [
+    "Ryan Dew <ryan.j.dew@gmail.com>"
+  ],
+  "description": "Library for managing documents in MarkLogic",
+  "main": [
+    "dist/ml-document-management.css",
+    "dist/ml-document-management.js"
+  ],
+  "keywords": [
+    "MarkLogic",
+    "DLS",
+    "Documents"
+  ],
+  "license": "Apache 2.0",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ml-uploader": "^0.0.6"
+  }
+}

@@ -29,7 +29,8 @@
     "angular-google-maps": "^2.2",
     "angular-ui-sortable": "^0.14.0",
     "ml-google-maps-ng": "^0.0.1",
-    "angular-color-picker": "^1.0.10"
+    "angular-color-picker": "^1.0.10",
+    "ml-analytics-dashboard-ng": "^2.2.1"
   },
   "overrides": {
     "angular-highlightjs": {
@@ -48,7 +49,8 @@
   "resolutions": {
     "angular": "~1.5.3",
     "angular-bootstrap": "^1.1",
-    "lodash": "~3.10.1",
-    "highcharts": "^4.2"
+    "lodash": "~4.5.1",
+    "highcharts": "^4.2",
+    "angular-ui-sortable": "^0.14.0"
   }
 }

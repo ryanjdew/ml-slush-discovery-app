@@ -1,8 +1,0 @@
-<div class="form-group" ng-class="{ 'has-error' : indexForm.fieldname.$invalid && !indexForm.fieldname.$pristine }">
-  <label class="col-sm-4 control-label">fieldname <i class="fa fa-asterisk mandatory-field"></i></label>
-  <div class="col-sm-8">
-    <input type="text" name="fieldname" class="form-control" 
-           ng-model="current_index['field-name']" required />
-    <p ng-show="indexForm.fieldname.$invalid && !indexForm.fieldname.$pristine" class="help-block">field name uri is required.</p>
-  </div>
-</div>

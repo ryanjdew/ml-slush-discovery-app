@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "group-by": "1.1.*",
-    "ml-index-discovery": "2.0.*"
+    "ml-index-discovery": "2.0.*",
+    "analytics-dashboard": "0.0.*"
   }
 }

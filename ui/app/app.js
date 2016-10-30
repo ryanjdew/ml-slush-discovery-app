@@ -18,18 +18,13 @@
     'app.user',
     'ui.bootstrap',
     'ui.router',
-    'app.common',
-    'app.service',
     'ngRoute',
     'ngResource',
     'ngSanitize',
     'ui.dashboard',
     'ngTable',
-    'marklogic.widgets',
     'ml.google-maps',
-    'ml.report',
-    'ml-index-builder',
-    'compile'
+    'ml.analyticsDashboard'
   ]);
 
 }());
