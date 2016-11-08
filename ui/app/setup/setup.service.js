@@ -142,7 +142,7 @@
         }, $q.reject);
     };
 
-    var geospatialIndexTypes = ['geospatial-element-index', 'geospatial-element-pair-index'];
+    var geospatialIndexTypes = ['geospatial-element-index', 'geospatial-element-pair-index', 'geospatial-element-attribute-pair-index'];
     serverConfig.getGeospatialIndexes = function(cache) {
       return serverConfig.getDatabaseProperties(cache).then(
         function(dbProperties) {

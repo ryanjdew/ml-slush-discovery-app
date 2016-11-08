@@ -36,13 +36,13 @@
         'invalid-values': 'ignore'
       };
       var subPart = index[$scope.indexType];
-      if ($scope.indexType === 'geospatial-element-pair-index') {
+      if ($scope.indexType === 'geospatial-element-pair-index' || $scope.indexType === 'geospatial-element-attribute-pair-index') {
         subPart['parent-localname'] = $scope.index['parent-localname'];
         subPart['parent-namespace-uri'] = $scope.index['parent-namespace-uri'] || '';
-        subPart['latitude-localname'] = $scope.index['parent-localname'];
-        subPart['latitude-namespace-uri'] = $scope.index['parent-namespace-uri'] || '';
-        subPart['longitude-localname'] = $scope.index['parent-localname'];
-        subPart['longitude-namespace-uri'] = $scope.index['parent-namespace-uri'] || '';
+        subPart['latitude-localname'] = $scope.index['latitude-localname'];
+        subPart['latitude-namespace-uri'] = $scope.index['latitude-namespace-uri'] || '';
+        subPart['longitude-localname'] = $scope.index['longitude-localname'];
+        subPart['longitude-namespace-uri'] = $scope.index['longitude-namespace-uri'] || '';
       } else if ($scope.indexType === 'geospatial-element-index') {
         subPart.localname = $scope.index.localname;
         subPart['namespace-uri'] = $scope.index['namespace-uri'] || '';

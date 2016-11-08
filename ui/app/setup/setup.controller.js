@@ -442,7 +442,7 @@
               ns: value['longitude-namespace-uri'],
               name: value['longitude-localname']
             };
-          } else if (indexType === 'geospatial-attribute-pair-index') {
+          } else if (indexType === 'geospatial-element-attribute-pair-index') {
             constraint = {
               name: value['latitude-localname'] + ' ' + value['longitude-localname'],
               'geo-attr-pair': geoObj
