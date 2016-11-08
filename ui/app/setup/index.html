@@ -117,8 +117,8 @@
             </thead>
             <tbody>
               <tr ng-repeat="index in model.geospatialIndexes['geospatial-index-list'] track by $index">
-                <td><a ng-click="editGeospatialIndex(index)">{{index['geospatial-element-index'].localname || index['geospatial-element-pair-index']['parent-localname']}}</a></td>
-                <td>{{(index['geospatial-element-index'] || index['geospatial-element-pair-index'])['coordinate-system']}}</td>
+                <td><a ng-click="editGeospatialIndex(index)">{{index['geospatial-element-index'].localname || index['geospatial-element-pair-index']['parent-localname'] || index['geospatial-element-attribute-pair-index']['parent-localname']}}</a></td>
+                <td>{{(index['geospatial-element-index'] || index['geospatial-element-pair-index'] || index['geospatial-element-attribute-pair-index'])['coordinate-system']}}</td>
                 <td class="col-sm-1"><a class="pull-right" ng-click="removeGeospatialIndex($index)"><i class="glyphicon glyphicon-trash"></i></a></td>
               </tr>
             </tbody>

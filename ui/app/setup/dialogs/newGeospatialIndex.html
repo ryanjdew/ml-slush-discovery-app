@@ -13,6 +13,7 @@
         <select class="form-control" name="indexType" ng-model="indexType">
           <option value="geospatial-element-index">Geospatial Element</option>
           <option value="geospatial-element-pair-index">Geospatial Element Pair</option>
+          <option value="geospatial-element-attribute-pair-index">Geospatial Element Attribute Pair</option>
         </select>
       </div>
       <div class="form-group">
@@ -22,7 +23,7 @@
           <option value="raw">raw</option>
         </select>
       </div>
-      <div ng-if="indexType === 'geospatial-element-pair-index'">
+      <div ng-if="indexType === 'geospatial-element-pair-index' || indexType === 'geospatial-element-attribute-pair-index'">
         <div class="form-group">
           <label class="control-label">Parent Namespace</label>
           <input class="form-control" type="text" ng-model="index['parent-namespace-uri']">
