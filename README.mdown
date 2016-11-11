@@ -28,6 +28,8 @@ On Windows, that would be:
     ml.bat local bootstrap
     ml.bat local deploy modules
 
+**You may need to run the deploy modules command twice as there are some reports of a race condition causing it to fail. That issue will hopefully be resolved soon.**
+
 Install additional dependencies using the npm and bower package managers:
 
     npm install
