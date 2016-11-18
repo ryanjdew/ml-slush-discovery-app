@@ -360,7 +360,18 @@
         }, handleError);
       },
       resampleConstraints: function() {
-        model.constraints = [];
+        if (!model.constraints) {
+          model.constraints = [];
+        }
+        function constraintExists(constraint) {
+          var compareConstraint = angular.copy(constraint);
+          delete compareConstraint.name;
+          return _.some(model.constraints, function(existingConstraint) {
+            var existingCompareConstraint = angular.copy(existingConstraint);
+            delete existingCompareConstraint.name;
+            return angular.equals(existingCompareConstraint, compareConstraint);
+          });
+        }
         angular.forEach(model.rangeIndexes['range-index-list'], function(val) {
           var value = val['range-element-index'] ||
             val['range-element-attribute-index'] ||
@@ -399,7 +410,9 @@
                 'collation': value.collation
               };
             }
-            model.constraints.push(constraint);
+            if (!constraintExists(constraint)) {
+              model.constraints.push(constraint);
+            }
           }
         });
         angular.forEach(model.geospatialIndexes['geospatial-index-list'], function(val) {
@@ -408,12 +421,12 @@
           var constraint;
           var geoObj = {
             heatmap: {
-              s: 23.2,
-              w: -118.3,
-              n: 23.3,
-              e: -118.2,
-              latdivs: 4,
-              londivs: 4
+              s: -85,
+              w: -180,
+              n: 85,
+              e: 180,
+              latdivs: 50,
+              londivs: 50
             }
           };
           if (indexType === 'geospatial-element-index') {
@@ -466,7 +479,7 @@
             };
             geoObj['path-index'] = value['path-index'];
           }
-          if (constraint) {
+          if (constraint && !constraintExists(constraint)) {
             model.constraints.push(constraint);
           }
         });
@@ -481,7 +494,9 @@
                 }
               }
             };
-            model.constraints.push(constraint);
+            if (constraint && !constraintExists(constraint)) {
+              model.constraints.push(constraint);
+            }
           }
         });
       },
