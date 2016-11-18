@@ -4,6 +4,7 @@
       <cts:not-query>
         <cts:directory-query depth="infinity">
           <cts:uri>/discovery-app/config/</cts:uri>
+          <cts:uri>/ml-analytics-dashboard-reports/</cts:uri>
         </cts:directory-query>
       </cts:not-query>
       <cts:or-query>

@@ -1,0 +1,10 @@
+{
+  "name": "ml-document-management",
+  "version": "0.0.2",
+  "description": "Library for managing documents in MarkLogic",
+  "repository": "git@github.com:ryanjdew/ml-document-management.git",
+  "dependencies": {
+    "marklogic-xml-diff": "0.1.*"
+  },
+  "gitHead": "650ff6d562eb1fcb09adb80715044e3ec3fe70e1"
+}

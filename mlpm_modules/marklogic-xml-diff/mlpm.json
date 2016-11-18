@@ -1,0 +1,11 @@
+{
+  "name": "marklogic-xml-diff",
+  "version": "0.1.0",
+  "description": "MarkLogic XQuery library to annotate different versions of XML with attributes and elements indicating differences.",
+  "repository": "https://github.com/ryanjdew/marklogic-xml-diff.git",
+  "dependencies": {
+    "XQuery-XML-Memory-Operations": "1.0.*",
+    "xq3-ml-extensions": "0.1.*"
+  },
+  "gitHead": "6840d99715dae383a201687451f6d2b1d2bab557"
+}
