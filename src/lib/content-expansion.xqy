@@ -127,16 +127,36 @@ declare function expand:enrich-text($elem) {
         <options xmlns="cts:distinctive-terms">
           <max-terms>30</max-terms>
         </options>
-      )/cts:term[every $text in .//cts:text satisfies not(matches($text, '^\d+$') or map:contains($stop-words, fn:lower-case($text)))]
+      )/cts:term[some $text in .//cts:text satisfies not(matches($text, '^\d+$') or map:contains($stop-words, fn:lower-case($text)))]
   )
-  let $query := cts:or-query($terms/*/cts:query(.))
-  return
+  let $query := cts:or-query(
+    for $query in $terms/*
+    return
+      if ($query instance of element(cts:near-query)) then
+        fn:string-join($query//cts:text, " ")
+      else
+        cts:query($query)
+
+  )
+  return (
+    $query,
     cts:highlight($elem, $query,
       if (fn:count($cts:queries) eq 1 or (every $q in $cts:queries satisfies expand:matches-entire-text($q,$cts:text))) then
-        element tag { $cts:text }
+        element tag {
+          let $tokens := cts:tokenize(fn:substring($cts:node, $cts:start))
+          let $last-token-index := fn:index-of($tokens, cts:tokenize(cts:word-query-text($cts:queries))[fn:last()], "http://marklogic.com/collation//S1")[1]
+          return
+            fn:normalize-space(
+              if (fn:exists($last-token-index)) then
+                fn:string-join(fn:subsequence($tokens, 1, $last-token-index), "")
+              else
+                $cts:text
+            )
+       }
      else
         xdmp:set($cts:action, "continue")
    )
+ )
 };
 
 declare function expand:binary(
