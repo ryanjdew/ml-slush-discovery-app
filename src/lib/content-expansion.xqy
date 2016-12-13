@@ -112,18 +112,31 @@ declare function expand:decode-hex($hexBinary as document-node())
     }
 };
 
+declare
+function expand:matches-entire-text(
+  $q as cts:query,
+  $matching-text as xs:string)
+ as xs:boolean {
+  $matching-text = cts:walk(element t {$matching-text},$q,$cts:text)
+};
+
 declare function expand:enrich-text($elem) {
   let $terms := (
     cts:distinctive-terms(
-      text { lower-case(fn:string($elem)) },
-      <options xmlns="cts:distinctive-terms">
-        <max-terms>30</max-terms>
-      </options>
-    )/cts:term[empty(.//cts:text[matches(., '^\d+$') or map:contains($stop-words, .)])]
-  )[1 to 10]
-  let $query := cts:and-query($terms/*/cts:query(.))
+        text { lower-case(fn:string($elem)) },
+        <options xmlns="cts:distinctive-terms">
+          <max-terms>30</max-terms>
+        </options>
+      )/cts:term[every $text in .//cts:text satisfies not(matches($text, '^\d+$') or map:contains($stop-words, fn:lower-case($text)))]
+  )
+  let $query := cts:or-query($terms/*/cts:query(.))
   return
-    cts:highlight($elem, $query, element tag { $cts:text })
+    cts:highlight($elem, $query,
+      if (fn:count($cts:queries) eq 1 or (every $q in $cts:queries satisfies expand:matches-entire-text($q,$cts:text))) then
+        element tag { $cts:text }
+     else
+        xdmp:set($cts:action, "continue")
+   )
 };
 
 declare function expand:binary(
