@@ -3,12 +3,12 @@
   'use strict';
 
   angular.module('app.search')
-    .controller('SearchCtrl', SearchCtrl);
+  .controller('SearchCtrl', SearchCtrl);
 
   SearchCtrl.$inject = [
-    '$scope', '$location', '$window',
-    'userService', 'MLSearchFactory', 'RegisteredComponents',
-    'ServerConfig', 'MLQueryBuilder'
+  '$scope', '$location', '$window',
+  'userService', 'MLSearchFactory', 'RegisteredComponents',
+  'ServerConfig', 'MLQueryBuilder'
   ];
 
   // inherit from MLSearchController
@@ -19,9 +19,11 @@
     $scope, $location, $window,
     userService, searchFactory,
     RegisteredComponents, ServerConfig, qb
-  ) {
+    ) {
     var ctrl = this;
     var mlSearch = searchFactory.newContext();
+
+    
 
     ctrl.pageExtensions = RegisteredComponents.pageExtensions();
 
@@ -77,11 +79,11 @@
         function(val) {
           return val.name === 'sort';
         }
-      )[0] || { state: []}).state;
+        )[0] || { state: []}).state;
 
       angular.forEach(data.options.constraint, function(constraint) {
         if (constraint.range && (constraint.range.type === 'xs:date' ||
-             constraint.range.type === 'xs:dateTime')) {
+         constraint.range.type === 'xs:dateTime')) {
           ctrl.dateTimeConstraints[constraint.name] = {
             name: constraint.name,
             type: constraint.range.type
@@ -92,7 +94,61 @@
       MLSearchController.call(ctrl, $scope, $location, mlSearch);
 
       ctrl.init();
-    });
+
+      // add in components for d3.cloud
+      // override the updateSearchResults function from superCtrl to append a call to updateCloud..
+      ctrl.updateSearchResults = function updateSearchResults(data) {
+        superCtrl.updateSearchResults.apply(ctrl, arguments);
+        ctrl.updateCloud(data);
+        return ctrl;
+      };
+
+      ctrl.words = [];
+
+      ctrl.updateCloud = function(data) {
+        if (data && data.facets && data.facets.TagCloud) {
+          ctrl.words = [];
+          var activeFacets = [];
+
+      // find all selected facet values..
+      angular.forEach(mlSearch.getActiveFacets(), function(facet, key) {
+        angular.forEach(facet.values, function(value, index) {
+          activeFacets.push((value.value+'').toLowerCase());
+        });
+      });
+
+      angular.forEach(data.facets.TagCloud.facetValues, function(value, index) {
+        var q = (ctrl.qtext || '').toLowerCase();
+        var val = value.name.toLowerCase();
+
+        // suppress search terms, and selected facet values from the D3 cloud..
+        if (q.indexOf(val) < 0 && activeFacets.indexOf(val) < 0) {
+          ctrl.words.push({name: value.name, score: value.count});
+        }
+      });
+    }
+  };
+
+  ctrl.noRotate = function(word) {
+    return 0;
+  };
+
+  ctrl.cloudEvents = {
+    'dblclick': function(tag) {
+      // stop propagation
+      d3.event.stopPropagation();
+
+      // undo default behavior of browsers to select at dblclick
+      var body = document.getElementsByTagName('body')[0];
+      window.getSelection().collapse(body,0);
+
+      // custom behavior, for instance search on dblclick
+      ctrl.search((ctrl.qtext ? ctrl.qtext + ' ' : '') + tag.text.toLowerCase());
+    }
+  };
+
+  // end of d3cloud section 
+});
 
     // implement superCtrl extension method
     ctrl.parseExtraURLParams = function () {
@@ -130,10 +186,10 @@
       });
       angular.forEach($location.search(), function(val, key) {
         if ((key.indexOf('startDate:') === 0 && !ctrl.pickerDateStart[key.substr(10)]) ||
-            (key.indexOf('endDate:') === 0 && !ctrl.pickerDateEnd[key.substr(8)])) {
+          (key.indexOf('endDate:') === 0 && !ctrl.pickerDateEnd[key.substr(8)])) {
           $location.search(key, null);
-        }
-      });
+      }
+    });
     };
 
     ctrl._search = function () {
@@ -143,8 +199,8 @@
           mlSearch.addAdditionalQuery(
             qb.and(
               ctrl.dateFilters[key]
-            )
-          );
+              )
+            );
         }
       }
       superCtrl._search.call(ctrl);
@@ -166,14 +222,14 @@
       ctrl.dateFilters[constraintName] = [];
       if (ctrl.pickerDateStart[constraintName] && ctrl.pickerDateStart[constraintName] !== '') {
         var startValue =
-          _constraintToDateTime(constraintName, ctrl.pickerDateStart[constraintName]);
+        _constraintToDateTime(constraintName, ctrl.pickerDateStart[constraintName]);
         ctrl.dateFilters[constraintName]
-          .push(qb.ext.rangeConstraint(constraintName, 'GE', startValue));
+        .push(qb.ext.rangeConstraint(constraintName, 'GE', startValue));
       }
       if (ctrl.pickerDateEnd[constraintName] && ctrl.pickerDateEnd[constraintName] !== '') {
         var endValue = _constraintToDateTime(constraintName, ctrl.pickerDateEnd[constraintName]);
         ctrl.dateFilters[constraintName]
-          .push(qb.ext.rangeConstraint(constraintName, 'LE', endValue));
+        .push(qb.ext.rangeConstraint(constraintName, 'LE', endValue));
       }
     };
 

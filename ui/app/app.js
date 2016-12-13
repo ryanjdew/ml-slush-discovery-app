@@ -24,7 +24,8 @@
     'ui.dashboard',
     'ngTable',
     'ml.google-maps',
-    'ml.analyticsDashboard'
+    'ml.analyticsDashboard',
+    'd3.cloud'
   ]);
 
 }());

@@ -49,6 +49,9 @@
       </div>
     </div>
   </div>
+  <div class="col-sm-3">
+    <d3-cloud words="ctrl.words" padding="0" rotate="ctrl.noRotate(word)" events="ctrl.cloudEvents"></d3-cloud>
+  </div>
   <div ng-show="ctrl.hasPageExtensions" class="col-sm-3">
     <uib-accordion ng-repeat="pageExtension in ctrl.pageExtensions" close-others="false" ng-show="pageExtension.active" ng-init="pageExtension.open = true">
       <uib-accordion-group is-open="pageExtension.open">

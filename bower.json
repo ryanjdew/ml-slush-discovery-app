@@ -30,7 +30,8 @@
     "angular-ui-sortable": "^0.14.0",
     "ml-google-maps-ng": "^0.0.1",
     "angular-color-picker": "^1.0.10",
-    "ml-analytics-dashboard-ng": "^2.2.1"
+    "ml-analytics-dashboard-ng": "^2.2.1",
+    "d3-cloud-ng": "^0.9.6"
   },
   "overrides": {
     "angular-highlightjs": {
