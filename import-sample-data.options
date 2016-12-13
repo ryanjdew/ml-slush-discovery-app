@@ -1,7 +1,7 @@
 import
 
 -input_file_path
-sample-data.zip
+sample-content/sample-data.zip
 
 -input_compressed
 
