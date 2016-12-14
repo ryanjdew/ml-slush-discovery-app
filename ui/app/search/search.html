@@ -52,15 +52,12 @@
   <div class="col-sm-3">
       <d3-cloud words="ctrl.words" padding="0" rotate="ctrl.noRotate(word)" events="ctrl.cloudEvents"></d3-cloud>
       <!-- Large modal -->
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Large modal</button>
-
-      <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-        <div class="modal-dialog modal-lg" role="document">
-          <div class="modal-content" >fdsa
-            <d3-cloud words="ctrl.words" padding="0" rotate="ctrl.noRotate(word)" events="ctrl.cloudEvents">asdf</d3-cloud>
-          </div>
+      <button type="button" class="btn btn-primary" ng-click="ctrl.d3cloudModal()">Large modal</button>
+      <script type="text/ng-template" id="d3cloudModal.html">
+        <div class="modal-body" >
+          <d3-cloud words="ctrl.words" padding="0" rotate="ctrl.noRotate(word)" events="ctrl.cloudEvents"></d3-cloud>
         </div>
-      </div>
+      </script>
     <uib-accordion ng-repeat="pageExtension in ctrl.pageExtensions" close-others="false" ng-show="pageExtension.active" ng-init="pageExtension.open = true">
       <uib-accordion-group is-open="pageExtension.open">
         <uib-accordion-heading>

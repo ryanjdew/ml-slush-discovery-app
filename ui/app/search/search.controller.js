@@ -6,7 +6,7 @@
   .controller('SearchCtrl', SearchCtrl);
 
   SearchCtrl.$inject = [
-  '$scope', '$location', '$window',
+  '$scope', '$location', '$window', '$timeout', '$uibModal',
   'userService', 'MLSearchFactory', 'RegisteredComponents',
   'ServerConfig', 'MLQueryBuilder'
   ];
@@ -16,14 +16,14 @@
   SearchCtrl.prototype = Object.create(superCtrl);
 
   function SearchCtrl(
-    $scope, $location, $window,
+    $scope, $location, $window, $timeout, $uibModal,
     userService, searchFactory,
     RegisteredComponents, ServerConfig, qb
     ) {
     var ctrl = this;
     var mlSearch = searchFactory.newContext();
 
-    
+
 
     ctrl.pageExtensions = RegisteredComponents.pageExtensions();
 
@@ -147,7 +147,7 @@
     }
   };
 
-  // end of d3cloud section 
+  // end of d3cloud section
 });
 
     // implement superCtrl extension method
@@ -284,6 +284,30 @@
         ctrl.mlSearch.toggleFacet(chart.dataPointNameMLConstraint, name);
       }
       ctrl.search();
+    };
+
+    ctrl.d3cloudModal = function() {
+      $uibModal.open({
+        ariaDescribedBy: 'modal-body',
+        templateUrl: 'd3cloudModal.html',
+        controller: ['words', function(words) {
+          var $ctrl = this;
+          $timeout(function() {
+            $ctrl.words = words;
+            $ctrl.noRotate = function(word) {
+              return 0;
+            };
+            $ctrl.cloudEvents = ctrl.cloudEvents;
+          });
+        }],
+        controllerAs: 'ctrl',
+        size: 'lg',
+        resolve: {
+          words: function () {
+            return ctrl.words;
+          }
+        }
+      });
     };
   }
 }());
