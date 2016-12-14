@@ -139,25 +139,35 @@ declare function expand:enrich-text($elem) {
 
   )
   return (
-    $query,
-    cts:highlight($elem, $query,
+    cts:walk($elem, $query,
       if (fn:count($cts:queries) eq 1 or (every $q in $cts:queries satisfies expand:matches-entire-text($q,$cts:text))) then
-        element tag {
+        (element tag {
           let $tokens := cts:tokenize(fn:substring($cts:node, $cts:start))
-          let $last-token-index := fn:index-of($tokens, cts:tokenize(cts:word-query-text($cts:queries))[fn:last()], "http://marklogic.com/collation//S1")[1]
+          let $last-token-index := fn:index-of($tokens, cts:tokenize(cts:word-query-text($cts:queries[. instance of cts:word-query][1]))[fn:last()], "http://marklogic.com/collation//S1")[1]
           return
-            fn:normalize-space(
-              if (fn:exists($last-token-index)) then
-                fn:string-join(fn:subsequence($tokens, 1, $last-token-index), "")
-              else
-                $cts:text
+            fn:lower-case(
+              fn:normalize-space(
+                if (fn:exists($last-token-index)) then
+                  fn:string-join(fn:subsequence($tokens, 1, $last-token-index) ! expand:normalized-word(.), "")
+                else
+                  expand:normalized-word($cts:text)
+              )
             )
-       }
+       })[. ne ""]
      else
         xdmp:set($cts:action, "continue")
    )
  )
 };
+
+declare function expand:normalized-word($word) {
+  (
+    for $stem in cts:stem(fn:lower-case($word))
+    order by fn:string-length($stem) ascending
+    return $stem
+  )[1]
+};
+
 
 declare function expand:binary(
   $uri as xs:string,
@@ -175,14 +185,17 @@ declare function expand:binary(
       }
     else
       xdmp:document-filter($content)
-  let $new-metadata := expand:enrich-text($metadata)
+  let $tags := expand:enrich-text($metadata)
   return (
     xdmp:document-insert($uri || ".xml",
       element binary-details {
         element binary-file-location {$uri},
         element binary-content-type {$content-type},
         element metadata {
-          $new-metadata
+          $metadata
+        },
+        element tags {
+          $tags
         }
       },
       (
