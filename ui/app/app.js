@@ -18,11 +18,6 @@
     'app.user',
     'ui.bootstrap',
     'ui.router',
-    'ngRoute',
-    'ngResource',
-    'ngSanitize',
-    'ui.dashboard',
-    'ngTable',
     'ml.google-maps',
     'ml.analyticsDashboard'
   ]);
