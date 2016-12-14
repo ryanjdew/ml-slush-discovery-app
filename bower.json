@@ -44,6 +44,7 @@
     "angular": "~1.5.3",
     "angular-bootstrap": "^1.1",
     "lodash": "~4.5.1",
-    "highcharts": "^4.2"
+    "highcharts": "^4.2",
+    "highcharts-ng": "~0.0.12"
   }
 }
