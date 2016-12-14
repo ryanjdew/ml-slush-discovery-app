@@ -13,7 +13,7 @@
     "bootstrap": "~3.3.5",
     "font-awesome": "~4.5.0",
     "highlightjs": "~8.7.0",
-    "lodash": "~3.10.1",
+    "lodash": ">= 2.4.x < 4",
     "ml-search-ng": "~0.2.7",
     "ml-utils": "withjam/ml-utils",
     "ng-json-explorer": "8c2a0f9104",
@@ -43,7 +43,7 @@
   "resolutions": {
     "angular": "~1.5.3",
     "angular-bootstrap": "^1.1",
-    "lodash": "~4.5.1",
+    "lodash": "~3.10.1",
     "highcharts": "^4.2",
     "highcharts-ng": "~0.0.12"
   }
