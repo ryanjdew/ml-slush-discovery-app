@@ -35,12 +35,19 @@
       <button class="btn btn-primary" type="button" ng-click="setDatabase()">Set Database</button>
       <h4>Load Data</h4>
       <div class="form-group">
-        <label class="control-label">Directory</label>
         <div ng-show="isUploading">
           <uib-progressbar max="currentFilesToUpload" value="currentFilesUploaded"></uib-progressbar>
         </div>
         <div ng-hide="isUploading">
-          <input class="form-control" id="directoryUploader" name="directory" type="file" multiple webkitdirectory>
+          <div class="form-group">
+            <label class="control-label" for="uploadType">Upload Type</label>
+            <select name="uploadType" ng-model="model.uploadType">
+              <option value="file">File</option>
+              <option ng-if="isInputDirSupported()" value="directory">Directory</option>
+            </select>
+          </div>
+          <input ng-if="model.uploadType === 'directory'" class="form-control" id="directoryUploader" name="directory" type="file" directory mozDirectory webkitdirectory />
+          <input ng-if="model.uploadType === 'file'" class="form-control" id="fileUploader" name="file" type="file" multiple/>
         </div>
         <label class="control-label">Upload with Collections <a ng-click="model.uploadCollections.push('')"><i class="glyphicon glyphicon-plus-sign"></i> Add</a></label>
         <div ng-repeat="collection in model.uploadCollections track by $index" class="col-sm-12">

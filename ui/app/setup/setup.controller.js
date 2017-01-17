@@ -26,7 +26,8 @@
     CommonUtil, UIService
   ) {
     var model = {
-      uploadCollections: []
+      uploadCollections: [],
+      uploadType: 'file'
     };
     var mlSearch = searchFactory.newContext();
 
@@ -111,6 +112,18 @@
       },
       state: 'database',
       mlSearch: mlSearch,
+      isInputDirSupported: function() {
+        var tmpInput = document.createElement('input');
+        if ('webkitdirectory' in tmpInput ||
+            'mozdirectory' in tmpInput ||
+             'odirectory' in tmpInput ||
+             'msdirectory' in tmpInput ||
+             'directory' in tmpInput) {
+          return true;
+        }
+
+        return false;
+      },
       setDatabase: function() {
         ServerConfig.setDatabase({
           'database-name': model.databaseName
@@ -171,7 +184,7 @@
         });
       },
       loadData: function() {
-        var uploaderInput = document.getElementById('directoryUploader');
+        var uploaderInput = document.getElementById(model.uploadType + 'Uploader');
         var allFiles = ServerConfig.arrangeFiles(uploaderInput.files);
         $scope.isUploading = true;
         $scope.currentFilesToUpload = allFiles.length;
