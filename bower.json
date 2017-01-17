@@ -18,7 +18,7 @@
     "ml-utils": "withjam/ml-utils",
     "ng-json-explorer": "8c2a0f9104",
     "ng-sortable": "^1.3.3",
-    "vkbeautify-wrapper": "*",
+    "vkbeautify": "https://github.com/kayhadrin/vkBeautify.git",
     "highcharts": "^4.2",
     "ml-highcharts-ng": ">=0.0.11",
     "angular-google-maps": "^2.2",

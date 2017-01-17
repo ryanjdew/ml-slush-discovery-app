@@ -3,9 +3,9 @@
   angular.module('app.detail')
     .controller('DetailCtrl', DetailCtrl);
 
-  DetailCtrl.$inject = ['$scope', 'doc', 'RegisteredComponents', '$stateParams'];
+  DetailCtrl.$inject = ['$scope', 'doc', 'RegisteredComponents', '$stateParams', '$sce'];
 
-  function DetailCtrl($scope, doc, RegisteredComponents, $stateParams) {
+  function DetailCtrl($scope, doc, RegisteredComponents, $stateParams, $sce) {
     var ctrl = this;
 
     ctrl.pageExtensions = RegisteredComponents.pageExtensions();
@@ -80,7 +80,7 @@
         }
         var body = html.getElementsByTagName('body')[0];
         if (body) {
-          ctrl.html = body.innerHTML;
+          ctrl.html = $sce.trustAsHtml(body.innerHTML);
         }
       } else {
         ctrl.type = 'xml';
