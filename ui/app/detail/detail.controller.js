@@ -23,7 +23,7 @@
 
     ctrl.defaultTab = 0;
 
-    ctrl.html = doc.data.html;
+    ctrl.html = $sce.trustAsHtml(doc.data.html);
 
     var x2js = new X2JS();
     if (doc.data.json) {
