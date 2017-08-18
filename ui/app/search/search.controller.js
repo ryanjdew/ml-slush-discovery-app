@@ -217,7 +217,7 @@
       if (isFacetConstraint(chart.xAxisCategoriesMLConstraint)) {
         ctrl.mlSearch.toggleFacet(chart.xAxisCategoriesMLConstraint, xCategory);
       } else if (isFacetConstraint(chart.xAxisMLConstraint)) {
-        ctrl.mlSearch.toggleFacet(chart.yAxisMLConstraint, x);
+        ctrl.mlSearch.toggleFacet(chart.xAxisMLConstraint, x);
       } else if (isFacetConstraint(chart.yAxisMLConstraint)) {
         ctrl.mlSearch.toggleFacet(chart.yAxisMLConstraint, y);
       } else if (isFacetConstraint(chart.zAxisMLConstraint)) {
