@@ -50,29 +50,6 @@
       $scope.error = response.data.message || response.data;
     }
 
-    function constructDefaultSourceOptions(inContraints, inDefaultSource) {
-      var options = [];
-      angular.forEach(inContraints, function(val) {
-        if (val.range && val.range.type === 'xs:string') {
-          var option = {
-            name: val.name,
-            value: val.name
-          };
-          options.push(option);
-        }
-      });
-      return options;
-    }
-
-    function convertToOption(inDefaultSource) {
-      var result = [];
-      if (inDefaultSource && inDefaultSource.options['default-suggestion-source']) {
-        var ref = inDefaultSource.options['default-suggestion-source'].ref;
-        result.push(ref);
-      }
-      return result.join('|');
-    }
-
     updateSearchResults();
 
     function init() {
@@ -91,13 +68,7 @@
               return val.name === 'sort';
             }
           )[0];
-        model.newSortOptionDirection = 'ascending';
-        model.defaultSource = convertToOption(config.searchOptions);
         model.uiConfig = config.uiConfig;
-        model.suggestOptions = constructDefaultSourceOptions(
-          model.constraints,
-          model.defaultSource
-        );
         model.databaseOptions = config.databases;
         $scope.$emit('uiConfigChanged', model.uiConfig);
       });
@@ -170,17 +141,6 @@
             return a.toLowerCase().localeCompare(b.toLowerCase());
           });
           model.databaseName = dbName;
-        });
-      },
-      addConstraint: function() {
-        EditConstraintDialog(model.rangeIndexes['range-index-list']).then(function(constraint) {
-          model.constraints.push(constraint);
-        });
-      },
-      editConstraint: function(index) {
-        EditConstraintDialog(model.rangeIndexes['range-index-list'], model.constraints[index])
-        .then(function(constraint) {
-          model.constraints[index] = constraint;
         });
       },
       loadData: function() {
@@ -301,215 +261,6 @@
         fieldDialog(field).then(function(field) {
           if (field) {
             ServerConfig.setFields(model.fields).then(updateSearchResults, handleError);
-          }
-        });
-      },
-      removeConstraint: function(index) {
-        model.constraints.splice(index, 1);
-      },
-      reorderConstraint: function(index, newIndex) {
-        CommonUtil.moveArrayItem(model.constraints, index, newIndex);
-      },
-      submitConstraints: function() {
-        var constraints = [];
-        angular.forEach(model.constraints, function(constraint) {
-          var newConstraint = angular.copy(constraint);
-          constraints.push(newConstraint);
-        });
-        model.searchOptions.options.constraint = constraints;
-        ServerConfig.setSearchOptions(model.searchOptions).then(function() {
-          updateSearchResults().then(function() {
-            $scope.state = 'appearance';
-            $scope.redrawCharts();
-            $scope.getDefaultSourceOpts();
-          });
-        }, handleError);
-      },
-      saveDefaultSource: function() {
-        var chosenOption = model.defaultSource;
-        model.searchOptions.options['default-suggestion-source'] = {
-          'ref': chosenOption
-        };
-        model.searchOptions.options['suggestion-source'] = [];
-        angular.forEach(model.searchOptions.options.constraint, function(constraint) {
-          if (constraint.range && constraint.range.type === 'xs:string') {
-            model.searchOptions.options['suggestion-source'].push({ ref: constraint.name });
-          }
-        });
-        ServerConfig.setSearchOptions(model.searchOptions).then(updateSearchResults, handleError);
-      },
-      getDefaultSourceOpts: function() {
-        model.suggestOptions = constructDefaultSourceOptions(
-          model.searchOptions.options.constraint,
-          model.defaultSource
-        );
-      },
-      addSortOption: function() {
-        if (model.newSortOptionName && model.newSortOptionRange) {
-          var selectedRange = model.newSortOptionRange.range;
-          model.sortOptions.state.push({
-            name: encodeURIComponent(model.newSortOptionName),
-            'sort-order': [
-              {
-                direction: model.newSortOptionDirection,
-                element: selectedRange.element,
-                attribute: selectedRange.attribute,
-                field: selectedRange.field,
-                'json-property': selectedRange['json-property']
-              }
-            ]
-          });
-        }
-      },
-      removeSortOption: function(index) {
-        model.sortOptions.state.splice(index, 1);
-      },
-      saveSortOptions: function() {
-        ServerConfig.setSearchOptions(model.searchOptions).then(function() {
-          updateSearchResults().then(function() {
-            $scope.state = 'appearance';
-            $scope.redrawCharts();
-          });
-        }, handleError);
-      },
-      resampleConstraints: function() {
-        if (!model.constraints) {
-          model.constraints = [];
-        }
-        function constraintExists(constraint) {
-          var compareConstraint = angular.copy(constraint);
-          delete compareConstraint.name;
-          return _.some(model.constraints, function(existingConstraint) {
-            var existingCompareConstraint = angular.copy(existingConstraint);
-            delete existingCompareConstraint.name;
-            return angular.equals(existingCompareConstraint, compareConstraint);
-          });
-        }
-        angular.forEach(model.rangeIndexes['range-index-list'], function(val) {
-          var value = val['range-element-index'] ||
-            val['range-element-attribute-index'] ||
-            val['range-field-index'] ||
-            val['range-path-index'];
-          var name = value.localname || value['field-name'] || value['path-expression'];
-          if (name && name !== '') {
-            var constraint = {
-              'name': name,
-              'range': {
-                'type': 'xs:' + value['scalar-type'],
-                'facet': true,
-                'facet-option': [
-                  'limit=10',
-                  'frequency-order',
-                  'descending'
-                ],
-                'collation': value.collation
-              }
-            };
-            if (value.localname) {
-              constraint.range.element = {
-                'name': (value['parent-localname'] || value.localname),
-                'ns': (value['parent-namespace-uri'] || value['namespace-uri'])
-              };
-            }
-            if (value['parent-localname']) {
-              constraint.range.attribute = {
-                'name': value.localname,
-                'ns': value['namespace-uri']
-              };
-            }
-            if (value['field-name']) {
-              constraint.range.field = {
-                'name': value['field-name'],
-                'collation': value.collation
-              };
-            }
-            if (!constraintExists(constraint)) {
-              model.constraints.push(constraint);
-            }
-          }
-        });
-        angular.forEach(model.geospatialIndexes['geospatial-index-list'], function(val) {
-          var indexType = Object.keys(val)[0];
-          var value = val[indexType];
-          var constraint;
-          var geoObj = {
-            heatmap: {
-              s: -85,
-              w: -180,
-              n: 85,
-              e: 180,
-              latdivs: 50,
-              londivs: 50
-            }
-          };
-          if (indexType === 'geospatial-element-index') {
-            constraint = {
-              name: value.localname,
-              'geo-elem': geoObj
-            };
-            geoObj.element = {
-              ns: value['namespace-uri'],
-              name: value.localname
-            };
-          } else if (indexType === 'geospatial-element-pair-index') {
-            constraint = {
-              name: value['latitude-localname'] + ' ' + value['longitude-localname'],
-              'geo-elem-pair': geoObj
-            };
-            geoObj.parent = {
-              ns: value['parent-namespace-uri'],
-              name: value['parent-localname']
-            };
-            geoObj.lat = {
-              ns: value['latitude-namespace-uri'],
-              name: value['latitude-localname']
-            };
-            geoObj.lon = {
-              ns: value['longitude-namespace-uri'],
-              name: value['longitude-localname']
-            };
-          } else if (indexType === 'geospatial-element-attribute-pair-index') {
-            constraint = {
-              name: value['latitude-localname'] + ' ' + value['longitude-localname'],
-              'geo-attr-pair': geoObj
-            };
-            geoObj.parent = {
-              ns: value['parent-namespace-uri'],
-              name: value['parent-localname']
-            };
-            geoObj.lat = {
-              ns: value['latitude-namespace-uri'],
-              name: value['latitude-localname']
-            };
-            geoObj.lon = {
-              ns: value['longitude-namespace-uri'],
-              name: value['longitude-localname']
-            };
-          } else if (indexType === 'geospatial-path-index') {
-            constraint = {
-              name: value['path-index'],
-              'geo-path': geoObj
-            };
-            geoObj['path-index'] = value['path-index'];
-          }
-          if (constraint && !constraintExists(constraint)) {
-            model.constraints.push(constraint);
-          }
-        });
-        angular.forEach(model.fields['field-list'], function(value) {
-          if (value['field-name'] && value['field-name'] !== '') {
-            var constraint = {
-              'name': value['field-name'],
-              'word': {
-                'field': {
-                  'name': value['field-name'],
-                  'collation': value.collation
-                }
-              }
-            };
-            if (constraint && !constraintExists(constraint)) {
-              model.constraints.push(constraint);
-            }
           }
         });
       },

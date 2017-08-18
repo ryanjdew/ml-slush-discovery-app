@@ -3,9 +3,9 @@
   angular.module('app.setup')
     .factory('ServerConfig', ServerConfig);
 
-  ServerConfig.$inject = ['$http', '$q', '$timeout', 'UIService'];
+  ServerConfig.$inject = ['$http', '$q', '$timeout', 'SearchAdmin', 'UIService'];
 
-  function ServerConfig($http, $q, $timeout, UIService) {
+  function ServerConfig($http, $q, $timeout, SearchAdmin, UIService) {
     var serverConfig = {};
     var databasePropertiesPromise;
     serverConfig.get = function() {
