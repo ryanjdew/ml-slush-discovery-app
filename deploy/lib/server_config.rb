@@ -88,6 +88,14 @@ class ServerConfig < MLClient
 
     @server_version = @properties["ml.server-version"].to_i
 
+    if (@server_version < 7)
+      logger.warn "WARN: This version of Roxy is not tested against MarkLogic #{@server_version}."
+      if (@server_version > 4)
+        logger.info "      Consider downgrading to v1.7.0 using `./ml upgrade --branch=v1.7.0`."
+      end
+      logger.warn "Note: MarkLogic #{@server_version} is EOL."
+    end
+
     if @properties["ml.bootstrap-port"]
       @bootstrap_port = @properties["ml.bootstrap-port"]
     else
@@ -103,6 +111,25 @@ class ServerConfig < MLClient
       @qconsole_port = @properties['ml.qconsole-port']
     else
       @qconsole_port = @bootstrap_port
+    end
+
+    begin
+      r = execute_query %Q{xdmp:host-name()}
+      @properties["ml.server-name"] = parse_body(r.body)
+    rescue
+      logger.warn "WARN: unable to determine MarkLogic Host name of #{@hostname}"
+    end
+
+    @properties["ml.password"] = @ml_password
+
+    begin
+      r = execute_query %Q{ substring-before(xdmp:version(), ".") }
+      r.body = parse_body r.body
+      if r.body.to_i != @server_version
+        logger.warn "WARN: #{@hostname} is running MarkLogic #{r.body}, but server-version is set to #{@server_version}!"
+      end
+    rescue
+      logger.warn "WARN: unable to determine MarkLogic Version of #{@hostname}"
     end
   end
 
@@ -147,6 +174,11 @@ class ServerConfig < MLClient
     return result
   end
 
+  def ServerConfig.strip_path(path)
+    basepath = File.expand_path(@@path + "/..", @@context)
+    return path.sub(basepath + '/', '')
+  end
+
   def self.jar
     raise HelpException.new("jar", "You must be using JRuby to create a jar") unless RUBY_PLATFORM == "java"
     begin
@@ -186,22 +218,26 @@ class ServerConfig < MLClient
       sample_properties = "roxy/sample/build.sample.properties"
       sample_options = "roxy/sample/all.sample.xml"
       sample_rest_properties = "roxy/sample/properties.sample.xml"
+      sample_app_config = "roxy/deploy/sample/custom-config.xqy"
     else
-    sample_config = ServerConfig.expand_path("#{@@path}/sample/ml-config.sample.xml")
-    sample_properties = ServerConfig.expand_path("#{@@path}/sample/build.sample.properties")
+      sample_config = ServerConfig.expand_path("#{@@path}/sample/ml-config.sample.xml")
+      sample_properties = ServerConfig.expand_path("#{@@path}/sample/build.sample.properties")
       sample_options = ServerConfig.expand_path("#{@@path}/sample/all.sample.xml")
       sample_rest_properties = ServerConfig.expand_path("#{@@path}/sample/properties.sample.xml")
+      sample_app_config = ServerConfig.expand_path("#{@@path}/sample/custom-config.xqy")
     end
 
     # output files
     build_properties = ServerConfig.expand_path("#{@@path}/build.properties")
     options_file = ServerConfig.expand_path("#{@@path}/../rest-api/config/options/all.xml")
     rest_properties = ServerConfig.expand_path("#{@@path}/../rest-api/config/properties.xml")
+    app_config = ServerConfig.expand_path("#{@@path}/../src/config/config.xqy")
 
     # dirs to create
     rest_ext_dir = ServerConfig.expand_path("#{@@path}/../rest-api/ext")
     rest_transforms_dir = ServerConfig.expand_path("#{@@path}/../rest-api/transforms")
     options_dir = ServerConfig.expand_path("#{@@path}/../rest-api/config/options")
+    config_dir = ServerConfig.expand_path("#{@@path}/../src/config")
 
     # get supplied options
     force = find_arg(['--force']).present?
@@ -258,6 +294,10 @@ class ServerConfig < MLClient
       # Update properties file to set server-version to value specified on command-line
       properties_file.gsub!(/server-version=6/, "server-version=#{server_version}")
 
+      if ["rest", "bare"].include? app_type
+        properties_file.gsub!(/application-conf-file=src\/app\/config\/config.xqy/, 'application-conf-file=src/config/config.xqy')
+      end
+
       # save the replacements
       open(build_properties, 'w') {|f| f.write(properties_file) }
     end
@@ -269,6 +309,11 @@ class ServerConfig < MLClient
       FileUtils.mkdir_p options_dir
       copy_file sample_options, options_file
       copy_file sample_rest_properties, rest_properties
+    end
+
+    if ["rest", "bare"].include? app_type
+      FileUtils.mkdir_p config_dir
+      copy_file sample_app_config, app_config
     end
 
     target_config = ServerConfig.expand_path(ServerConfig.properties["ml.config.file"])
@@ -289,9 +334,9 @@ class ServerConfig < MLClient
     if @@is_jar
       sample_config = "roxy/sample/pipeline-config.sample.xml"
     else
-    sample_config = ServerConfig.expand_path("#{@@path}/sample/pipeline-config.sample.xml")
+      sample_config = ServerConfig.expand_path("#{@@path}/sample/pipeline-config.sample.xml")
     end
-    target_config = ServerConfig.expand_path("#{@@path}/pipeline-config.xml")
+    target_config = ServerConfig.expand_path(ServerConfig.properties["ml.pipeline-config-file"])
 
     force = find_arg(['--force']).present?
     if !force && File.exists?(target_config)
@@ -305,15 +350,19 @@ class ServerConfig < MLClient
   def self.prompt_server_version
     if @@no_prompt
       puts 'Required option --server-version=[version] not specified with valid value,
-but --no-prompt parameter prevents prompting for password. Assuming 8.'
+but --no-prompt parameter prevents prompting for password.'
+      server_version = 0
     else
       puts 'Required option --server-version=[version] not specified with valid value.
 
-  What is the version number of the target MarkLogic server? [5, 6, 7, 8, or 9]'
+  What is the version number of the target MarkLogic server? [7, 8, or 9]'
       server_version = STDIN.gets.chomp.to_i
-      server_version = 8 if server_version == 0
-      server_version
     end
+    if server_version == 0
+      puts "Defaulting to 9.."
+      server_version = 9
+    end
+    server_version
   end
 
   def self.index
@@ -520,7 +569,87 @@ but --no-prompt parameter prevents prompting for password. Assuming 8.'
     return r
   end
 
+  def restart_group(group = nil, legacy = false)
+    logger.debug "group: #{group}"
+    logger.debug "legacy: #{legacy}"
+
+    if ! group
+      # Note:
+      # Restarting partial cluster is unsafe when working with multiple groups.
+      # Therefor restart entire cluster by default..
+      group = "cluster"
+    end
+
+    if group == "cluster"
+      logger.info "Restarting MarkLogic Server cluster of #{@hostname}"
+    else
+      logger.info "Restarting MarkLogic Server group #{group}"
+    end
+
+    if @server_version > 7 && !legacy
+      # MarkLogic 8+, make use of Management REST api and return details of all involved hosts
+
+      if group == "cluster"
+        r = go(%Q{http://#{@properties["ml.server"]}:#{@properties["ml.bootstrap-port"]}/manage/v2?format=json}, "post", {
+          'Content-Type' => 'application/json'
+        }, nil, %Q{
+          { "operation": "restart-local-cluster" }
+        })
+      else
+        r = go(%Q{http://#{@properties["ml.server"]}:#{@properties["ml.bootstrap-port"]}/manage/v2/groups/#{group}?format=json}, "post", {
+          'Content-Type' => 'application/json'
+        }, nil, %Q{
+          { "operation": "restart-group" }
+        })
+      end
+
+      raise ExitException.new(r.body) unless r.code.to_i == 202
+
+      return JSON.parse(r.body)['restart']['last-startup']
+    else
+      # MarkLogic 7- fallback, restart as before, and only verify restart of bootstrap host
+
+      old_timestamp = go(%Q{http://#{@properties["ml.server"]}:8001/admin/v1/timestamp}, "get").body
+
+      setup = File.read ServerConfig.expand_path("#{@@path}/lib/xquery/setup.xqy")
+      r = execute_query %Q{#{setup} setup:do-restart("#{group}")}
+      logger.debug "code: #{r.code.to_i}"
+
+      r.body = parse_body(r.body)
+      logger.info r.body
+
+      return [{
+        'host-id' => @properties["ml.server"],
+        'value' => old_timestamp
+      }]
+    end
+  end
+
+  def get_host_names
+    r = go(%Q{http://#{@properties["ml.server"]}:8002/manage/v2/hosts?format=json}, "get")
+
+    raise ExitException.new(r.body) unless r.code.to_i == 200
+
+    names = { @properties["ml.server"] => @properties["ml.server"] } # ml7 fallback
+
+    JSON.parse(r.body)['host-default-list']['list-items']['list-item'].each do |host|
+      names[host['idref']] = host['nameref']
+    end
+
+    return names
+  end
+
   def restart
+    # Default to verified restart
+    verify = find_arg(['--no-verify']) == nil  && find_arg(['--verify']) != 'false'
+    # Default to using Management Rest api (if available)
+    legacy = find_arg(['--legacy']) != nil
+
+    logger.debug "verify: #{verify}"
+    logger.debug "legacy: #{legacy}"
+
+    group = next_arg("^[^-]")
+
     @ml_username = @properties['ml.bootstrap-user'] || @properties['ml.user']
     if @ml_username == @properties['ml.bootstrap-user']
       @ml_password = @properties['ml.bootstrap-password']
@@ -528,32 +657,54 @@ but --no-prompt parameter prevents prompting for password. Assuming 8.'
       @ml_password = @properties['ml.password']
     end
 
-    group = nil
-    ARGV.each do |arg|
-      # Exclude any argument passed from command line.
-      if ! arg.match("^-")
-        group = arg
-      end
-    end
-
-    if group && group == "cluster"
-      logger.info "Restarting MarkLogic Server cluster of #{@hostname}"
-    elsif group
-      logger.info "Restarting MarkLogic Server group #{group}"
+    if ! verify
+      restart_group(group, legacy)
     else
-      # restarting partial cluster unsafe when working with multiple groups
-      #logger.info "Restarting MarkLogic Server group of #{@hostname}"
-      logger.info "Restarting MarkLogic Server cluster of #{@hostname}"
-      group = "cluster"
-    end
-    logger.debug "this: #{self}"
-    setup = File.read ServerConfig.expand_path("#{@@path}/lib/xquery/setup.xqy")
-    r = execute_query %Q{#{setup} setup:do-restart("#{group}")}
-    logger.debug "code: #{r.code.to_i}"
+      host_names = get_host_names()
 
-    r.body = parse_body(r.body)
-    logger.info r.body
-    return true
+      old_timestamps = restart_group(group, legacy)
+
+      # Iterate until all hosts have restarted (or max is reached)
+      old_timestamps.each do |host|
+        host_name = host_names[host['host-id']]
+        old_timestamp = host['value']
+
+        print "Verifying restart for #{host_name}"
+
+        # Initialize vars for repeated check
+        retry_count = 0
+        retry_max = @properties["ml.verify_retry_max"].to_i
+        retry_interval = [@properties["ml.verify_retry_interval"].to_i, 10].max # 10 sec sleep at least
+        new_timestamp = old_timestamp
+
+        while retry_count < retry_max do
+          begin
+            new_timestamp = go(%Q{http://#{host_name}:8001/admin/v1/timestamp}, "get").body
+          rescue
+            logger.debug 'Retry attempt ' + retry_count.to_s + ' failed'
+          end
+
+          if new_timestamp != old_timestamp
+            # Indicates that restart is confirmed successful
+            break
+          end
+
+          # Retry..
+          print ".."
+          sleep retry_interval
+          retry_count += 1
+        end
+
+        if retry_max < 1
+          puts ": SKIPPED"
+        elsif new_timestamp == old_timestamp
+          puts ": FAILED"
+        else
+          puts ": OK"
+        end
+      end
+
+    end
   end
 
   def merge
@@ -622,12 +773,20 @@ but --no-prompt parameter prevents prompting for password. Assuming 8.'
     logger.info r.body
   end
 
+  def properties_map
+    entries = []
+    @properties.each do |k, v|
+      entries.push %Q{map:entry("#{k}", "#{v.xquery_safe}")}
+    end
+    "map:new((\n" + entries.join(",\n  ")+ "))"
+  end
+
   def config
     setup = File.read ServerConfig.expand_path("#{@@path}/lib/xquery/setup.xqy")
     r = execute_query %Q{
       #{setup}
       try {
-        setup:rewrite-config(#{get_config})
+        setup:rewrite-config(#{get_config}, #{properties_map})
       } catch($ex) {
         xdmp:log($ex),
         fn:concat($ex/err:format-string/text(), '&#10;See MarkLogic Server error log for more details.')
@@ -652,17 +811,24 @@ but --no-prompt parameter prevents prompting for password. Assuming 8.'
 
     internals = find_arg(['--replicate-internals'])
     if internals
+      dointernals = 'internals'
 
-      nr = find_arg(['--nr-replicas'])
-      if nr
-        nr = nr.to_i
-      else
-        nr = 2
-      end
-
-      # check cluster size
+      # Number of hosts
       r = execute_query %Q{ fn:count(xdmp:hosts()) }
       r.body = parse_body(r.body)
+
+      # check cluster size
+      nr = find_arg(['--nr-replicas'])
+      if nr
+        if nr.downcase == "max"
+          nr = r.body.to_i - 1
+        else
+          nr = nr.to_i
+        end
+      else
+        nr = 1
+      end
+
       raise ExitException.new("Increase nr-replicas, minimum is 1") if nr < 1
       raise ExitException.new("Adding #{nr} replicas to internals requires at least a #{nr + 1} node cluster") if r.body.to_i <= nr
 
@@ -672,16 +838,12 @@ but --no-prompt parameter prevents prompting for password. Assuming 8.'
       assigns = ''
       internals = @properties['ml.system-dbs'].split ','
       internals.each do |db|
-        repnames = ''
-        repassigns = ''
-        (1..nr).each do |i|
-          repnames = repnames + %Q{
-                <replica-name>#{db}-rep#{i}</replica-name>}
-          repassigns = repassigns + %Q{
+        repnames = %Q{
+            <replica-name>#{db}-rep1</replica-name>}
+        repassigns = %Q{
             <assignment>
-              <forest-name>#{db}-rep#{i}</forest-name>
+              <forest-name nr-replicas="#{nr}">#{db}-rep1</forest-name>
             </assignment>}
-        end
 
         assigns = assigns + %Q{
 
@@ -714,18 +876,19 @@ but --no-prompt parameter prevents prompting for password. Assuming 8.'
       }
       logger.debug config
     else
+      dointernals = ''
       logger.info "Bootstrapping your project into MarkLogic #{@properties['ml.server-version']} on #{@hostname}..."
       config = get_config
     end
 
     apply_changes = find_arg(['--apply-changes'])
 
-    if apply_changes == nil
-      apply_changes = ""
+    if apply_changes == nil or apply_changes == ""
+      apply_changes = "all"
     end
 
     setup = File.read(ServerConfig.expand_path("#{@@path}/lib/xquery/setup.xqy"))
-    r = execute_query %Q{#{setup} setup:do-setup(#{config}, "#{apply_changes}")}
+    r = execute_query %Q{#{setup} setup:do-setup(#{config}, "#{apply_changes},#{dointernals}", #{properties_map})}
     logger.debug "code: #{r.code.to_i}"
 
     r.body = parse_body(r.body)
@@ -733,7 +896,7 @@ but --no-prompt parameter prevents prompting for password. Assuming 8.'
 
     if r.body.match("error log")
       logger.error r.body
-      logger.error "... Bootstrap FAILED"
+      raise ExitException.new("... Bootstrap FAILED")
       return false
     else
       if r.body.match("(note: restart required)")
@@ -746,6 +909,71 @@ but --no-prompt parameter prevents prompting for password. Assuming 8.'
     end
   end
 
+  def clean_replicas_state
+    internals = find_arg(['--internal-replicas'])
+
+    if internals == nil
+      internals = ''
+      logger.info "Cleaning application forest decommissioned replica state"
+    else
+      logger.info "Cleaning interal forest decommissioned replica state"
+      internals = 'internals'
+    end
+
+    setup = File.read(ServerConfig.expand_path("#{@@path}/lib/xquery/setup.xqy"))
+    r = execute_query %Q{#{setup} setup:do-clean-replicas-state("#{internals}")}
+
+    if r.body.match("error log")
+      logger.error r.body
+      logger.error "... Cleaning replicas FAILED"
+      return false
+    end
+
+    logger.info r.body
+    logger.info "... Cleaning replicas Complete"
+    return true
+  end
+
+  def clean_replicas
+    internals = find_arg(['--internal-replicas'])
+
+    if internals == nil
+      internals = ''
+      logger.info "Cleaning application forest decommissioned replicas, if ready."
+      config = get_config
+    else
+      logger.info "Cleaning interal forest decommissioned replicas, if ready."
+      internals = 'internals'
+      config = get_config
+    end
+
+    setup = File.read(ServerConfig.expand_path("#{@@path}/lib/xquery/setup.xqy"))
+    r = execute_query %Q{#{setup} setup:do-clean-replicas(#{config}, "#{internals}", #{properties_map})}
+    logger.debug "code: #{r.code.to_i}"
+
+    r.body = parse_body(r.body)
+    logger.debug r.body
+
+    if r.body.match("error log")
+      logger.error r.body
+      logger.error "... Cleaning replicas FAILED"
+      return false
+    end
+    if r.body.match("Replicas not ready")
+      logger.error r.body
+      return false
+    end
+    if r.body.match("nothing to do")
+      logger.error r.body
+      logger.info "No replicas were found to be retired.  Nothing to do."
+      return false
+    end
+
+    logger.info r.body
+    logger.info "... Cleaning replicas Complete"
+    return true
+  end
+
   def wipe
 
     @ml_username = @properties['ml.bootstrap-user'] || @properties['ml.user']
@@ -755,7 +983,8 @@ but --no-prompt parameter prevents prompting for password. Assuming 8.'
       @ml_password = @properties['ml.password']
     end
 
-    if @environment != "local"
+    wipe_environments = (@properties['ml.wipe-environments'] || 'local').split(',')
+    if ! wipe_environments.index(@environment)
       expected_response = %Q{I WANT TO WIPE #{@environment.upcase}}
       print %Q{
 *******************************************************************************
@@ -878,15 +1107,15 @@ In order to proceed please type: #{expected_response}
 
       }
     else
-      #logger.debug %Q{#{setup} setup:do-wipe(#{config})}
+      #logger.debug %Q{#{setup} setup:do-wipe(#{config}, #{properties_map})}
 
       wipe_changes = find_arg(['--apply-changes'])
 
-      if wipe_changes == nil
-        wipe_changes = ""
+      if wipe_changes == nil or wipe_changes == ""
+        wipe_changes = "all"
       end
 
-      r = execute_query %Q{#{setup} setup:do-wipe(#{config}, "#{wipe_changes}")}
+      r = execute_query %Q{#{setup} setup:do-wipe(#{config}, "#{wipe_changes}", #{properties_map})}
     end
     logger.debug "code: #{r.code.to_i}"
 
@@ -918,7 +1147,7 @@ In order to proceed please type: #{expected_response}
     logger.info "Validating your project installation into MarkLogic on #{@hostname}..."
     setup = File.read(ServerConfig.expand_path("#{@@path}/lib/xquery/setup.xqy"))
     begin
-      r = execute_query %Q{#{setup} setup:validate-install(#{get_config})}
+      r = execute_query %Q{#{setup} setup:validate-install(#{get_config}, #{properties_map})}
       logger.debug "code: #{r.code.to_i}"
 
       r.body = parse_body(r.body)
@@ -1044,10 +1273,46 @@ In order to proceed please type: #{expected_response}
         clean_cpf
       when 'triggers'
         clean_triggers
+      when 'replicas'
+        clean_replicas
+      when 'replicas-state'
+        clean_replicas_state
       else
         raise HelpException.new("clean", "Invalid WHAT")
     end
     return true
+  end
+
+  #
+  # An alernative command for clean
+  #
+  def clear
+    clean
+  end
+
+  #
+  # Install - Runs all steps needed to 'install' a Roxy application
+  #
+  def install
+    bootstrap
+    deploy_modules
+    if File.exist?(@properties["ml.schemas.dir"])
+      deploy_schemas
+    end
+    if @properties["ml.triggers-db"]
+      deploy_triggers
+    end
+    if @properties["ml.triggers-db"] and @properties["ml.data.dir"] and File.exist?(ServerConfig.expand_path(@properties["ml.pipeline-config-file"]))
+      deploy_cpf
+    end
+    deploy_content
+  end
+
+  #
+  # Uninstall - an alternative command for wipe to complement install
+  #
+  def uninstall
+    wipe
   end
 
   #
@@ -1075,12 +1340,25 @@ In order to proceed please type: #{expected_response}
         suites << line.gsub(/.*suite path="([^"]+)".*/, '\1').strip if line.match("suite path")
       end
 
+      success = true
       suites.each do |suite|
-        r = go(%Q{http://#{@hostname}:#{@properties["ml.test-port"]}/test/default.xqy?func=run&suite=#{url_encode(suite)}&format=junit#{suiteTearDown}#{testTearDown}}, "get")
-        logger.info r.body
+        begin
+          r = go(%Q{http://#{@hostname}:#{@properties["ml.test-port"]}/test/default.xqy?func=run&suite=#{url_encode(suite)}&format=junit#{suiteTearDown}#{testTearDown}}, "get")
+          logger.info r.body
+        rescue Net::HTTPServerException => e
+          if e.response.code.to_i == 409
+            # ignore 409's, but mark failure
+            success = false
+          else
+            raise # reraise last exception
+          end
+        end
       end
     end
-    return true
+    if !success
+      logger.error "Some tests failed!"
+    end
+    return success
   end
 
   def test_cleanup
@@ -1141,7 +1419,19 @@ In order to proceed please type: #{expected_response}
 
     runme = %Q{java -cp #{recordloader_file}#{path_separator}#{xcc_file}#{path_separator}#{xpp_file} #{prop_string} com.marklogic.ps.RecordLoader}
     logger.info runme
-    `#{runme}`
+    r = system(runme)
+    logger.debug $?
+
+    if r == nil
+      logger.error "Call to RecordLoader failed"
+      r = false
+    elsif !r
+      logger.error "RecordLoader non-zero exit"
+    else
+      logger.info ""
+    end
+
+    return r
   end
 
   def xqsync
@@ -1167,7 +1457,21 @@ In order to proceed please type: #{expected_response}
 
     runme = %Q{java -Xmx2048m -cp #{xqsync_file}#{path_separator}#{xcc_file}#{path_separator}#{xstream_file}#{path_separator}#{xpp_file} -Dfile.encoding=UTF-8 #{prop_string} com.marklogic.ps.xqsync.XQSync}
     logger.info runme
-    `#{runme}`
+
+    # Note: XQSync doesn't seem to exit with non-zero code at failure (yet), putting this in place nonetheless
+    r = system(runme)
+    logger.debug $?
+
+    if r == nil
+      logger.error "Call to XQSync failed"
+      r = false
+    elsif !r
+      logger.error "XQSync non-zero exit"
+    else
+      logger.info ""
+    end
+
+    return r
   end
 
   def corb
@@ -1180,7 +1484,7 @@ In order to proceed please type: #{expected_response}
 
     password_prompt
     encoded_password = url_encode(@ml_password)
-    connection_string = %Q{xcc://#{@properties['ml.user']}:#{encoded_password}@#{@properties['ml.server']}:#{@properties['ml.xcc-port']}/#{@properties['ml.content-db']}}
+    connection_string = %Q{xcc://#{@ml_username}:#{encoded_password}@#{@properties['ml.server']}:#{@properties['ml.xcc-port']}/#{@properties['ml.content-db']}}
 
     options = Hash.new("")
     # handle Roxy convention for CoRB properties first
@@ -1229,9 +1533,6 @@ In order to proceed please type: #{expected_response}
       end
     end
 
-    # we have normalized the options, now clear the args
-    ARGV.clear
-
     # collect options and set as Java system properties switches
     systemProperties = options.delete_if{ |key, value| value.blank? }
                         .map{ |key, value| "-D#{key}=\"#{value}\""}
@@ -1249,11 +1550,24 @@ In order to proceed please type: #{expected_response}
       # directory, so that the xquery_modules will be visible with the
       # same path that will be used to see it in the modules database.
       Dir.chdir(@properties['ml.xquery.dir']) do
-        `#{runme}`
+        r = system(runme)
       end
     else
-      `#{runme}`
+      r = system(runme)
     end
+    logger.debug $?
+
+    if r == nil
+      logger.error "Call to Corb failed"
+      r = false
+    elsif !r
+      logger.error "Corb non-zero exit"
+    else
+      logger.info ""
+    end
+
+    ARGV.clear
+    return r
   end
 
   def mlcp
@@ -1333,12 +1647,20 @@ In order to proceed please type: #{expected_response}
       "PATH" => "#{ENV['PATH']};#{mlcp_home}\\bin",
       "HADOOP_HOME" => mlcp_home
     }
-    system(env_variables, runme)
+    r = system(env_variables, runme)
+    logger.debug $?
 
-    logger.info ""
+    if r == nil
+      logger.error "Call to MLCP failed"
+      r = false
+    elsif !r
+      logger.error "MLCP non-zero exit"
+    else
+      logger.info ""
+    end
 
     ARGV.clear
-    return true
+    return r
   end
 
   def credentials
@@ -1498,10 +1820,10 @@ Provides listings of various kinds of settings supported within ml-config.xml.
       raise ExitException.new("Deploy triggers requires a triggers database")
     end
 
-    target_config = ServerConfig.expand_path(ServerConfig.properties["ml.triggers.file"])
+    target_config = ServerConfig.expand_path(@properties["ml.triggers.file"])
 
     if !File.exist?(target_config)
-      logger.error "ml.triggers.file=#{ServerConfig.properties['ml.triggers.file']}"
+      logger.error "ml.triggers.file=#{@properties['ml.triggers.file']}"
       logger.error <<-ERR.strip_heredoc
         Before you can deploy triggers, you must define a configuration. Steps:
         1. Copy deploy/sample/triggers-config.sample.xml to #{target_config}
@@ -1542,12 +1864,14 @@ private
     end
 
     uris = files.map { |f| xcc.build_target_uri(f, options) }
-    stamps_db = get_db_timestamps(uris)
+    stamps_db = get_db_timestamps(uris, options[:db])
     stamps_local = files.map { |file_uri| File.mtime(file_uri).getgm.iso8601(5) }
 
     files_with_stamps = files.zip(stamps_local, stamps_db)
 
     filtered = files_with_stamps.select do |file_uri, stamp_locally, stamp_in_db|
+
+      stamp_in_db = stamp_in_db || ""
 
       newer = (stamp_locally > stamp_in_db || stamp_in_db.strip.empty?)
 
@@ -1561,11 +1885,11 @@ private
     filtered.map { |f, stamp1, stamp2| f}
   end
 
-  def get_db_timestamps(uris)
+  def get_db_timestamps(uris, target_db)
     uris_as_string = uris.map{|i| "\"#{i}\""}.join(",")
     q = %Q{for $u in (#{uris_as_string}) return "" || adjust-dateTime-to-timezone(xdmp:timestamp-to-wallclock(xdmp:document-timestamp($u)), xs:dayTimeDuration("PT0H"))}
 
-    result = execute_query q, :db_name => @properties["ml.content-db"]
+    result = execute_query q, :db_name => target_db
     parse_body(result.body).split("\n")
   end
 
@@ -1610,7 +1934,7 @@ private
           File.open("#{path}", 'wb') { |file| file.write(r.body) }
         end
       end
-    else
+    elsif @properties['ml.server-version'] == '7'
       # In ML7, the response is JSON
       # [
       #  {"qid":null, "type":"string", "result":"\/"},
@@ -1629,6 +1953,42 @@ private
           File.open("#{path}", 'wb') { |file| file.write(r.body) }
         end
       end
+    else
+      # ML8, we're using /v1/eval, so we get a multi-part response
+      uris = parse_body(dirs.body)
+      uris.split(/\r?\n/).each do |uri|
+        if ! uri.end_with?("/")
+
+          r = execute_query %Q{
+            fn:doc("#{uri}")
+          },
+          { :db_name => target_db }
+
+          delimiter = r.body.split("\r\n")[1].strip
+          parts = r.body.split(delimiter)
+
+          # The first part will always be an empty string. Just remove it.
+          parts.shift
+          # The last part will be the "--". Just remove it.
+          parts.pop
+
+          # Get rid of part headers
+          parts = parts.map{ |part|
+            sections = part.split("\r\n\r\n");
+            sections.slice(1, sections.length).join("\r\n\r\n")
+          }
+
+          # Return all parts as one long string, like we were used to.
+          parts = parts.join().chomp("\r\n")
+
+          path = "#{target_dir}#{uri}"
+          parentdir = File.dirname path
+          FileUtils.mkdir_p(parentdir) unless File.exists?(parentdir)
+          if ! uri.end_with?("/")
+            File.open("#{path}", 'wb') { |file| file.write(parts) }
+          end
+        end
+      end
     end
   end
 
@@ -1643,9 +2003,9 @@ private
     raise ExitException.new("Capture requires the target environment's hostname to be defined") unless @hostname.present?
 
     if (full_config == nil)
-      databases = quote_arglist(find_arg(['--databases']) || "#{@properties["ml.content-db"]},#{@properties["ml.modules-db"]},#{@properties["ml.triggers-db"]},#{@properties["ml.schemas-db"]},#{@properties["ml.app-modules-db"]}")
+      databases = quote_arglist(find_arg(['--databases']) || "#{@properties["ml.content-db"]},#{@properties["ml.modules-db"]},#{@properties["ml.triggers-db"]},#{@properties["ml.schemas-db"]}")
       # TODO: take content-forests-per-host into account properly, just taking first by default
-      forests = quote_arglist(find_arg(['--forests']) || "#{@properties["ml.content-db"]},#{@properties["ml.content-db"]}-001-1,#{@properties["ml.modules-db"]},#{@properties["ml.triggers-db"]},#{@properties["ml.schemas-db"]},,#{@properties["ml.app-modules-db"]}")
+      forests = quote_arglist(find_arg(['--forests']) || "#{@properties["ml.content-db"]},#{@properties["ml.content-db"]}-001-1,#{@properties["ml.modules-db"]},#{@properties["ml.triggers-db"]},#{@properties["ml.schemas-db"]}")
       # TODO: include dav, xdbc, odbc servers?
       servers = quote_arglist(find_arg(['--servers']) || "#{@properties["ml.app-name"]},#{@properties["ml.app-name"]}-xdbc,#{@properties["ml.app-name"]}-odbc,#{@properties["ml.app-name"]}-test,#{@properties["ml.app-name"]}-webdav")
       mimes = quote_arglist(find_arg(['--mime-types']) || "##none##")
@@ -1709,13 +2069,13 @@ private
     @properties['ml.test-content-db'].present? &&
     @properties['ml.test-port'].present? &&
     !@properties['ml.do-not-deploy-tests'].split(",").include?(@environment) &&
-    conditional_prop('ml.test-modules-db', 'ml.app-modules-db') == target_db
+    conditional_prop('ml.test-modules-db', 'ml.modules-db') == target_db
   end
 
   def modules_databases
-    dbs = [@properties['ml.app-modules-db']]
+    dbs = [@properties['ml.modules-db']]
     dbs << @properties['ml.test-modules-db'] if @properties['ml.test-modules-db'].present? &&
-                                                @properties['ml.test-modules-db'] != @properties['ml.app-modules-db']
+                                                @properties['ml.test-modules-db'] != @properties['ml.modules-db']
     dbs
   end
 
@@ -1727,8 +2087,7 @@ private
   def deploy_src
     test_dir = @properties['ml.xquery-test.dir']
     xquery_dir = @properties['ml.xquery.dir']
-    # modules_db = @properties['ml.modules-db']
-    app_config_file = File.join xquery_dir, "/app/config/config.xqy"
+    app_configs = @properties['ml.application-conf-file']
     test_config_file = File.join test_dir, "/test-config.xqy"
     load_html_as_xml = @properties['ml.load-html-as-xml']
     load_js_as_binary = @properties['ml.load-js-as-binary']
@@ -1755,6 +2114,7 @@ private
 
     end
 
+    total_count = 0
     modules_databases.each do |dest_db|
       if dest_db == "filesystem"
         logger.info "Skipping deployment of src to #{dest_db}.."
@@ -1763,7 +2123,6 @@ private
 
       ignore_us = []
       ignore_us << "^#{test_dir}.*$" unless test_dir.blank? || deploy_tests?(dest_db)
-      ignore_us << "^#{app_config_file}$"
       ignore_us << "^#{test_config_file}$"
       ignore_us << "^#{folders_to_ignore}$" unless folders_to_ignore.blank?
 
@@ -1778,7 +2137,34 @@ private
         src_permissions.flatten!
       end
 
-      @logger.debug("source permissions: #{src_permissions}")
+      @logger.debug "source permissions: #{src_permissions}"
+      if app_configs.present?
+        logger.debug "Deploying application configurations"
+
+        app_configs.split(',').each do |item|
+          buffer = File.read item
+          replace_properties(buffer, File.basename(item))
+
+          item_name = item
+          prefix = '/'
+          if item_name === 'src/app/config/config.xqy'
+            item_name = '/config.xqy'
+            ignore_us << '/app/config/config.xqy'
+            prefix = 'app/config/'
+          elsif item.start_with?("src/")
+            item_name = '/' + item[4, item.length]
+            ignore_us << item_name
+          end
+
+          logger.debug "deploying application configuration #{item} with name #{item_name} on #{dest_db}"
+          total_count += xcc.load_buffer item_name,
+                                         buffer,
+                                         :db => dest_db,
+                                         :add_prefix => File.join(@properties["ml.modules-root"], prefix),
+                                         :permissions => src_permissions
+        end
+        logger.debug "Done deploying application configurations"
+      end
 
       total_count = load_data xquery_dir,
                               :add_prefix => @properties["ml.modules-prefix"],
@@ -1790,16 +2176,6 @@ private
                               :load_css_as_binary => load_css_as_binary,
                               :permissions => src_permissions
 
-      if File.exist? app_config_file
-        buffer = File.read app_config_file
-        replace_properties(buffer, File.basename(app_config_file))
-
-        total_count += xcc.load_buffer "/config.xqy",
-                                       buffer,
-                                       :db => dest_db,
-                                       :add_prefix => File.join(@properties["ml.modules-root"], "app/config"),
-                                       :permissions => src_permissions
-      end
 
       if deploy_tests?(dest_db) && File.exist?(test_config_file)
         buffer = File.read test_config_file
@@ -1830,7 +2206,7 @@ private
     end
   end
 
-  def deploy_rest
+  def deploy_rest(test = false)
     # Deploy options, extensions to the REST API server
     if ['rest', 'hybrid'].include? @properties["ml.app-type"]
       # Verify that we're not trying to run REST from the filesystem
@@ -1849,6 +2225,37 @@ private
       deploy_rest_config()
       deploy_ext()
       deploy_transform()
+
+      if !test &&
+         @properties['ml.test-content-db'].present? &&
+         @properties['ml.test-port'].present? &&
+         !@properties['ml.do-not-deploy-tests'].split(",").include?(@environment)
+
+         # preserve original mlRest client
+         org_mlRest = @mlRest
+
+         # recreate client, with test settings
+         @mlRest = Roxy::MLRest.new({
+           :user_name => @ml_username,
+           :password => @ml_password,
+           :server => @hostname,
+           :app_port => @properties["ml.app-port"],
+           :rest_port => @properties["ml.test-port"],
+           :logger => @logger,
+           :server_version => @server_version,
+           :http_connection_retry_count => @properties["ml.http.retry-count"].to_i,
+           :http_connection_open_timeout => @properties["ml.http.open-timeout"].to_i,
+           :http_connection_read_timeout => @properties["ml.http.read-timeout"].to_i,
+           :http_connection_retry_delay => @properties["ml.http.retry-delay"].to_i,
+           :use_https_for_rest => @properties["ml.ssl-certificate-template"].present? || @properties["ml.use-https-for-rest"] == "true"
+         })
+
+         # rerun deploy rest
+         deploy_rest(true)
+
+         # restore original client
+         @mlRest = org_mlRest
+      end
     end
   end
 
@@ -1973,18 +2380,24 @@ private
   end
 
   def deploy_cpf
+    default_cpf_config_file = ServerConfig.expand_path(ServerConfig.properties["ml.pipeline-config-file"])
+    cpf_config_file = ServerConfig.expand_path(@properties["ml.pipeline-config-file"])
+
     if @properties["ml.triggers-db"].blank? || @properties["ml.data.dir"].blank?
-      logger.error "To use CPF, you must define the triggers-db property in your build.properties file"
-    elsif !File.exist?(ServerConfig.expand_path("#{@@path}/pipeline-config.xml"))
-      logger.error <<-ERR.strip_heredoc
-        Before you can deploy CPF, you must define a configuration. Steps:
-        1. Run 'ml initcpf'
-        2. Edit deploy/pipeline-config.xml to set up your domain and pipelines
-        3. Run 'ml <env> deploy cpf')
-      ERR
+      logger.error "To use CPF, you must define the triggers-db property in your deploy/build.properties file"
+    elsif !File.exist?(cpf_config_file)
+      msg = "Before you can deploy CPF, you must define a configuration. Steps:"
+      if !File.exist?(default_cpf_config_file) && !File.exist?(cpf_config_file)
+        msg = msg + "\n- CPF requires a pipeline-config file, run ml initcpf to create a sample."
+      end
+      if !File.exist?(cpf_config_file) && cpf_config_file != default_cpf_config_file
+        msg = msg + "\n- Copy #{ServerConfig.strip_path(default_cpf_config_file)} to #{ServerConfig.strip_path(cpf_config_file)}."
+      end
+      msg = msg + "\n- Edit #{ServerConfig.strip_path(cpf_config_file)} to customize your domain and pipelines for the given environment."
+      logger.error msg
     else
-      cpf_config = File.read ServerConfig.expand_path("#{@@path}/pipeline-config.xml")
-      replace_properties(cpf_config, "pipeline-config.xml")
+      cpf_config = File.read cpf_config_file
+      replace_properties(cpf_config, ServerConfig.strip_path(cpf_config_file))
       cpf_code = File.read ServerConfig.expand_path("#{@@path}/lib/xquery/cpf.xqy")
       query = %Q{#{cpf_code} cpf:load-from-config(#{cpf_config})}
       logger.debug(query)
@@ -2029,7 +2442,7 @@ private
         :http_connection_open_timeout => @properties["ml.http.open-timeout"].to_i,
         :http_connection_read_timeout => @properties["ml.http.read-timeout"].to_i,
         :http_connection_retry_delay => @properties["ml.http.retry-delay"].to_i,
-        :use_https_for_rest => @properties["ml.ssl-certificate-template"].present?
+        :use_https_for_rest => @properties["ml.ssl-certificate-template"].present? || @properties["ml.use-https-for-rest"] == "true"
       })
     else
       @mlRest
@@ -2138,8 +2551,10 @@ private
     # 4. Any database
     if properties[:db_name] != nil
       db_id = get_db_id(properties[:db_name])
+      logger.warn "WARN: No Database with name #{properties[:db_name]} found" if db_id.nil?
     elsif properties[:app_name] != nil
       sid = get_sid(properties[:app_name])
+      logger.warn "WARN: No App-Server with name #{properties[:app_name]} found" if sid.nil?
     else
       sid = get_sid("Manage")
     end
@@ -2180,8 +2595,10 @@ private
     # 4. Any database
     if properties[:db_name] != nil
       db_id = get_db_id(properties[:db_name])
+      logger.warn "WARN: No Database with name #{properties[:db_name]} found" if db_id.nil?
     elsif properties[:app_name] != nil
       sid = get_sid(properties[:app_name])
+      logger.warn "WARN: No App-Server with name #{properties[:app_name]} found" if sid.nil?
     else
       sid = get_sid("Manage")
     end
@@ -2213,22 +2630,80 @@ private
   end
 
   def execute_query_8(query, properties = {})
-    if properties[:app_name] != nil
-      raise ExitException.new("Executing queries with an app_name (currently) not supported with ML8+")
+    # check input like in older versions
+    if properties[:db_name] != nil
+      db_id = get_db_id(properties[:db_name])
+      raise ExitException.new("No Database with name #{properties[:db_name]} found") if db_id.nil?
+    elsif properties[:app_name] != nil
+      sid = get_sid(properties[:app_name])
+      raise ExitException.new("No Server with name #{properties[:app_name]} found") if sid.nil?
     end
 
     headers = {
       "Content-Type" => "application/x-www-form-urlencoded"
     }
+    params = {}
 
-    params = {
-      :xquery => query,
-      :locale => LOCALE,
-      :tzoffset => "-18000"
-    }
+    # If app_name is specified, wrap the eval in an xdmp:eval to create an eval context
+    # that matches that of the selected app-server
+    if properties[:app_name] != nil
+      params[:xquery] = %Q{
+        xquery version "1.0-ml";
 
-    if properties[:db_name] != nil
-      params[:database] = properties[:db_name]
+        (: derived from qconsole-amped.xqy :)
+        declare function local:eval-options(
+          $server-id as xs:unsignedLong
+        ) as element()
+        {
+          let $database-id := xdmp:server-database($server-id)
+          let $collation := xdmp:server-collation($server-id)
+          let $modules-id := xdmp:server-modules-database($server-id)
+          let $xquery-version := xdmp:server-default-xquery-version($server-id)
+          let $modules-root := xdmp:server-root($server-id)
+          let $default-coordinate-system :=
+            (: xdmp:server-coordinate-system not supported in ML8 and older :)
+            for $f in fn:function-lookup(xs:QName("xdmp:server-coordinate-system"), 1)
+            return $f($server-id)
+          return
+            <options xmlns="xdmp:eval">{
+              if ($database-id eq xdmp:database()) then ()
+              else element database { $database-id },
+
+              if ($modules-id eq xdmp:modules-database()) then ()
+              else element modules { $modules-id },
+
+              if ($collation eq default-collation()) then ()
+              else element default-collation { $collation },
+
+              if (empty($default-coordinate-system)) then ()
+              else element default-coordinate-system { $default-coordinate-system },
+
+              if ($xquery-version eq xdmp:xquery-version()) then ()
+              else element default-xquery-version { $xquery-version },
+
+              (: we should always have a root path, but better safe than sorry :)
+              if (empty($modules-root) or $modules-root eq xdmp:modules-root()) then ()
+              else element root { $modules-root },
+
+              element isolation { "different-transaction" }
+            }</options>
+        };
+
+        let $query := <query><![CDATA[#{query}]]></query>
+        return xdmp:eval(
+          string($query),
+          (),
+          local:eval-options(xdmp:server("#{properties[:app_name]}"))
+        )
+      }
+    else
+      # No app_name, just run the straight query
+      params[:xquery] = query
+
+      # Pass through selected database if specified, otherwise run against App-Services
+      if properties[:db_name] != nil
+        params[:database] = properties[:db_name]
+      end
     end
 
     r = go "#{@protocol}://#{@hostname}:#{@qconsole_port}/v1/eval", "post", headers, params
@@ -2245,6 +2720,8 @@ private
       sub_me.each do |k,v|
         if v.match(/\$\{basedir\}/)
           sub_me[k] = ServerConfig.expand_path(v.gsub("${basedir}", Dir.pwd))
+          matches = v.scan(/\$\{([^}]+)\}/)
+          needs_rescan = true if matches.length > 1
         else
           matches = v.scan(/\$\{([^}]+)\}/)
           if matches.length > 0
@@ -2262,10 +2739,6 @@ private
       end
     end while (needs_rescan == true)
 
-    sub_me.each do |k,v|
-      sub_me[k] = v.xquery_safe
-    end
-
     raise DanglingVarsException.new(dangling_vars) if dangling_vars.length > 0
 
     sub_me
@@ -2281,7 +2754,7 @@ private
           if i
             key = prefix + line[0..i - 1].strip
             value = line[i + 1..-1].strip
-            properties[key] = ENV[key.sub("ml.", "ml_")] || value
+            properties[key] = ENV[key.gsub(/[^0-9A-Za-z_]/, '_')] || value
           end
         end
       end
@@ -2385,7 +2858,7 @@ private
 
   def test_appserver
     # The modules database for the test server can be different from the app one
-    test_modules_db = conditional_prop('ml.test-modules-db', 'ml.app-modules-db')
+    test_modules_db = conditional_prop('ml.test-modules-db', 'ml.modules-db')
     test_auth_method = conditional_prop('ml.test-authentication-method', 'ml.authentication-method')
     test_default_user = conditional_prop('ml.test-default-user', 'ml.default-user')
 
@@ -2436,7 +2909,7 @@ private
   end
 
   def rest_appserver
-    rest_modules_db = conditional_prop('ml.rest-modules-db', 'ml.app-modules-db')
+    rest_modules_db = conditional_prop('ml.rest-modules-db', 'ml.modules-db')
     rest_auth_method = conditional_prop('ml.rest-authentication-method', 'ml.authentication-method')
     rest_default_user = conditional_prop('ml.rest-default-user', 'ml.default-user')
 
@@ -2465,7 +2938,7 @@ private
   end
 
   def rest_modules_db_xml
-    rest_modules_db = conditional_prop('ml.rest-modules-db', 'ml.app-modules-db')
+    rest_modules_db = conditional_prop('ml.rest-modules-db', 'ml.modules-db')
 
     %Q{
       <database>
@@ -2478,7 +2951,7 @@ private
   end
 
   def rest_modules_db_assignment
-    rest_modules_db = conditional_prop('ml.rest-modules-db', 'ml.app-modules-db')
+    rest_modules_db = conditional_prop('ml.rest-modules-db', 'ml.modules-db')
 
     %Q{
       <assignment>
@@ -2506,151 +2979,151 @@ private
     config_files.split(",").each do |config_file|
       config = File.read(config_file)
 
-    # Build the triggers db if it is provided
-    if @properties['ml.triggers-db'].present?
+      # Build the triggers db if it is provided
+      if @properties['ml.triggers-db'].present?
 
-      if @properties['ml.triggers-db'] != @properties['ml.app-modules-db']
-        config.gsub!("@ml.triggers-db-xml", triggers_db_xml)
-        config.gsub!("@ml.triggers-assignment", triggers_assignment)
+        if @properties['ml.triggers-db'] != @properties['ml.modules-db']
+          config.gsub!("@ml.triggers-db-xml", triggers_db_xml)
+          config.gsub!("@ml.triggers-assignment", triggers_assignment)
+        else
+          config.gsub!("@ml.triggers-db-xml", "")
+          config.gsub!("@ml.triggers-assignment", "")
+        end
+
+        config.gsub!("@ml.triggers-mapping",
+          %Q{
+          <triggers-database name="@ml.triggers-db"/>
+          })
+
       else
         config.gsub!("@ml.triggers-db-xml", "")
         config.gsub!("@ml.triggers-assignment", "")
+        config.gsub!("@ml.triggers-mapping", "")
       end
 
-      config.gsub!("@ml.triggers-mapping",
-        %Q{
-        <triggers-database name="@ml.triggers-db"/>
-        })
+      if @properties['ml.xcc-port'].present? and @properties['ml.install-xcc'] != 'false'
+        config.gsub!("@ml.xdbc-server", xdbc_server)
+      else
+        config.gsub!("@ml.xdbc-server", "")
+      end
 
-    else
-      config.gsub!("@ml.triggers-db-xml", "")
-      config.gsub!("@ml.triggers-assignment", "")
-      config.gsub!("@ml.triggers-mapping", "")
-    end
+      if @properties['ml.odbc-port'].present?
+        config.gsub!("@ml.odbc-server", odbc_server)
+      else
+        config.gsub!("@ml.odbc-server", "")
+      end
 
-    if @properties['ml.xcc-port'].present? and @properties['ml.install-xcc'] != 'false'
-      config.gsub!("@ml.xdbc-server", xdbc_server)
-    else
-      config.gsub!("@ml.xdbc-server", "")
-    end
+      # Build the schemas db if it is provided
+      if @properties['ml.schemas-db'].present?
 
-    if @properties['ml.odbc-port'].present?
-      config.gsub!("@ml.odbc-server", odbc_server)
-    else
-      config.gsub!("@ml.odbc-server", "")
-    end
+        if @properties['ml.schemas-db'] != @properties['ml.modules-db']
+          config.gsub!("@ml.schemas-db-xml", schemas_db_xml)
+          config.gsub!("@ml.schemas-assignment", schemas_assignment)
+        else
+          config.gsub!("@ml.schemas-db-xml", "")
+          config.gsub!("@ml.schemas-assignment", "")
+        end
 
-    # Build the schemas db if it is provided
-    if @properties['ml.schemas-db'].present?
+        config.gsub!("@ml.schemas-mapping",
+          %Q{
+          <schema-database name="@ml.schemas-db"/>
+          })
 
-      if @properties['ml.schemas-db'] != @properties['ml.app-modules-db']
-        config.gsub!("@ml.schemas-db-xml", schemas_db_xml)
-        config.gsub!("@ml.schemas-assignment", schemas_assignment)
       else
         config.gsub!("@ml.schemas-db-xml", "")
         config.gsub!("@ml.schemas-assignment", "")
+        config.gsub!("@ml.schemas-mapping", "")
       end
 
-      config.gsub!("@ml.schemas-mapping",
-        %Q{
-        <schema-database name="@ml.schemas-db"/>
-        })
+      # Build the test appserver and db if it is provided
+      if @properties['ml.test-content-db'].present? &&
+         @properties['ml.test-port'].present? &&
+         @environment != "prod"
 
-    else
-      config.gsub!("@ml.schemas-db-xml", "")
-      config.gsub!("@ml.schemas-assignment", "")
-      config.gsub!("@ml.schemas-mapping", "")
-    end
+        config.gsub!("@ml.test-content-db-xml", test_content_db_xml)
+        config.gsub!("@ml.test-content-db-assignment", test_content_db_assignment)
+        config.gsub!("@ml.test-appserver", test_appserver)
 
-    # Build the test appserver and db if it is provided
-    if @properties['ml.test-content-db'].present? &&
-       @properties['ml.test-port'].present? &&
-       @environment != "prod"
-
-      config.gsub!("@ml.test-content-db-xml", test_content_db_xml)
-      config.gsub!("@ml.test-content-db-assignment", test_content_db_assignment)
-      config.gsub!("@ml.test-appserver", test_appserver)
-
-    else
-      config.gsub!("@ml.test-content-db-xml", "")
-      config.gsub!("@ml.test-content-db-assignment", "")
-      config.gsub!("@ml.test-appserver", "")
-    end
-
-    # Build the test modules db if it is different from the app modules db
-    if @properties['ml.test-modules-db'].present? &&
-       @properties['ml.test-modules-db'] != @properties['ml.app-modules-db']
-
-      config.gsub!("@ml.test-modules-db-xml", test_modules_db_xml)
-      config.gsub!("@ml.test-modules-db-assignment", test_modules_db_assignment)
-
-    else
-      config.gsub!("@ml.test-modules-db-xml", "")
-      config.gsub!("@ml.test-modules-db-assignment", "")
-    end
-
-    if @properties['ml.test-user'].present?
-
-      config.gsub!("@ml.test-user-xml", test_user_xml)
-
-    else
-      config.gsub!("@ml.test-user-xml", "")
-    end
-
-    if @properties['ml.rest-port'].present?
-
-      # Set up a REST API app server, distinct from the main application.
-      config.gsub!("@ml.rest-appserver", rest_appserver)
-
-      if @properties['ml.rest-modules-db'].present? &&
-         @properties['ml.rest-modules-db'] != @properties['ml.app-modules-db']
-         config.gsub!("@ml.rest-modules-db-xml", rest_modules_db_xml)
-         config.gsub!("@ml.rest-modules-db-assignment", rest_modules_db_assignment)
       else
+        config.gsub!("@ml.test-content-db-xml", "")
+        config.gsub!("@ml.test-content-db-assignment", "")
+        config.gsub!("@ml.test-appserver", "")
+      end
+
+      # Build the test modules db if it is different from the app modules db
+      if @properties['ml.test-modules-db'].present? &&
+         @properties['ml.test-modules-db'] != @properties['ml.modules-db']
+
+        config.gsub!("@ml.test-modules-db-xml", test_modules_db_xml)
+        config.gsub!("@ml.test-modules-db-assignment", test_modules_db_assignment)
+
+      else
+        config.gsub!("@ml.test-modules-db-xml", "")
+        config.gsub!("@ml.test-modules-db-assignment", "")
+      end
+
+      if @properties['ml.test-user'].present?
+
+        config.gsub!("@ml.test-user-xml", test_user_xml)
+
+      else
+        config.gsub!("@ml.test-user-xml", "")
+      end
+
+      if @properties['ml.rest-port'].present?
+
+        # Set up a REST API app server, distinct from the main application.
+        config.gsub!("@ml.rest-appserver", rest_appserver)
+
+        if @properties['ml.rest-modules-db'].present? &&
+           @properties['ml.rest-modules-db'] != @properties['ml.modules-db']
+           config.gsub!("@ml.rest-modules-db-xml", rest_modules_db_xml)
+           config.gsub!("@ml.rest-modules-db-assignment", rest_modules_db_assignment)
+        else
+          config.gsub!("@ml.rest-modules-db-xml", "")
+          config.gsub!("@ml.rest-modules-db-assignment", "")
+        end
+
+      else
+        config.gsub!("@ml.rest-appserver", "")
         config.gsub!("@ml.rest-modules-db-xml", "")
         config.gsub!("@ml.rest-modules-db-assignment", "")
       end
 
-    else
-      config.gsub!("@ml.rest-appserver", "")
-      config.gsub!("@ml.rest-modules-db-xml", "")
-      config.gsub!("@ml.rest-modules-db-assignment", "")
-    end
+      if @properties['ml.forest-data-dir'].present?
+        config.gsub!("@ml.forest-data-dir-xml",
+          %Q{
+            <data-directory>@ml.forest-data-dir</data-directory>
+          })
+      else
+        config.gsub!("@ml.forest-data-dir-xml", "")
+      end
 
-    if @properties['ml.forest-data-dir'].present?
-      config.gsub!("@ml.forest-data-dir-xml",
-        %Q{
-          <data-directory>@ml.forest-data-dir</data-directory>
-        })
-    else
-      config.gsub!("@ml.forest-data-dir-xml", "")
-    end
+      if !@properties['ml.rewrite-resolves-globally'].nil?
+        config.gsub!("@ml.rewrite-resolves-globally",
+          %Q{
+            <rewrite-resolves-globally>#{@properties['ml.rewrite-resolves-globally']}</rewrite-resolves-globally>
+          })
+      elsif ['rest', 'hybrid'].include?(@properties["ml.app-type"])
+        config.gsub!("@ml.rewrite-resolves-globally",
+          %Q{
+            <rewrite-resolves-globally>true</rewrite-resolves-globally>
+          })
+      else
+        config.gsub!("@ml.rewrite-resolves-globally", "")
+      end
 
-    if !@properties['ml.rewrite-resolves-globally'].nil?
-      config.gsub!("@ml.rewrite-resolves-globally",
-        %Q{
-          <rewrite-resolves-globally>#{@properties['ml.rewrite-resolves-globally']}</rewrite-resolves-globally>
-        })
-    elsif ['rest', 'hybrid'].include?(@properties["ml.app-type"])
-      config.gsub!("@ml.rewrite-resolves-globally",
-        %Q{
-          <rewrite-resolves-globally>true</rewrite-resolves-globally>
-        })
-    else
-      config.gsub!("@ml.rewrite-resolves-globally", "")
-    end
+      if @properties['ml.ssl-certificate-template'].present?
+        config.gsub!("@ml.ssl-certificate-xml", ssl_certificate_xml)
+      else
+        config.gsub!("@ml.ssl-certificate-xml", "")
+      end
 
-    if @properties['ml.ssl-certificate-template'].present?
-      config.gsub!("@ml.ssl-certificate-xml", ssl_certificate_xml)
-    else
-      config.gsub!("@ml.ssl-certificate-xml", "")
-    end
+      replace_properties(config, File.basename(config_file), true)
 
-    replace_properties(config, File.basename(config_file))
-
-    # escape unresolved braces, they have special meaning in XQuery
-    config.gsub!("{", "{{")
-    config.gsub!("}", "}}")
+      # escape unresolved braces, they have special meaning in XQuery
+      config.gsub!("{", "{{")
+      config.gsub!("}", "}}")
 
       configs << config
     end
@@ -2658,9 +3131,23 @@ private
     %Q{(#{configs.join(", ")})}
   end
 
-  def replace_properties(contents, name)
+  def replace_properties(contents, name, xquery = false)
+    # warn for deprecated properties
+    deprecated={
+      "app-modules-db" => "modules-db"
+    }
+    contents.scan(/(@ml.|[@$]\{)(app-modules-db)(\}?)/).each do |match|
+      key=match[1]
+      logger.warn("Deprecated property #{match.join} used in #{name}, please use ${#{deprecated[key]}} instead!")
+    end
+
     # make sure to apply descending order to replace @ml.foo-bar before @ml.foo
     @properties.sort {|x,y| y <=> x}.each do |k, v|
+      if xquery
+        # escape XML specials, they have special meaning in XQuery
+        v = v.xquery_safe
+      end
+
       # new property syntax: @{app-name} or ${app-name}
       n = k.sub("ml.", "")
       contents.gsub!("@{#{n}}", v)
@@ -2685,10 +3172,18 @@ private
     properties = ServerConfig.load_properties(default_properties_file, "ml.")
     properties.merge!(ServerConfig.load_properties(properties_file, "ml."))
 
+    #Look for optional shared_config, if it is set grab the properties from path relative to the root of the roxy project
+    if properties['ml.shared_config']
+      shared_properties_file = ServerConfig.expand_path("#{@@path}/../#{properties['ml.shared_config']}")
+      properties.merge!(ServerConfig.load_properties(shared_properties_file))
+    end
+
     environments = properties['ml.environments'].split(",") if properties['ml.environments']
     environments = ["local", "dev", "prod"] unless environments
 
-    environment = find_arg(environments)
+    if environments.index(ARGV[0])
+      environment = ARGV.shift
+    end
 
     properties["environment"] = environment if environment
     properties["ml.environment"] = environment if environment
