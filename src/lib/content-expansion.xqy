@@ -148,6 +148,11 @@ declare function expand:csv(
 ) as empty-sequence()
 {
   let $uri-base := fn:replace($uri, "\.[^\.]+$", "/")
+  let $content :=
+    if (fn:exists($content/binary())) then
+      xdmp:binary-decode($content, "UTF-8")
+    else
+      $content
   let $lines := fn:tokenize($content, "(&#10;|&#13;)+")
   let $headers := fn:tokenize(fn:head($lines), ",")
   for $row at $row-num in fn:tail($lines)
