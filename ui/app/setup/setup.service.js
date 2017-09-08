@@ -96,7 +96,10 @@
         .then(function(response) {
             return response.data;
           },
-          $q.reject);
+          $q.reject)
+        .catch(function (err) {
+          return {};
+        });
     };
 
     serverConfig.setCharts = function(charts) {
@@ -104,7 +107,8 @@
         .then(function(response) {
             return response.data;
           },
-          $q.reject);
+          $q.reject)
+        .catch(function (err) {});
     };
 
     serverConfig.getDatabaseName = function(cache) {
@@ -113,7 +117,8 @@
           return dbProperties['database-name'];
         },
         $q.reject
-      );
+      )
+      .catch(function (err) {});
     };
 
     serverConfig.getFields = function(cache) {

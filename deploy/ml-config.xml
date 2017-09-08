@@ -30,7 +30,7 @@
             <task-period>2</task-period>
             <task-start-time>13:00:00-05:00</task-start-time>
             <task-database name="@ml.content-db"/>
-            <task-modules name="@ml.app-modules-db"/>
+            <task-modules name="@ml.modules-db"/>
             <task-user name="@ml.app-name-user"/>
           </scheduled-task>
           <scheduled-task>
@@ -40,7 +40,7 @@
             <task-period>2</task-period>
             <task-minute>15</task-minute>
             <task-database name="@ml.content-db"/>
-            <task-modules name="@ml.app-modules-db"/>
+            <task-modules name="@ml.modules-db"/>
             <task-user name="@ml.app-name-user"/>
           </scheduled-task>
           <scheduled-task>
@@ -49,7 +49,7 @@
             <task-type>minutely</task-type>
             <task-period>3</task-period>
             <task-database name="@ml.content-db"/>
-            <task-modules name="@ml.app-modules-db"/>
+            <task-modules name="@ml.modules-db"/>
             <task-user name="@ml.app-name-user"/>
           </scheduled-task>
           <scheduled-task>
@@ -60,7 +60,7 @@
             <task-month-day>15</task-month-day>
             <task-start-time>13:00:00-05:00</task-start-time>
             <task-database name="@ml.content-db"/>
-            <task-modules name="@ml.app-modules-db"/>
+            <task-modules name="@ml.modules-db"/>
             <task-user name="@ml.app-name-user"/>
           </scheduled-task>
           <scheduled-task>
@@ -70,7 +70,7 @@
             <task-period>1</task-period>
             <task-start>2019-01-01T13:00:00-05:00</task-start>
             <task-database name="@ml.content-db"/>
-            <task-modules name="@ml.app-modules-db"/>
+            <task-modules name="@ml.modules-db"/>
             <task-user name="@ml.app-name-user"/>
           </scheduled-task>
           <scheduled-task>
@@ -85,7 +85,7 @@
             </task-days>
             <task-start-time>13:00:00-05:00</task-start-time>
             <task-database name="@ml.content-db"/>
-            <task-modules name="@ml.app-modules-db"/>
+            <task-modules name="@ml.modules-db"/>
             <task-user name="@ml.app-name-user"/>
           </scheduled-task>
         </scheduled-tasks>
@@ -97,7 +97,7 @@
           <http-server-name>@ml.app-name</http-server-name>
           <port>@ml.app-port</port>
           <database name="@ml.content-db"/>
-          <modules name="@ml.app-modules-db"/>
+          <modules name="@ml.modules-db"/>
           <root>@ml.modules-root</root>
           <authentication>@ml.authentication-method</authentication>
           <default-user name="@ml.default-user"/>
@@ -562,7 +562,7 @@
       <namespace>http://marklogic.com/roxy</namespace>
       <local-name>sample</local-name>
       <doc-uri>/app/models/sample.xqy</doc-uri>
-      <db-name>@ml.app-modules-db</db-name>
+      <db-name>@ml.modules-db</db-name>
       <role-name>a-privileged-role</role-name>
     </amp>
 -->
@@ -570,7 +570,7 @@
       <namespace>http://marklogic.com/discovery-app/extension-points/search-decorator</namespace>
       <localname>decorator</localname>
       <doc-uri>/extension-points/search-decorator.xqy</doc-uri>
-      <db-name>@ml.app-modules-db</db-name>
+      <db-name>@ml.modules-db</db-name>
       <role-name>dls-user</role-name>
     </amp>
   </amps>

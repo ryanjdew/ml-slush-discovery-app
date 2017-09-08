@@ -21,6 +21,7 @@
     RegisteredComponents, ServerConfig, qb
   ) {
     var ctrl = this;
+    ctrl.qtext = '';
     var mlSearch = searchFactory.newContext();
 
     ctrl.pageExtensions = RegisteredComponents.pageExtensions();
@@ -51,12 +52,29 @@
       ctrl.search();
     };
 
+    function listFromOperator(operatorArray, operatorType) {
+      return (_.filter(
+        operatorArray,
+        function(val) {
+          return val && val.state && val.state[0] && val.state[0][operatorType];
+        }
+      )[0] || { state: []}).state.map(function(state) {
+        return state.name;
+      });
+    }
+
     ctrl.showMoreFacets = function(facet, facetName) {
       mlSearch.showMoreFacets(facet, facetName);
     };
 
     $scope.$watch(userService.currentUser, function(newValue) {
       ctrl.currentUser = newValue;
+    });
+
+    $scope.$watch(function() {return ctrl.qtext; }, function(newValue) {
+      if (newValue == null || newValue == undefined) {
+        ctrl.qtext = '';
+      }
     });
 
     /* BEGIN Date/DateTime constraint logic */
@@ -72,6 +90,8 @@
     };
 
     mlSearch.getStoredOptions().then(function(data) {
+      ctrl.sortList = listFromOperator(data.options.operator, 'sort-order');
+      ctrl.snippetList = listFromOperator(data.options.operator, 'transform-results');
       ctrl.sortOptions = (_.filter(
         data.options.operator,
         function(val) {

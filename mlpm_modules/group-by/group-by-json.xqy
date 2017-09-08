@@ -70,9 +70,11 @@ declare %private function grpj:cts-query-parser(
 {
   let $json-structured-query := xdmp:to-json(map:get($query, 'query'))
   let $search := sut:search-from-json($json-structured-query)/*
+  let $stored-options := xdmp:unquote(string(map:get($query, 'queryOptions')))
   let $search-resolve := search:resolve(
     $search,
     element search:options {
+      $stored-options/search:options/*,
       element search:return-constraints { fn:false() },
       element search:return-facets { fn:false() },
       element search:return-metrics { fn:false() },

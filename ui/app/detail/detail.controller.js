@@ -7,7 +7,11 @@
 
   function DetailCtrl($scope, doc, RegisteredComponents, $stateParams, $sce) {
     var ctrl = this;
-
+    if (doc.data && doc.data.xml) {
+      ctrl.contentType = 'application/xml';
+    } else if (doc.data && doc.data.json) {
+      ctrl.contentType = 'application/json';
+    }
     ctrl.pageExtensions = RegisteredComponents.pageExtensions();
     ctrl.hasPageExtensions = false;
 
@@ -72,7 +76,8 @@
               metaCount++;
               ctrl.hasMeta = true;
             }
-            var metaName = i18n[metaEl.getAttribute('name')] || metaEl.getAttribute('name') || metaEl.getAttribute('http-equiv')
+            var metaName = i18n[metaEl.getAttribute('name')] ||
+            metaEl.getAttribute('name') || metaEl.getAttribute('http-equiv')
               .replace(/([a-z])([A-Z])/g, '$1 $2')
               .replace(/(\-|\_)/g, ' ');
             metaObj[metaName] = metaEl.getAttribute('content') || ' ';

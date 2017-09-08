@@ -14,7 +14,8 @@
         .then(function(response) {
             return response.data;
           },
-          $q.reject);
+          $q.reject)
+        .catch(function (err) { return {}; });
     };
 
     service.setUIConfig = function(uiConfig) {
@@ -22,7 +23,8 @@
         .then(function(response) {
             return response.data;
           },
-          $q.reject);
+          $q.reject)
+        .catch(function (err) { return {}; });
     };
 
     service.setLayout = function setLayout(uiConfig) {

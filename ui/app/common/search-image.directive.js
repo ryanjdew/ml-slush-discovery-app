@@ -71,7 +71,7 @@
             '<span ng-if="hasUpdatedIcon" class="document-type-icon {{className}}" ' +
             'document-content-type="{{docTypeCleaned}}">' +
             '</span>' +
-          '<span ng-if="!hasUpdatedIcon" class="btn btn-primary btn-xs">' +
+          '<span ng-if="!hasUpdatedIcon" class="btn btn-primary">' +
             '<i class="fa {{ className }}">&nbsp;</i></span>' +
           '</span>',
         link: function (scope, element) {

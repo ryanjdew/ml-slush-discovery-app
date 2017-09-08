@@ -5,9 +5,9 @@
     "jquery": "~2.1.4",
     "angular": "^1.6.6",
     "angular-bootstrap": "^1.1",
-    "angular-cookies": "~1.5.3",
+    "angular-cookies": "^1.6.6",
     "angular-highlightjs": "~0.6.1",
-    "angular-mocks": "~1.5.3",
+    "angular-mocks": "^1.6.6",
     "angular-ui-router": "^1.0.6",
     "angular-x2js": "https://github.com/janmichaelyu/angular-x2js.git",
     "bootstrap": "~3.3.5",
@@ -24,8 +24,10 @@
     "angular-google-maps": "^2.2",
     "ml-google-maps-ng": "^0.0.1",
     "angular-color-picker": "^1.0.10",
-    "ml-analytics-dashboard-ng": "^2.2.1",
-    "ml-search-admin-ng": "*"
+    "ml-analytics-dashboard-ng": "^3.5.0",
+    "ml-search-admin-ng": "*",
+    "socket.io-client": "^2.0.3",
+    "angular-socket-io": "^0.7.0"
   },
   "overrides": {
     "angular-highlightjs": {
@@ -37,6 +39,11 @@
     "vkbeautify-wrapper": {
       "main": [
         "vkbeautify.js"
+      ]
+    },
+    "socket.io-client": {
+      "main": [
+        "dist/socket.io.js"
       ]
     }
   },
@@ -53,6 +60,7 @@
     "highcharts": "^4.2",
     "highcharts-ng": "~0.0.12",
     "sinon": "*",
-    "angular-ui-router": "^1.0.6"
+    "angular-ui-router": "^1.0.6",
+    "ml-analytics-dashboard-ng": "^3.5.0"
   }
 }

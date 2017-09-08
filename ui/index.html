@@ -25,9 +25,6 @@
     <link rel="stylesheet" href="/.tmp/main.css">
     <!-- endinject -->
     <!-- endbuild -->
-
-    <link rel="stylesheet" href="/ui/app/styles/malhar-angular-dashboard.css">
-    <link rel="stylesheet" href="/ui/app/styles/custom.css">
     <style id="ui-styles" type="text/css"></style>
   </head>
   <body ng-app="app">
@@ -73,6 +70,7 @@
     <script src="/bower_components/angular-ui-map/ui-map.js"></script>
     <script src="/bower_components/ml-google-maps-ng/dist/ml-google-maps-ng.js"></script>
     <script src="/bower_components/angular-color-picker/angular-color-picker.js"></script>
+    <script src="/bower_components/angular-animate/angular-animate.js"></script>
     <script src="/bower_components/angular-recursion/angular-recursion.js"></script>
     <script src="/bower_components/jquery-ui/jquery-ui.js"></script>
     <script src="/bower_components/angular-ui-sortable/sortable.js"></script>
@@ -81,12 +79,15 @@
     <script src="/bower_components/ml-analytics-dashboard-ng/dist/ml-analytics-dashboard-ng-templates.js"></script>
     <script src="/bower_components/ml-search-admin-ng/dist/mlSearchAdmin.js"></script>
     <script src="/bower_components/ml-search-admin-ng/dist/ml-search-admin-ng-tpls.min.js"></script>
+    <script src="/bower_components/socket.io-client/dist/socket.io.js"></script>
+    <script src="/bower_components/angular-socket-io/socket.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:js js/app.js -->
     <!-- inject:js -->
     <script src="/ui/app/common/common.module.js"></script>
+    <script src="/ui/app/common/ml-document-markup/ml-document-markup.module.js"></script>
     <script src="/ui/app/components/components.module.js"></script>
     <script src="/ui/app/create/create.module.js"></script>
     <script src="/ui/app/detail/detail.module.js"></script>
@@ -96,10 +97,10 @@
     <script src="/ui/app/message-board/message-board.module.js"></script>
     <script src="/ui/app/root/root.module.js"></script>
     <script src="/ui/app/search/search.module.js"></script>
-    <script src="/ui/app/search/snippet.module.js"></script>
     <script src="/ui/app/setup/setup.module.js"></script>
     <script src="/ui/app/user/user.module.js"></script>
     <script src="/ui/app/app.js"></script>
+    <script src="/ui/app/common/ml-document-markup/ml-document-markup.directive.js"></script>
     <script src="/ui/app/common/search-image.directive.js"></script>
     <script src="/ui/app/common/ui.service.js"></script>
     <script src="/ui/app/common/utility.service.js"></script>
@@ -119,8 +120,8 @@
     <script src="/ui/app/root/root.controller.js"></script>
     <script src="/ui/app/route/routes.js"></script>
     <script src="/ui/app/search/facet-charts.directive.js"></script>
+    <script src="/ui/app/search/ml-select.component.js"></script>
     <script src="/ui/app/search/search.controller.js"></script>
-    <script src="/ui/app/search/snippet.directive.js"></script>
     <script src="/ui/app/setup/dialogs/editGeospatialIndex.js"></script>
     <script src="/ui/app/setup/dialogs/editRangeIndex.js"></script>
     <script src="/ui/app/setup/dialogs/field.js"></script>
