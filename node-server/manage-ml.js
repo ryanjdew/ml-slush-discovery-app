@@ -238,6 +238,7 @@ function createDatabase(req, databaseProperties) {
   var databaseName = databaseProperties['database-name'];
   databaseProperties['collection-lexicon'] = true;
   databaseProperties['triple-index'] = true;
+  databaseProperties['stemmed-searches'] = 'basic';
   passOnToMLManage(
     req,
     new MockRes(d),

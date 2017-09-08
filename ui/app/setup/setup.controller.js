@@ -43,6 +43,10 @@
         function() {
           model.search = {};
           model.isInErrorState = true;
+        })
+        .catch(function() {
+          model.search = {};
+          model.isInErrorState = true;
         });
     }
 

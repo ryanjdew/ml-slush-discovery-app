@@ -96,9 +96,11 @@
         .then(function(response) {
             return response.data;
           },
-          $q.reject)
+          function(response) {
+            return { charts: [] };
+          })
         .catch(function (err) {
-          return {};
+          return { charts: [] };
         });
     };
 

@@ -172,6 +172,7 @@
       <word-lexicons>
         <word-lexicon>http://marklogic.com/collation/</word-lexicon>
       </word-lexicons>
+      <stemmed-searches>basic</stemmed-searches>
       <uri-lexicon>true</uri-lexicon>
       <triple-index>true</triple-index>
       <collection-lexicon>true</collection-lexicon>
