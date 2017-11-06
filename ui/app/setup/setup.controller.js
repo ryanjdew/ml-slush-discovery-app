@@ -74,6 +74,10 @@
           )[0];
         model.uiConfig = config.uiConfig;
         model.databaseOptions = config.databases;
+        model.existingIndexes = angular.extend({},
+          model.rangeIndexes,
+          model.geospatialIndexes,
+          model.fields)
         $scope.$emit('uiConfigChanged', model.uiConfig);
       });
     }
