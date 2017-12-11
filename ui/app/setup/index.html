@@ -134,12 +134,12 @@
       </div>
     </div>
     <div ng-show="state === 'constraints'">
-      <ml-constraints constraints="model.constraints" existing-indexes="model.existingIndexes"></ml-constraints>
+      <ml-constraints constraints="model.constraints" existing-indexes="model.existingIndexes" save-callback="loadResultsTab()"></ml-constraints>
     </div>
   </div>
   <div ng-show="state === 'suggestions'">
-    <ml-suggest-options constraints="model.constraints" default-source="model.searchOptions.options['default-suggest-source']"></ml-suggest-options>
-    <ml-sort-options constraints="model.constraints" sort-options="model.sortOptions"></ml-sort-options>
+    <ml-suggest-options constraints="model.constraints" default-source="model.searchOptions.options['default-suggest-source']" save-callback="loadResultsTab()"></ml-suggest-options>
+    <ml-sort-options constraints="model.constraints" sort-options="model.sortOptions" save-callback="loadResultsTab()"></ml-sort-options>
   </div>
   <div ng-show="state === 'uiConfig'">
     <div class="panel panel-default">
@@ -220,36 +220,41 @@
         <div class="col-md-9">
           <facet-charts charts="model.chartData.charts" ml-search="mlSearch" remove-chart="removeChart" edit-chart="editChart" callback="toggleFacet(facet, value)"></facet-charts>
           <section class="well well-xs">
-              <h3>Result display settings</h3>
-              <div class="margin-bottom-sm">
-                <strong>Title:</strong>
-                <span ng-repeat="part in model.uiConfig['result-label']" class="btn btn-primary btn-xs">
+            <h3>Result display settings</h3>
+            <div class="margin-bottom-sm">
+              <strong>Title:</strong>
+              <span ng-repeat="part in model.uiConfig['result-label']" class="btn btn-primary btn-xs">
                 <span ng-if="part.type === 'element'">Element/JSON Property:</span>
-                <span ng-if="part.type === 'attribute'">Attribute:</span>
-                <span ng-if="part.type === 'path'">Path:</span>
-                <span ng-if="part.value.elementNamespace">{{part.value.elementNamespace}}:</span>
-                <span ng-if="part.type === 'text'">"</span>{{ part.value.element || part.value }}<span ng-if="part.type === 'text'">"</span>
-                <span ng-if="  part.value.attribute">/@<span ng-if="part.value.attributeNamespace">  {{part.value.attributeNamespace}}:</span>{{part.value.attribute}}</span>
-                <a class="badge" ng-click="removeLabelPart($index)">&times;</a>
-                </span>
-              </div>
-              <button class="btn btn-primary" ng-click="addLabelPart()">Add Item</button>
-              <div class="margin-bottom-sm">
-                <strong>Metadata:</strong>
-                <span ng-repeat="part in model.uiConfig['result-metadata']" class="btn btn-primary btn-xs">
+              <span ng-if="part.type === 'attribute'">Attribute:</span>
+              <span ng-if="part.type === 'path'">Path:</span>
+              <span ng-if="part.value.elementNamespace">{{part.value.elementNamespace}}:</span>
+              <span ng-if="part.type === 'text'">"</span>{{ part.value.element || part.value }}<span ng-if="part.type === 'text'">"</span>
+              <span ng-if="  part.value.attribute">/@<span ng-if="part.value.attributeNamespace">  {{part.value.attributeNamespace}}:</span>{{part.value.attribute}}</span>
+              <a class="badge" ng-click="removeLabelPart($index)">&times;</a>
+              </span>
+            </div>
+            <button class="btn btn-primary" ng-click="addLabelPart()">Add Item</button>
+            <div class="margin-bottom-sm">
+              <strong>Metadata:</strong>
+              <span ng-repeat="part in model.uiConfig['result-metadata']" class="btn btn-primary btn-xs">
                 <span ng-if="part.label">Label: "{{part.label}}"</span>
-                <span ng-if="part.type === 'element'">Element/JSON Property:</span>
-                <span ng-if="part.type === 'attribute'">Attribute:</span>
-                <span ng-if="part.type === 'path'">Path:</span>
-                <span ng-if="part.value.elementNamespace">{{part.value.elementNamespace}}:</span>
-                <span ng-if="part.type === 'text'">"</span>{{ part.value.element || part.value }}<span ng-if="part.type === 'text'">"</span>
-                <span ng-if="part.value.attribute">/@<span ng-if="part.value.attributeNamespace">{{part.value.attributeNamespace}}:</span>{{part.value.attribute}}</span>
-                <a class="badge" ng-click="removeResultMetadata($index)">&times;</a>
-                </span>
-              </div>
-              <button class="btn btn-primary" ng-click="addResultMetadata()">Add Item</button>
+              <span ng-if="part.type === 'element'">Element/JSON Property:</span>
+              <span ng-if="part.type === 'attribute'">Attribute:</span>
+              <span ng-if="part.type === 'path'">Path:</span>
+              <span ng-if="part.value.elementNamespace">{{part.value.elementNamespace}}:</span>
+              <span ng-if="part.type === 'text'">"</span>{{ part.value.element || part.value }}<span ng-if="part.type === 'text'">"</span>
+              <span ng-if="part.value.attribute">/@<span ng-if="part.value.attributeNamespace">{{part.value.attributeNamespace}}:</span>{{part.value.attribute}}</span>
+              <a class="badge" ng-click="removeResultMetadata($index)">&times;</a>
+              </span>
+            </div>
+            <button class="btn btn-primary" ng-click="addResultMetadata()">Add Item</button>
           </section>
-          <ml-results results="model.search.results" template="app/search/search-results.html"></ml-results>
+          <div class="col-sm-12 col-lg-5" id="search-operator-dropdowns">
+            <ml-select label="'Snippet Size'" current-selection="mlSearch.getSnippet() || 'compact'" selection-list="model.snippetList"></ml-select>
+            <ml-select label="'Sort'" current-selection="mlSearch.getSort() || 'score'" selection-list="model.sortList"></ml-select>
+          </div>
+          <div class="col-sm-12">
+            <ml-results results="model.search.results" template="app/search/search-results.html"></ml-results>
           </div>
         </div>
       </div>

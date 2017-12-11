@@ -66,6 +66,11 @@
         model.geospatialIndexes = config.geospatialIndexes;
         model.searchOptions = config.searchOptions;
         model.constraints = config.searchOptions.options.constraint;
+        model.sortList = listFromOperator(config.searchOptions.options.operator, 'sort-order');
+        model.snippetList = listFromOperator(
+          config.searchOptions.options.operator,
+          'transform-results'
+        );
         model.sortOptions = _.filter(
             config.searchOptions.options.operator,
             function(val) {
@@ -82,6 +87,17 @@
       });
     }
     init();
+
+    function listFromOperator(operatorArray, operatorType) {
+      return (_.filter(
+        operatorArray,
+        function(val) {
+          return val && val.state && val.state[0] && val.state[0][operatorType];
+        }
+      )[0] || { state: []}).state.map(function(state) {
+        return state.name;
+      });
+    }
 
     angular.extend($scope, {
       model: model,
@@ -181,6 +197,12 @@
               $scope.redrawCharts();
             });
           }, handleError);
+      },
+      loadResultsTab: function() {
+        updateSearchResults().then(function() {
+          $scope.state = 'appearance';
+          $scope.redrawCharts();
+        });
       },
       removeCollection: function(index) {
         ServerConfig.removeDataCollection(model.dataCollections[index]).then(function() {

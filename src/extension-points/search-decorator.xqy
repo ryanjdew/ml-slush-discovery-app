@@ -68,7 +68,7 @@ declare function search-dec:_build-metadata($doc, $parts, $base-object) as xs:st
     xdmp:to-json-string($base-object)
   else
     let $part := fn:head($parts)
-    let $qname-label := xs:QName(xdmp:encode-for-NCName($part/label))
+    let $qname-label := fn:head((fn:string($part/label), "blank")[. ne ''])
     let $value := search-dec:get-value-from-part($doc, $part)
     return
       search-dec:_build-metadata(

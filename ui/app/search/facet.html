@@ -2,7 +2,7 @@
   <ml-chiclets ng-if="shouldNegate" active-facets="activeFacets" toggle="toggle({facet:facet, value:value})" truncate="{{ truncateLength }}"></ml-chiclets>
   <div ng-if="(activeFacets | object2Array).length"><small class="pull-right"><a ng-click="$parent.$parent.ctrl.clearFacets()">clear all</a></small></div>
   <div class="facet" ng-if="filter(facet.facetValues, {selected: '!'+true}, false).length" ng-repeat="(index, facet) in facets | object2Array">
-    <h3>{{ $parent.$parent.$parent.decodeURIComponent(facet.__key) }}</h3>
+    <h3>{{ facet.__key | decodeString | decodeString }}</h3>
     <div ng-repeat="value in facet.facetValues | filter:{selected: '!'+true}:false">
       <i class="fa fa-plus-circle facet-add-pos" ng-click="toggle({facet: facet.__key, value: value.name})"></i>
       <span ng-if="!!value.name" title="{{ value.name }}">{{ value.name | truncate:truncateLength }}</span>
