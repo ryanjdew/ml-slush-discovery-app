@@ -78,7 +78,7 @@ function proxy(req, res) {
   var origUrl = req.originalUrl;
   var separator = /\?/.test(origUrl) ? '&' : '?';
   var databaseParam;
-  if (/^\/(alert|documents|graphs|keyvalue|qbe|resources|search|suggest|values)/.test(req.path) &&
+  if (/^(\/(v[0-9]+|LATEST))?\/(alert|documents|graphs|keyvalue|qbe|resources|search|suggest|values)/.test(req.path) &&
     manageML.database()) {
     databaseParam = separator + 'database=' + manageML.database();
   }
@@ -161,7 +161,7 @@ function proxy(req, res) {
   });
 }
 
-function noCache(response){
+function noCache(response) {
   response.append('Cache-Control', 'no-cache, must-revalidate');//HTTP 1.1 - must-revalidate
   response.append('Pragma', 'no-cache');//HTTP 1.0
   response.append('Expires', 'Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
