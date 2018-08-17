@@ -20,7 +20,7 @@
     "ng-sortable": "^1.3.8",
     "vkbeautify": "https://github.com/vkiryukhin/vkBeautify.git",
     "highcharts": "^6.1.1",
-    "ml-highcharts-ng": ">=0.0.11",
+    "ml-highcharts-ng": "^0.0.19",
     "angular-google-maps": "^2.4.1",
     "ml-google-maps-ng": "^0.0.1",
     "angular-color-picker": "^1.0.11",
