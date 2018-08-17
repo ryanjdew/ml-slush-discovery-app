@@ -18,9 +18,9 @@
       </div>
     </div>
     <div class="row">
-      <uib-tabset active="ctrl.defaultTab" type="pills">
-        <uib-tab ng-show="ctrl.html">
-          <uib-tab-heading>Display</uib-tab-heading>
+      <div uib-tabset active="ctrl.defaultTab" type="pills">
+        <div uib-tab ng-show="ctrl.html">
+          <div uib-tab-heading>Display</div>
           <div class="col-sm-10">
             <div>
               <div ng-if="ctrl.meta.length" class="alert alert-info col-md-12">
@@ -34,9 +34,9 @@
               <div class="clearfix" ng-bind-html="ctrl.html"></div>
             </div>
           </div>
-        </uib-tab>
-        <uib-tab ng-show="ctrl.binaryType && ctrl.binaryType !== 'other'">
-          <uib-tab-heading>Binary Preview</uib-tab-heading>
+        </div>
+        <div uib-tab ng-show="ctrl.binaryType && ctrl.binaryType !== 'other'">
+          <div uib-tab-heading>Binary Preview</div>
           <div class="col-sm-10">
             <div>
               <div ng-if="ctrl.binaryType === 'pdf'">
@@ -47,20 +47,20 @@
               </div>
             </div>
           </div>
-        </uib-tab>
-        <uib-tab>
-          <uib-tab-heading>JSON</uib-tab-heading>
+        </div>
+        <div uib-tab>
+          <div uib-tab-heading>JSON</div>
           <div class="col-sm-10">
             <div>
               <json-explorer data="ctrl.json"></json-explorer>
             </div>
           </div>
-        </uib-tab>
-        <uib-tab>
-          <uib-tab-heading>XML</uib-tab-heading>
+        </div>
+        <div uib-tab>
+          <div uib-tab-heading>XML</div>
           <div class="col-sm-10" hljs hljs-no-escape hljs-source="ctrl.xml"></div>
-        </uib-tab>
-      </uib-tabset>
+        </div>
+      </div>
     </div>
   </div>
   <div class="col-sm-4">
@@ -71,15 +71,15 @@
         <ml-similar uri="{{ctrl.uri}}" limit="5"></ml-similar>
       </div>
     </div>
-    <uib-accordion ng-repeat="pageExtension in ctrl.pageExtensions" close-others="false" ng-show="pageExtension.active" ng-init="pageExtension.open = true">
-      <uib-accordion-group is-open="pageExtension.open">
-        <uib-accordion-heading>
+    <div uib-accordion ng-repeat="pageExtension in ctrl.pageExtensions" close-others="false" ng-show="pageExtension.active" ng-init="pageExtension.open = true">
+      <div uib-accordion-group is-open="pageExtension.open">
+        <div uib-accordion-heading>
           <strong>{{pageExtension.name}}</strong>
           <a class="pull-right"><span class="glyphicon" ng-class="{'glyphicon-chevron-down': pageExtension.open, 'glyphicon-chevron-right': !pageExtension.open}"></span></a>
-        </uib-accordion-heading>
+        </div>
         <div compile="pageExtension.html">
         </div>
-      </uib-accordion-group>
-    </uib-accordion>
+      </div>
+    </div>
   </div>
 </div>
