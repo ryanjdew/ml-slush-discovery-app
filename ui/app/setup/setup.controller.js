@@ -65,7 +65,7 @@
         model.rangeIndexes = config.rangeIndexes;
         model.geospatialIndexes = config.geospatialIndexes;
         model.searchOptions = config.searchOptions;
-        model.constraints = config.searchOptions.options.constraint;
+        model.constraints = config.searchOptions.options.constraint || [];
         model.sortList = listFromOperator(config.searchOptions.options.operator, 'sort-order');
         model.snippetList = listFromOperator(
           config.searchOptions.options.operator,
