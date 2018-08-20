@@ -157,14 +157,21 @@ declare function expand:csv(
   let $headers := fn:tokenize(fn:head($lines), ",")
   for $row at $row-num in fn:tail($lines)
   let $properties :=
-    if (fn:matches($row, '"([^"]+)"')) then
-      for $part in fn:analyze-string($row ,'"([^"]+)"')/*
-      return
+    (: TODO support multi-line quoted fields :)
+    if (fn:matches($row, '(^|,)\s*"([^"]*|(.*"{2,2}.*)+)"')) then
+      for $part in fn:analyze-string($row ,'(^|,)\s*"([^"]*|(.*"{2,2}.*)+)"')/*
+      return (
         typeswitch($part)
         case element(fn:match) return
-          fn:string($part/fn:group)
+          fn:replace(fn:replace(fn:replace(fn:string($part/fn:group[@nr=2]), '^"', ""), '"$', ""),'""','"')
         default return
-          fn:tokenize($part, "\s*,\s*") ! fn:normalize-space()[. ne '']
+          let $tokenized := fn:tokenize($part, "\s*,\s*")
+          return
+            if ($part/preceding-sibling::*[1] instance of element(fn:match) and fn:head($tokenized) eq '') then
+              fn:tail($tokenized)
+            else
+              $tokenized
+      )
     else
       fn:tokenize($row, "\s*,\s*")
   return
