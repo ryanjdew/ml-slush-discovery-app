@@ -76,7 +76,12 @@ declare function trns:to-html($node as node())
           )
         }
       else
-        text{fn:string($node)}
+        let $str := fn:string($node)
+        return
+          if (fn:matches($str, "^(https?|ftp|file)://[-a-zA-Z0-9+&amp;@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&amp;@#/%=~_|]")) then
+            element a { attribute href {$str}, attribute target {"_blank"}, $str}
+          else
+            text{fn:string($node)}
     case array-node() return
       element ul {
         for $child in $node/node()
@@ -86,7 +91,12 @@ declare function trns:to-html($node as node())
     case comment() return
       ()
     default return
-      text { fn:string($node) }
+      let $str := fn:string($node)
+      return
+        if (fn:matches($str, "^(https?|ftp|file)://[-a-zA-Z0-9+&amp;@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&amp;@#/%=~_|]")) then
+          element a { attribute href {$str}, attribute target {"_blank"}, $str}
+        else
+          text{fn:string($node)}
 };
 
 declare function trns:human-readable-name($string as xs:string)
