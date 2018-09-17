@@ -1,0 +1,5 @@
+<div ui-tree id="tree-root">
+  <ul ui-tree-nodes ng-model="$ctrl.topLevelNodes">
+    <li ng-repeat="node in $ctrl.topLevelNodes" ng-if="$ctrl.shouldShowEmpty(node)" ui-tree-node data-nodrag data-collapsed="true" ng-init="$ctrl.requestNodes(node)" ng-include="'app/search/ml-nodes-renderer.html'"></li>
+  </ul>
+</div>

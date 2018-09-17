@@ -3,7 +3,7 @@
     <div class="col-md-12">
       <ml-input qtext="ctrl.qtext" search="ctrl.search(qtext)" suggest="ctrl.suggest(val)" template="app/search/ml-input-fa.html" class="search"></ml-input>
     </div>
-    <div class="facets-col col-sm-3">
+    <div class="facets-col col-sm-4">
       <div class="facet" ng-repeat="(constraintName, constraint) in ctrl.dateTimeConstraints">
         <h3>{{constraintName}}</h3>
         <div class="input-daterange input-group">
@@ -16,16 +16,16 @@
       </div>
       <ml-facets template="app/search/facet.html" facets="ctrl.response.facets" toggle="ctrl.toggleFacet(facet, value)" active-facets="ctrl.mlSearch.activeFacets" negate="ctrl.toggleNegatedFacet(facet,value)" show-more="ctrl.showMoreFacets(facet, facetName)"></ml-facets>
     </div>
-    <div class="col-sm-9">
+    <div class="col-sm-8">
       <h4 ng-if="ctrl.response.total === 0">No results to show</h4>
       <div ng-if="ctrl.response.total > 0" class="results">
         <facet-charts charts="ctrl.charts" ml-search="ctrl.mlSearch" callback="ctrl.chartItemSelected"></facet-charts>
         <div class="pagination-ctrls">
-          <uib-pagination class="pagination pagination-sm" ng-model="ctrl.page" ng-change=" ctrl.search()" max-size="10" boundary-links="true" total-items="ctrl.response.total" items-per-page="ctrl.response['page-length']">
-          </uib-pagination>
+          <ul uib-pagination class="pagination pagination-sm" ng-model="ctrl.page" ng-change=" ctrl.search()" max-size="10" boundary-links="true" total-items="ctrl.response.total" items-per-page="ctrl.response['page-length']">
+          </ul>
           <div class="col-sm-12 col-lg-5" id="search-operator-dropdowns">
-            <ml-select label="'Snippet Size'" current-selection="ctrl.mlSearch.getSnippet() || 'compact'" selection-list="ctrl.snippetList" on-select="ctrl.setSnippet(selectionName)"></ml-select>
-            <ml-select label="'Sort'" current-selection="ctrl.mlSearch.getSort() || 'score'" selection-list="ctrl.sortList" on-select="ctrl.setSort(selectionName)"></ml-select>
+            <ml-select class="col-sm-8" label="'Snippet Size'" current-selection="ctrl.mlSearch.getSnippet() || 'compact'" selection-list="ctrl.snippetList" on-select="ctrl.setSnippet(selectionName)"></ml-select>
+            <ml-select class="col-sm-4" label="'Sort'" current-selection="ctrl.mlSearch.getSort() || 'score'" selection-list="ctrl.sortList" on-select="ctrl.setSort(selectionName)"></ml-select>
           </div>
         </div>
         <ml-metrics search="ctrl.response"></ml-metrics>

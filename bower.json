@@ -27,7 +27,8 @@
     "ml-analytics-dashboard-ng": "^3.5.0",
     "ml-search-admin-ng": "^0.0.2",
     "socket.io-client": "^2.0.3",
-    "angular-socket-io": "^0.7.0"
+    "angular-socket-io": "^0.7.0",
+    "angular-ui-tree": "^2.22.6"
   },
   "overrides": {
     "angular-highlightjs": {

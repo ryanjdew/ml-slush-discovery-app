@@ -1,0 +1,18 @@
+<div>
+<div ui-tree-handle class="tree-node tree-node-content" ng-class="node.highlight ? 'tree-highlighted' : '' ">
+  <em class="fa-lg fa fa-spinner fa-spin" data-nodrag ng-if="!node.nodes"></em>
+  <a class="btn tree-btn-success btn-xs" data-nodrag ng-click="node.show=!node.show"
+    ng-if="node.nodes.length > 0">
+    <span class="glyphicon" ng-class="{
+                'glyphicon-chevron-right': !node.show,
+                'glyphicon-chevron-down': node.show
+              }"></span>
+  </a>
+  <span class="hierarchicalFacetTitle" ng-click="$ctrl.clickFacetTitle(node.iri)">{{node.label}} </span>
+  <span>({{node.count}})</span>
+</div>
+<ul ng-if="node.show" ui-tree-nodes ng-model="$ctrl.nodes">
+  <li ng-if="$ctrl.shouldShowEmpty(node)" ng-repeat="node in $ctrl.getNodes(node)" ng-init="$ctrl.requestNodes(node)" ui-tree-node data-collapsed="true" ng-include="'app/search/ml-nodes-renderer.html'">
+  </li>
+</ul>
+</div>

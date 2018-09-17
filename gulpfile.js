@@ -231,8 +231,8 @@ gulp.task('optimize', gulp.series('inject'/*, 'test'*/, function() {
 
   // Filters are named for the gulp-useref path
   var cssFilter = $.filter('**/*.css', {restore: true});
-  var jsAppFilter = $.filter('**/' + config.optimized.app, {restore: true});
-  var jslibFilter = $.filter('**/' + config.optimized.lib, {restore: true});
+  //var jsAppFilter = $.filter('**/' + config.optimized.app, {restore: true});
+  //var jslibFilter = $.filter('**/' + config.optimized.lib, {restore: true});
 
   var templateCache = config.temp + config.templateCache.file;
 
@@ -253,7 +253,7 @@ gulp.task('optimize', gulp.series('inject'/*, 'test'*/, function() {
     // write sourcemap for css
     .pipe($.sourcemaps.write('.'))
     .pipe(cssFilter.restore)
-
+/*
     // Get the custom javascript
     .pipe(jsAppFilter)
     // Take inventory of the js app file name for future rev numbers
@@ -277,7 +277,7 @@ gulp.task('optimize', gulp.series('inject'/*, 'test'*/, function() {
 
     // Rename the recorded file names in the steam, and in the html to append rev numbers
     .pipe($.revReplace())
-
+*/
     // copy result to dist/, and print some logging..
     .pipe(gulp.dest(config.build))
     .pipe($.if(args.verbose, $.print()));

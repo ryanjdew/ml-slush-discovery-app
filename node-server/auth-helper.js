@@ -48,6 +48,8 @@ function clearAuthenticator(session) {
 }
 
 function createAuthenticator(session, host, port, user, password, challenge) {
+  user = user || defaultOptions.authUser;
+  password = password || defaultOptions.authPassword;
   var authenticator = www_authenticate.call(null, user, password)(challenge);
   if (!session.authenticators) {
     session.authenticators = {};
