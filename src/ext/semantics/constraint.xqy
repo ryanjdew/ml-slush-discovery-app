@@ -11,12 +11,14 @@ declare variable $all-child-IRIs-queries as map:map := map:new((
   map:entry('SKOS','
         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-        SELECT DISTINCT ?iri WHERE {
+        SELECT DISTINCT ?label WHERE {
           {
-            ?iri skos:broader* $parentIRI.
+            ?iri skos:broader* $parentIRI;
+              (skos:prefLabel|skos:altLabel) ?label.
           } UNION {
             $parentIRI skos:hasTopConcept ?item.
-            ?iri skos:broader* ?item.
+            ?iri skos:broader* ?item;
+              (skos:prefLabel|skos:altLabel) ?label.
           }
         }
         '),
@@ -38,15 +40,16 @@ let $s := $query-elem/(search:text|search:value) ! sem:iri(fn:string(.))
 let $query := <root>{
       if (map:contains($all-child-IRIs-queries, $constraint-name)) then
         let $sparql := map:get($all-child-IRIs-queries, $constraint-name)
-        let $all-child-IRIs := fn:distinct-values((
-            $s,
-            sem:sparql($sparql, map:entry('parentIRI', $s)) ! map:get(., 'iri')
-          ))
+        let $all-child-values := sem:sparql($sparql, map:entry('parentIRI', $s)) ! (map:get(., 'iri'),map:get(., 'label'))
         return
+          typeswitch ($all-child-values)
+          case sem:iri+ return
             cts:or-query((
-              cts:registered-query(cts:register(cts:triple-range-query($all-child-IRIs, (), (), "="))),
-              cts:registered-query(cts:register(cts:triple-range-query((), (), $all-child-IRIs, "=")))
+              cts:registered-query(cts:register(cts:triple-range-query($all-child-values, (), (), "="))),
+              cts:registered-query(cts:register(cts:triple-range-query((), (), $all-child-values, "=")))
             ))
+          default return
+            cts:word-query($all-child-values ! fn:string(.), ('case-insensitive','punctuation-insensitive'))
       else
         cts:and-query(())
     }</root>/*

@@ -453,7 +453,7 @@
                 parent[childPropertyName].push(childTriple);
               }
             });
-          } else if (response.data) {
+          } else if (response && response.data) {
             parent[childPropertyName] = response.data.childTriples;
           }
         });
